@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>অপারেটিং সিস্টেম · মডিউল ২ — Process ও Scheduling</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#12100e;--paper:#f5f1e8;--paper2:#ece5d6;--line:#d6ccb6;--accent:#1a6b5a;--accent2:#b8501f;--brown:#7a4a1e;--blue:#25608f;--plum:#6a3d7a;--green:#3d6b2f;--muted:#6a6152;--code-bg:#161a17;--code-ink:#e6ece6}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:18px;line-height:1.82}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace}
+  .wrap{display:flex;min-height:100vh}
+  aside{width:296px;flex-shrink:0;background:var(--paper2);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 20px}
+  main{flex:1;max-width:880px;margin:0 auto;padding:50px 50px 130px}
+  aside .brand{font-weight:700;font-size:1.02rem;line-height:1.35;color:var(--accent)}
+  aside .brand small{display:block;font-weight:400;font-size:.66rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;margin-top:7px}
+  aside nav{margin-top:20px}
+  aside nav a{display:block;text-decoration:none;color:var(--ink);padding:6px 11px;border-radius:7px;font-size:.87rem;margin-bottom:1px}
+  aside nav a .n{color:var(--accent);font-weight:600;font-family:'JetBrains Mono';font-size:.73rem;margin-right:7px}
+  aside nav a:hover{background:var(--paper)}
+  aside nav a.active{background:var(--accent);color:#fff}
+  aside nav a.active .n{color:#c9ece4}
+  aside .modtag{font-size:.67rem;background:var(--accent2);color:#fff;padding:2px 9px;border-radius:20px;letter-spacing:.07em;display:inline-block;margin-top:13px}
+  .hero{border-bottom:2px solid var(--ink);padding-bottom:30px;margin-bottom:44px}
+  .hero .eyebrow{font-family:'JetBrains Mono';font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:15px}
+  .hero h1{font-size:2.8rem;line-height:1.08;margin:0 0 15px;font-weight:700;letter-spacing:-.6px}
+  .hero p{font-size:1.1rem;color:var(--muted);max-width:60ch;margin:0}
+  section.chapter{margin-bottom:72px;scroll-margin-top:20px}
+  .ch-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:26px}
+  .ch-head .ch-num{font-family:'JetBrains Mono';font-size:2.1rem;font-weight:600;color:var(--accent);line-height:1}
+  .ch-head h2{font-size:1.72rem;margin:0;font-weight:700;letter-spacing:-.3px}
+  .ch-head .ch-sub{font-size:.79rem;color:var(--muted);font-family:'JetBrains Mono'}
+  h3{font-size:1.24rem;margin:34px 0 12px;font-weight:600}
+  h4{font-size:1.02rem;margin:22px 0 8px;font-weight:600;color:var(--accent)}
+  p{margin:12px 0}
+  .lead{font-size:1.04rem}
+  .box{border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.95rem;line-height:1.72}
+  .analogy{background:#fff5e6;border:1px solid #e6cb9c}
+  .analogy .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .note{background:#e7f1ee;border:1px solid #b2d4ca}
+  .note .tag{font-weight:700;color:var(--accent);font-size:.79rem;display:block;margin-bottom:5px}
+  .deep{background:#efe9f2;border:1px solid #cbb6d6}
+  .deep .tag{font-weight:700;color:var(--plum);font-size:.79rem;display:block;margin-bottom:5px}
+  .warn{background:#fceadf;border:1px solid #ecbb9d}
+  .warn .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .lab{background:#eaf1e4;border:1px solid #b6cfa2}
+  .lab .tag{font-weight:700;color:var(--green);font-size:.79rem;display:block;margin-bottom:5px}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:.81rem;line-height:1.62;margin:16px 0}
+  pre .c{color:#8a9b8f}
+  pre .k{color:#7fd6bd}
+  pre .s{color:#c8b88a}
+  pre .f{color:#8fb8e0}
+  p code,li code,td code{background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.83em;color:var(--accent2)}
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.88rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--paper2);font-weight:600;font-size:.82rem}
+  tr:hover td{background:#fff8ee}
+  figure{margin:26px 0}
+  .diagram{background:#fffdf7;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center}
+  figcaption{font-size:.82rem;color:var(--muted);text-align:center;margin-top:10px;font-style:italic}
+  svg{max-width:100%;height:auto}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  .quiz{background:var(--paper2);border:1px dashed var(--accent);border-radius:12px;padding:18px 22px;margin:24px 0}
+  .quiz .tag{font-weight:700;color:var(--accent);display:block;margin-bottom:8px;font-size:.86rem}
+  .quiz summary{cursor:pointer;font-weight:500;margin:8px 0}
+  .quiz details p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
+  .toc-hint{color:var(--muted);font-size:.76rem;margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+  @media(max-width:900px){aside{display:none}main{padding:28px 20px 90px}.hero h1{font-size:1.95rem}body{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+  <div class="brand">অপারেটিং সিস্টেম<small>মডিউল ২ · Process</small></div>
+  <span class="modtag">VIRTUALIZING THE CPU</span>
+  <nav id="toc">
+    <a href="#ch0"><span class="n">০০</span>শুরুর কথা</a>
+    <a href="#ch1"><span class="n">০১</span>Process কী</a>
+    <a href="#ch2"><span class="n">০২</span>Process-এর জীবনচক্র</a>
+    <a href="#ch3"><span class="n">০৩</span>fork / exec / wait</a>
+    <a href="#ch4"><span class="n">০৪</span>Context Switch</a>
+    <a href="#ch5"><span class="n">০৫</span>CPU Scheduling</a>
+    <a href="#ch6"><span class="n">০৬</span>Thread</a>
+    <a href="#ch7"><span class="n">০৭</span>IPC</a>
+    <a href="#ch8"><span class="n">০৮</span>প্রজেক্ট: নিজের shell</a>
+  </nav>
+  <div class="toc-hint">সবুজ = হাতে-কলমে ল্যাব। বেগুনি = গভীর প্রযুক্তিগত অংশ। প্রতিটা কোড নিজে চালিয়ে দেখুন।</div>
+</aside>
+<main>
+  <div class="hero">
+    <div class="eyebrow">মডিউল ২ · Virtualizing the CPU</div>
+    <h1>Process ও<br>Scheduling</h1>
+    <p>একটা CPU, অথচ শত শত প্রোগ্রাম একসাথে চলছে বলে মনে হয়। এই জাদুটা কীভাবে হয়? Process কী, কীভাবে তৈরি হয়, আর OS কীভাবে ঠিক করে কে কখন CPU পাবে — সব এই মডিউলে, নিজের shell বানানো পর্যন্ত।</p>
+  </div>
+
+  <section class="chapter" id="ch0">
+    <div class="ch-head"><span class="ch-num">০০</span><div><h2>শুরুর কথা</h2><div class="ch-sub">orientation</div></div></div>
+    <p class="lead">মডিউল ১-এ শিখেছি OS কী আর কীভাবে হার্ডওয়্যারের সাথে কথা বলে। এবার প্রথম বড় ধারণা — <strong>Virtualization</strong>। শুরু CPU দিয়ে: একটা প্রসেসরকে কীভাবে অনেক ভাগে "ভাগ" করে দেখানো হয়।</p>
+    <div class="box note"><span class="tag">🧭 এই মডিউল কোথায় ফিট করে</span>
+    OSTEP-এর প্রথম স্তম্ভ Virtualization-এর দুই অংশ: <strong>CPU virtualization</strong> (এই মডিউল — process, scheduling) আর <strong>memory virtualization</strong> (মডিউল ৩)। এখানকার মূল প্রশ্ন: একটা মাত্র CPU থাকলেও কীভাবে মনে হয় যে ব্রাউজার, গান, এডিটর সব একসাথে চলছে?</div>
+    <div class="box lab"><span class="tag">🛠 পরিবেশ</span>
+    মডিউল ১-এর মতোই Linux (বা WSL2) লাগবে। এই মডিউলে অনেক C কোড চালাবেন — <code>gcc</code> থাকলেই যথেষ্ট। প্রজেক্টের জন্য কোনো বাড়তি লাইব্রেরি লাগবে না, সব POSIX system call।</div>
+  </section>
+
+  <section class="chapter" id="ch1">
+    <div class="ch-head"><span class="ch-num">০১</span><div><h2>Process আসলে কী?</h2><div class="ch-sub">what-is-a-process</div></div></div>
+    <p class="lead">সহজ কথায়, <strong>process হলো একটা চলন্ত প্রোগ্রাম</strong>। কিন্তু এই পার্থক্যটা গুরুত্বপূর্ণ — প্রোগ্রাম আর process এক জিনিস নয়।</p>
+    <div class="box analogy"><span class="tag">🍰 উপমা — রেসিপি বনাম রান্না</span>
+    একটা <strong>রেসিপি</strong> (প্রোগ্রাম) হলো কাগজে লেখা নিষ্ক্রিয় নির্দেশনা — disk-এ পড়ে থাকা একটা ফাইল। যখন আপনি সেটা ধরে সত্যিই রান্না শুরু করেন — উপকরণ নেন, চুলা জ্বালান — তখন সেটা একটা <strong>process</strong>। একই রেসিপি থেকে দুজন একসাথে রান্না করতে পারে (একই প্রোগ্রামের দুটো process), কিন্তু প্রত্যেকের নিজের বাটি, চুলা, অগ্রগতি আলাদা।</div>
+    <h3>একটা process-এর ভেতরে কী থাকে</h3>
+    <p>প্রতিটা process-এর নিজস্ব একটা জগৎ (address space) থাকে। এতে কী কী থাকে:</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 460 330" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <text x="230" y="20" text-anchor="middle" font-size="12" font-weight="600">একটা process-এর memory (address space)</text>
+        <!-- boxes stacked -->
+        <rect x="120" y="35" width="220" height="42" rx="6" fill="#e6eef5" stroke="#25608f"/>
+        <text x="230" y="55" text-anchor="middle" font-size="11" font-weight="600">Text (কোড)</text>
+        <text x="230" y="70" text-anchor="middle" font-size="9" fill="#6a6152">প্রোগ্রামের instruction</text>
+        <rect x="120" y="80" width="220" height="42" rx="6" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="230" y="100" text-anchor="middle" font-size="11" font-weight="600">Data</text>
+        <text x="230" y="115" text-anchor="middle" font-size="9" fill="#6a6152">global ও static variable</text>
+        <rect x="120" y="125" width="220" height="55" rx="6" fill="#fff5e6" stroke="#b8501f"/>
+        <text x="230" y="147" text-anchor="middle" font-size="11" font-weight="600">Heap ↓</text>
+        <text x="230" y="163" text-anchor="middle" font-size="9" fill="#6a6152">malloc() — চলার সময় বাড়ে (নিচে নামে)</text>
+        <rect x="120" y="230" width="220" height="55" rx="6" fill="#efe9f2" stroke="#6a3d7a"/>
+        <text x="230" y="252" text-anchor="middle" font-size="11" font-weight="600">Stack ↑</text>
+        <text x="230" y="268" text-anchor="middle" font-size="9" fill="#6a6152">function call, local variable (উপরে ওঠে)</text>
+        <!-- arrows showing growth -->
+        <line x1="360" y1="145" x2="360" y2="210" stroke="#b8501f" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <path d="M360 210 l-4 -8 l8 0 z" fill="#b8501f"/>
+        <line x1="360" y1="270" x2="360" y2="205" stroke="#6a3d7a" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <path d="M360 205 l-4 8 l8 0 z" fill="#6a3d7a"/>
+        <text x="385" y="195" font-size="9" fill="#6a6152" transform="rotate(90 385 195)">মাঝের ফাঁকা জায়গা</text>
+        <text x="105" y="60" text-anchor="end" font-size="9" fill="#6a6152">নিচু</text>
+        <text x="105" y="260" text-anchor="end" font-size="9" fill="#6a6152">উঁচু</text>
+        <text x="70" y="160" text-anchor="middle" font-size="9" fill="#6a6152" transform="rotate(-90 70 160)">memory ঠিকানা</text>
+      </svg>
+    </div><figcaption>একটা process-এর address space — text, data, heap আর stack</figcaption></figure>
+    <p>এছাড়াও OS প্রতিটা process সম্পর্কে কিছু তথ্য রাখে: <strong>PID</strong> (process ID — অনন্য নম্বর), <strong>register-এর মান</strong> (program counter সহ — কোন instruction চলছে), খোলা <strong>ফাইলের তালিকা</strong>, আর বর্তমান <strong>অবস্থা</strong>। এই সব তথ্য একটা কাঠামোয় রাখা হয় — <strong>PCB</strong> (Process Control Block)।</p>
+    <div class="box note"><span class="tag">📋 PCB — process-এর পরিচয়পত্র</span>
+    OS প্রতিটা process-এর জন্য একটা PCB রাখে — এটাই process-এর সম্পূর্ণ "রেকর্ড"। CPU যখন এক process থেকে আরেকটায় যায়, সে বর্তমান process-এর অবস্থা তার PCB-তে সংরক্ষণ করে আর পরেরটার PCB থেকে অবস্থা তুলে নেয়। Linux-এ এই কাঠামোর নাম <code>task_struct</code>।</div>
+    <div class="box lab"><span class="tag">🛠 process দেখুন</span>
+    <pre><span class="k">ps</span> aux          <span class="c"># চলমান সব process</span>
+<span class="k">top</span>             <span class="c"># লাইভ, নিয়মিত আপডেট হয়</span>
+<span class="k">ps</span> -ef | grep bash   <span class="c"># নির্দিষ্ট process খোঁজা</span></pre>
+    প্রতিটা লাইনের শুরুতে PID দেখুন — এটাই ওই process-এর অনন্য পরিচয়।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>প্রোগ্রাম আর process-এর পার্থক্য?</summary><p>প্রোগ্রাম হলো disk-এ পড়ে থাকা নিষ্ক্রিয় ফাইল (নির্দেশনা)। Process হলো সেই প্রোগ্রামের একটা চলন্ত রূপ — নিজের memory, register, অবস্থা সহ। একই প্রোগ্রাম থেকে অনেক process হতে পারে।</p></details>
+    <details><summary>Heap আর stack কোন দিকে বাড়ে?</summary><p>সাধারণত heap নিচ থেকে উপরে (malloc-এ বাড়ে), stack উপর থেকে নিচে (function call-এ বাড়ে)। মাঝে ফাঁকা জায়গা থাকে যাতে দুটোই বাড়তে পারে।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch2">
+    <div class="ch-head"><span class="ch-num">০২</span><div><h2>Process-এর জীবনচক্র</h2><div class="ch-sub">process-states</div></div></div>
+    <p class="lead">একটা process সবসময় CPU-তে চলে না। বেশিরভাগ সময় সে অপেক্ষা করে — কখনো CPU-র জন্য, কখনো ফাইল বা নেটওয়ার্কের জন্য। এই অবস্থাগুলো একটা state machine তৈরি করে।</p>
+    <h3>তিনটা প্রধান অবস্থা</h3>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="pa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7a4a1e"/></marker></defs>
+        <!-- states -->
+        <rect x="230" y="30" width="140" height="50" rx="10" fill="#e7f1ee" stroke="#1a6b5a" stroke-width="1.5"/>
+        <text x="300" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#1a6b5a">Running</text>
+        <text x="300" y="68" text-anchor="middle" font-size="9" fill="#6a6152">CPU-তে চলছে</text>
+        <rect x="40" y="180" width="140" height="50" rx="10" fill="#fff5e6" stroke="#b8501f" stroke-width="1.5"/>
+        <text x="110" y="202" text-anchor="middle" font-size="12" font-weight="700" fill="#b8501f">Ready</text>
+        <text x="110" y="218" text-anchor="middle" font-size="9" fill="#6a6152">চলতে প্রস্তুত, CPU চায়</text>
+        <rect x="420" y="180" width="140" height="50" rx="10" fill="#efe9f2" stroke="#6a3d7a" stroke-width="1.5"/>
+        <text x="490" y="202" text-anchor="middle" font-size="12" font-weight="700" fill="#6a3d7a">Blocked</text>
+        <text x="490" y="218" text-anchor="middle" font-size="9" fill="#6a6152">I/O-র জন্য অপেক্ষা</text>
+        <!-- transitions -->
+        <line x1="230" y1="60" x2="155" y2="178" stroke="#7a4a1e" stroke-width="1.8" marker-end="url(#pa)"/>
+        <text x="150" y="120" text-anchor="end" font-size="9.5" fill="#7a4a1e">scheduler সরাল</text>
+        <text x="150" y="133" text-anchor="end" font-size="9.5" fill="#7a4a1e">(descheduled)</text>
+        <line x1="180" y1="195" x2="255" y2="82" stroke="#7a4a1e" stroke-width="1.8" marker-end="url(#pa)"/>
+        <text x="240" y="140" text-anchor="start" font-size="9.5" fill="#7a4a1e">scheduler বাছল</text>
+        <line x1="345" y1="82" x2="450" y2="178" stroke="#7a4a1e" stroke-width="1.8" marker-end="url(#pa)"/>
+        <text x="410" y="120" text-anchor="start" font-size="9.5" fill="#7a4a1e">I/O শুরু</text>
+        <line x1="450" y1="195" x2="180" y2="212" stroke="#7a4a1e" stroke-width="1.8" marker-end="url(#pa)"/>
+        <text x="300" y="228" text-anchor="middle" font-size="9.5" fill="#7a4a1e">I/O শেষ → আবার ready</text>
+        <text x="300" y="285" text-anchor="middle" font-size="10" fill="#6a6152">শুধু একটা process একসময় Running-এ থাকতে পারে (এক CPU-তে)</text>
+      </svg>
+    </div><figcaption>Process-এর তিন প্রধান অবস্থা ও তাদের মধ্যে যাতায়াত</figcaption></figure>
+    <p>এছাড়া দুটো ক্ষণস্থায়ী অবস্থা আছে: <strong>New</strong> (তৈরি হচ্ছে) আর <strong>Terminated</strong> (শেষ হয়ে গেছে কিন্তু এখনো পুরোপুরি পরিষ্কার হয়নি)।</p>
+    <div class="box deep"><span class="tag">🔬 গভীরে — Zombie ও Orphan</span>
+    <strong>Zombie:</strong> একটা process শেষ হয়ে গেছে, কিন্তু তার parent এখনো তার মৃত্যুর খবর (exit status) নেয়নি (<code>wait()</code> করেনি)। process টা "মৃত" কিন্তু PCB টা রয়ে গেছে — এটাই zombie। খবর নেওয়া হলে পুরোপুরি মুছে যায়।<br>
+    <strong>Orphan:</strong> parent আগে মরে গেলে child "অনাথ" হয়ে যায়। তখন <code>init</code>/<code>systemd</code> (PID 1) তাকে দত্তক নেয় আর তার শেষকৃত্য সামলায়।<br>
+    এজন্যই বাস্তব প্রোগ্রামে parent-কে সবসময় child-এর জন্য <code>wait()</code> করা উচিত — নাহলে zombie জমে।</div>
+    <div class="box note"><span class="tag">💡 কেন Blocked অবস্থা এত গুরুত্বপূর্ণ</span>
+    ধরুন একটা process ফাইল পড়তে চাইল — disk ধীর, তাই উত্তর আসতে হয়তো লক্ষ CPU cycle লাগবে। এই সময়টা CPU বসিয়ে রাখা ভয়ংকর অপচয়। তাই OS process-টাকে Blocked করে <strong>অন্য process-কে CPU দেয়</strong>। I/O শেষ হলে (interrupt দিয়ে খবর আসে) process আবার Ready হয়। এই কারণেই একটা CPU দিয়েও অনেক কাজ একসাথে এগোয় — বেশিরভাগ প্রোগ্রাম বেশিরভাগ সময় I/O-র জন্য অপেক্ষা করে।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>একটা process I/O-র জন্য অপেক্ষা করলে CPU কী করে?</summary><p>OS ওই process-কে Blocked করে অন্য একটা Ready process-কে CPU দেয়। I/O শেষ হলে প্রথম process আবার Ready হয়। এভাবে CPU বসে থাকে না।</p></details>
+    <details><summary>Zombie process কী?</summary><p>শেষ হয়ে যাওয়া একটা process যার exit status এখনো parent নেয়নি। PCB টা রয়ে গেছে যতক্ষণ না parent <code>wait()</code> করে।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch3">
+    <div class="ch-head"><span class="ch-num">০৩</span><div><h2>fork / exec / wait</h2><div class="ch-sub">process-creation</div></div></div>
+    <p class="lead">UNIX-এ নতুন process তৈরির পদ্ধতিটা প্রথমে অদ্ভুত লাগে, কিন্তু অসাধারণ মার্জিত। এই তিনটা system call বুঝলে shell কীভাবে কাজ করে তা পরিষ্কার হয়ে যাবে — আর সেটাই আপনার প্রজেক্ট।</p>
+    <h3>fork() — নিজের হুবহু নকল</h3>
+    <p><code>fork()</code> বর্তমান process-এর একটা <strong>প্রায় নিখুঁত কপি</strong> তৈরি করে। মূলটা "parent", নতুনটা "child"। দুটোই <code>fork()</code>-এর পরের লাইন থেকে চলতে শুরু করে।</p>
+    <div class="box analogy"><span class="tag">🍴 উপমা — রাস্তার কাঁটা (fork = কাঁটাচামচ/দ্বিধা)</span>
+    <code>fork</code> শব্দের মানে রাস্তার দ্বিধা। এক ব্যক্তি হাঁটতে হাঁটতে একটা জাদুকরী মোড়ে এসে <strong>দুজন হয়ে গেল</strong> — একই স্মৃতি, একই অবস্থান, কিন্তু এখন দুটো আলাদা মানুষ। শুধু একটা পার্থক্য: একজনের হাতে কাগজে লেখা "তুমি parent", আরেকজনের "তুমি child"। এই কাগজ দেখেই তারা ঠিক করে এরপর কে কী করবে।</div>
+    <pre><span class="c">// fork-এর মূল ধারণা</span>
+<span class="f">#include</span> <span class="s">&lt;stdio.h&gt;</span>
+<span class="f">#include</span> <span class="s">&lt;unistd.h&gt;</span>
+
+<span class="k">int</span> main() {
+    printf(<span class="s">"শুরু: একজন\n"</span>);
+    <span class="k">int</span> pid = fork();          <span class="c">// এখানে process দুই ভাগ হলো</span>
+
+    <span class="k">if</span> (pid == 0) {
+        printf(<span class="s">"আমি child\n"</span>);       <span class="c">// child-এ fork() ফেরত দেয় 0</span>
+    } <span class="k">else</span> {
+        printf(<span class="s">"আমি parent, আমার child-এর PID %d\n"</span>, pid);
+    }                             <span class="c">// parent-এ ফেরত দেয় child-এর PID</span>
+    <span class="k">return</span> 0;
+}</pre>
+    <div class="box warn"><span class="tag">⚠️ fork() একবার ডাকা হয়, দুবার return করে!</span>
+    এটাই সবচেয়ে বিভ্রান্তিকর অংশ। একটা <code>fork()</code> কল, কিন্তু দুটো return — parent-এ child-এর PID, child-এ <code>0</code>। কারণ কলের <em>পরে</em> দুটো process আছে, দুটোই ওই লাইন থেকে চলছে। এই return মান দেখেই আপনি বোঝেন আপনি কোন process-এ আছেন।</div>
+    <h3>exec() — নিজের খোলস বদলানো</h3>
+    <p><code>fork</code> শুধু নকল বানায়, কিন্তু আমরা তো নতুন <em>আলাদা</em> প্রোগ্রাম চালাতে চাই। সেটা করে <code>exec()</code> — এটা বর্তমান process-এর memory পুরো মুছে দিয়ে একটা <strong>নতুন প্রোগ্রাম</strong> সেখানে লোড করে। PID একই থাকে, কিন্তু ভেতরের প্রোগ্রাম সম্পূর্ণ বদলে যায়।</p>
+    <div class="box analogy"><span class="tag">🎭 উপমা — একই অভিনেতা, নতুন চরিত্র</span>
+    <code>exec</code> যেন একজন অভিনেতা এক নাটক শেষ করে সম্পূর্ণ নতুন সাজ-পোশাক-সংলাপ নিয়ে অন্য একটা চরিত্র হয়ে গেল। শরীর (process/PID) একই, কিন্তু ভেতরের সবকিছু (কোড, ডেটা) নতুন। পুরনো কিছুই আর ফিরে আসে না — <code>exec</code> সফল হলে পরের লাইন আর কখনো চলে না।</div>
+    <h3>fork + exec + wait — একসাথে</h3>
+    <p>এই তিনটা মিলেই shell একটা কমান্ড চালায়। প্যাটার্নটা দেখুন — এটাই আপনার প্রজেক্টের মূল:</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 620 280" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="fa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#1a6b5a"/></marker></defs>
+        <rect x="220" y="25" width="180" height="38" rx="8" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="310" y="49" text-anchor="middle" font-size="11" font-weight="600">Shell (parent) চলছে</text>
+        <line x1="310" y1="63" x2="310" y2="88" stroke="#1a6b5a" stroke-width="1.8" marker-end="url(#fa)"/>
+        <text x="325" y="80" font-size="9.5" fill="#6a6152">fork()</text>
+        <!-- split -->
+        <rect x="70" y="92" width="180" height="38" rx="8" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="160" y="116" text-anchor="middle" font-size="11" font-weight="600">Parent: wait()</text>
+        <rect x="370" y="92" width="180" height="38" rx="8" fill="#fff5e6" stroke="#b8501f"/>
+        <text x="460" y="116" text-anchor="middle" font-size="11" font-weight="600">Child (নকল)</text>
+        <line x1="290" y1="88" x2="180" y2="90" stroke="#1a6b5a" stroke-width="1.5"/>
+        <line x1="330" y1="88" x2="440" y2="90" stroke="#b8501f" stroke-width="1.5"/>
+        <line x1="460" y1="130" x2="460" y2="155" stroke="#b8501f" stroke-width="1.8" marker-end="url(#fa)"/>
+        <text x="475" y="147" font-size="9.5" fill="#6a6152">exec()</text>
+        <rect x="370" y="158" width="180" height="42" rx="8" fill="#fceadf" stroke="#b8501f"/>
+        <text x="460" y="176" text-anchor="middle" font-size="11" font-weight="600">নতুন প্রোগ্রাম (যেমন ls)</text>
+        <text x="460" y="192" text-anchor="middle" font-size="9" fill="#6a6152">child এখন ls হয়ে গেছে</text>
+        <line x1="460" y1="200" x2="460" y2="225" stroke="#b8501f" stroke-width="1.8" marker-end="url(#fa)"/>
+        <text x="490" y="217" font-size="9.5" fill="#6a6152">শেষ → exit</text>
+        <rect x="370" y="228" width="180" height="34" rx="8" fill="#eaf1e4" stroke="#3d6b2f"/>
+        <text x="460" y="249" text-anchor="middle" font-size="10" fill="#3d6b2f">child শেষ, খবর parent-কে</text>
+        <line x1="370" y1="245" x2="250" y2="118" stroke="#3d6b2f" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#fa)"/>
+        <text x="270" y="200" font-size="9" fill="#3d6b2f">wait() ফেরে</text>
+        <line x1="160" y1="130" x2="160" y2="200" stroke="#1a6b5a" stroke-width="1.5" stroke-dasharray="2 3"/>
+        <text x="160" y="220" text-anchor="middle" font-size="9" fill="#6a6152">অপেক্ষা করছে...</text>
+      </svg>
+    </div><figcaption>Shell যেভাবে কমান্ড চালায় — fork করে, child-এ exec করে, parent wait করে</figcaption></figure>
+    <pre><span class="c">// একটা কমান্ড চালানোর পূর্ণ প্যাটার্ন</span>
+<span class="k">int</span> pid = fork();
+<span class="k">if</span> (pid == 0) {
+    <span class="c">// child: নিজেকে নতুন প্রোগ্রামে বদলে ফেলো</span>
+    <span class="k">char</span> *args[] = {<span class="s">"ls"</span>, <span class="s">"-l"</span>, NULL};
+    execvp(<span class="s">"ls"</span>, args);
+    <span class="c">// exec সফল হলে নিচের লাইন কখনো চলবে না</span>
+    perror(<span class="s">"exec failed"</span>);
+} <span class="k">else</span> {
+    <span class="c">// parent: child শেষ হওয়া পর্যন্ত অপেক্ষা করো</span>
+    wait(NULL);
+    printf(<span class="s">"child শেষ, আবার prompt দেখাই\n"</span>);
+}</pre>
+    <div class="box note"><span class="tag">💡 কেন fork ও exec আলাদা?</span>
+    দুটো এক করে দিলেই তো সহজ হতো? না — আলাদা রাখার একটা চমৎকার সুবিধা আছে: fork ও exec-এর <strong>মাঝখানে</strong> child কিছু সেটআপ করতে পারে। যেমন — output কে ফাইলে redirect করা (<code>ls > out.txt</code>), বা pipe সেটআপ করা (<code>ls | grep</code>)। এই "মাঝের ফাঁক"-টাই UNIX-এর redirection ও pipe-এর ভিত্তি। প্রজেক্টে এটা কাজে লাগাবেন।</div>
+    <div class="box lab"><span class="tag">🛠 নিজে চালান</span>
+    উপরের প্রথম fork উদাহরণটা <code>fork.c</code> নামে সেভ করে চালান: <code>gcc fork.c -o fork &amp;&amp; ./fork</code>। কয়েকবার চালিয়ে দেখুন — parent আর child-এর প্রিন্টের ক্রম কখনো কখনো বদলে যায়। কেন? কারণ কোনটা আগে চলবে তা <strong>scheduler</strong> ঠিক করে, আর সেটা অনির্দিষ্ট। এটাই পরের অধ্যায়ের বিষয়।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary><code>fork()</code> child-এ কী return করে?</summary><p><code>0</code>। Parent-এ return করে child-এর PID (একটা ধনাত্মক সংখ্যা)। এই পার্থক্য দিয়েই কোড বোঝে সে কোন process-এ আছে।</p></details>
+    <details><summary><code>exec()</code> সফল হলে তার পরের লাইন চলে না কেন?</summary><p>কারণ exec বর্তমান process-এর পুরো memory (কোড সহ) নতুন প্রোগ্রাম দিয়ে প্রতিস্থাপন করে। পুরনো কোড আর অস্তিত্বেই থাকে না, তাই ফেরার জায়গা নেই।</p></details>
+    <details><summary>fork ও exec আলাদা রাখার সুবিধা কী?</summary><p>মাঝখানে child পরিবেশ সেটআপ করতে পারে — যেমন I/O redirection বা pipe। এটাই shell-এর <code>&gt;</code> ও <code>|</code> এর ভিত্তি।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch4">
+    <div class="ch-head"><span class="ch-num">০৪</span><div><h2>Context Switch</h2><div class="ch-sub">context-switch</div></div></div>
+    <p class="lead">এক CPU, অনেক process। OS দ্রুত একটার পর একটা চালিয়ে ভ্রম তৈরি করে যে সব একসাথে চলছে। এক process থেকে আরেকটায় যাওয়ার এই কৌশলটাই <strong>context switch</strong>।</p>
+    <div class="box analogy"><span class="tag">👨‍🍳 উপমা — একজন রাঁধুনি, অনেক পদ</span>
+    একজন রাঁধুনি একসাথে ভাত, ডাল, মাংস রাঁধছেন। আসলে তিনি একসাথে করছেন না — ভাত চাপিয়ে ডালে নাড়া দিতে যান, তার আগে মনে রাখেন ভাত কতটুকু হয়েছে। প্রতিটা পদে ফেরার সময় "কোথায় ছিলাম" মনে করেন। CPU-ও তাই — এক process থেকে সরার আগে তার অবস্থা মনে রাখে, পরে ফিরে এসে সেখান থেকে শুরু করে।</div>
+    <h3>Context switch-এ কী ঘটে</h3>
+    <p>OS যখন process A থেকে process B-তে যায়:</p>
+    <ol>
+      <li>A-র বর্তমান অবস্থা (সব register, program counter) A-র PCB-তে সংরক্ষণ করে</li>
+      <li>B-র PCB থেকে B-র সংরক্ষিত অবস্থা register-এ তুলে আনে</li>
+      <li>B যেখানে থেমেছিল ঠিক সেখান থেকে চলা শুরু করে</li>
+    </ol>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 620 250" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="ca" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7a4a1e"/></marker></defs>
+        <rect x="30" y="40" width="150" height="34" rx="6" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="105" y="62" text-anchor="middle" font-size="10.5" font-weight="600">Process A চলছে</text>
+        <rect x="440" y="40" width="150" height="34" rx="6" fill="#efe9f2" stroke="#6a3d7a"/>
+        <text x="515" y="62" text-anchor="middle" font-size="10.5" font-weight="600">Process B চলছে</text>
+        <rect x="180" y="95" width="260" height="90" rx="10" fill="#fbf0e2" stroke="#7a4a1e" stroke-width="1.5"/>
+        <text x="310" y="115" text-anchor="middle" font-size="11" font-weight="700" fill="#7a4a1e">OS: Context Switch</text>
+        <text x="310" y="138" text-anchor="middle" font-size="9.5" fill="#6a6152">১. A-র register → A-র PCB (save)</text>
+        <text x="310" y="155" text-anchor="middle" font-size="9.5" fill="#6a6152">২. B-র PCB → register (restore)</text>
+        <text x="310" y="172" text-anchor="middle" font-size="9.5" fill="#6a6152">৩. B-তে লাফ</text>
+        <line x1="180" y1="57" x2="178" y2="120" stroke="#7a4a1e" stroke-width="1.8" marker-end="url(#ca)"/>
+        <line x1="442" y1="120" x2="440" y2="57" stroke="#7a4a1e" stroke-width="1.8" marker-end="url(#ca)"/>
+        <text x="310" y="215" text-anchor="middle" font-size="10" fill="#b8501f" font-weight="600">এই পুরো সময়টা "overhead" — কোনো আসল কাজ হয় না</text>
+      </svg>
+    </div><figcaption>Context switch — A-র অবস্থা সংরক্ষণ করে B-র অবস্থা ফিরিয়ে আনা</figcaption></figure>
+    <div class="box warn"><span class="tag">⚠️ Context switch বিনামূল্যে নয়</span>
+    এই সময়টায় CPU কোনো <strong>উপকারী কাজ করে না</strong> — শুধু অবস্থা সরানো-আনা করে। তাই খুব ঘন ঘন switch করলে সময়ের বড় অংশ শুধু switch-এই চলে যায় (overhead)। আবার খুব কম করলে একটা process অন্যদের অভুক্ত রাখে। এই ভারসাম্যই scheduler-এর মূল চ্যালেঞ্জ। switch-এর সরাসরি খরচ ছাড়াও একটা লুকানো খরচ আছে: নতুন process-এর ডেটা CPU cache-এ না থাকায় শুরুতে ধীর চলে (cache পুনরায় গরম হতে সময় লাগে)।</div>
+    <div class="box deep"><span class="tag">🔬 গভীরে — কে context switch শুরু করে?</span>
+    দুটো উপায়। <strong>Cooperative:</strong> process নিজে থেকে ছেড়ে দেয় (system call করলে, বা I/O-র জন্য অপেক্ষায় গেলে)। পুরনো ও ঝুঁকিপূর্ণ — একটা লোভী process কখনো না ছাড়লে সব আটকে যায়। <strong>Preemptive (আধুনিক):</strong> সেই <strong>timer interrupt</strong> (মডিউল ১) নিয়মিত OS-কে নিয়ন্ত্রণ ফিরিয়ে দেয়, আর OS জোর করে switch করতে পারে। এজন্যই একটা infinite loop-এ আটকানো প্রোগ্রামও পুরো সিস্টেম জমিয়ে দেয় না — timer এসে OS-কে ডেকে তোলে।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Context switch-এর সময় CPU কী "উপকারী" কাজ করে?</summary><p>কিছুই না — এটা বিশুদ্ধ overhead। শুধু এক process-এর অবস্থা সংরক্ষণ ও আরেকটার অবস্থা পুনরুদ্ধার করে। এজন্য অতিরিক্ত switch ক্ষতিকর।</p></details>
+    <details><summary>Preemptive scheduling timer interrupt ছাড়া সম্ভব?</summary><p>না। Timer interrupt ছাড়া OS নিয়ন্ত্রণ ফিরে পায় না, তাই জোর করে process বদলাতে পারে না — তখন শুধু cooperative scheduling সম্ভব।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch5">
+    <div class="ch-head"><span class="ch-num">০৫</span><div><h2>CPU Scheduling</h2><div class="ch-sub">scheduling</div></div></div>
+    <p class="lead">অনেকগুলো process Ready অবস্থায় CPU চাইছে। OS কাকে আগে দেবে? এই সিদ্ধান্ত নেয় <strong>scheduler</strong>, আর তার নীতিই ঠিক করে সিস্টেম দ্রুত মনে হবে না ধীর।</p>
+    <div class="box note"><span class="tag">🎯 scheduler-এর লক্ষ্য (প্রায়ই পরস্পরবিরোধী)</span>
+    <strong>Throughput:</strong> একক সময়ে বেশি কাজ শেষ করা। <strong>Turnaround time:</strong> একটা কাজ জমা থেকে শেষ পর্যন্ত কম সময়। <strong>Response time:</strong> কি-চাপার পর দ্রুত সাড়া (ইন্টারঅ্যাক্টিভ কাজে জরুরি)। <strong>Fairness:</strong> কেউ যেন অভুক্ত না থাকে। একটা বাড়ালে আরেকটা কমে — তাই সব scheduler একটা সমঝোতা।</div>
+    <h3>মূল অ্যালগরিদমগুলো</h3>
+    <h4>FCFS — First Come First Served</h4>
+    <p>যে আগে আসে, সে আগে পুরো চলে। সহজ, কিন্তু একটা বড় সমস্যা।</p>
+    <div class="box warn"><span class="tag">⚠️ Convoy effect</span>
+    একটা দীর্ঘ কাজ আগে এলে পেছনের সব ছোট কাজ দীর্ঘক্ষণ অপেক্ষা করে — যেমন সুপারমার্কেটে আপনার সামনে ভরা ট্রলি নিয়ে একজন, আর আপনার হাতে একটা জিনিস। গড় অপেক্ষা অনেক বেড়ে যায়।</div>
+    <h4>SJF — Shortest Job First</h4>
+    <p>সবচেয়ে ছোট কাজ আগে। গড় turnaround time-এর জন্য এটা গাণিতিকভাবে সেরা। কিন্তু সমস্যা — কোন কাজ কত ছোট তা <strong>আগে থেকে জানা যায় না</strong>, আর একটা দীর্ঘ কাজ চিরকাল অপেক্ষায় থাকতে পারে (starvation)।</p>
+    <h4>Round Robin — সবাইকে সমান টুকরো</h4>
+    <p>প্রতিটা process একটা নির্দিষ্ট সময় (time slice / quantum) পায়, তারপর পেছনে চলে যায়, পরেরজন সুযোগ পায়। Response time-এর জন্য চমৎকার — সবাই দ্রুত একটু একটু করে চলে।</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <text x="300" y="20" text-anchor="middle" font-size="12" font-weight="600">Round Robin — quantum = ২ একক</text>
+        <!-- timeline -->
+        <g font-size="11" text-anchor="middle">
+          <rect x="40" y="45" width="70" height="40" fill="#e7f1ee" stroke="#1a6b5a"/><text x="75" y="70">A</text>
+          <rect x="110" y="45" width="70" height="40" fill="#fff5e6" stroke="#b8501f"/><text x="145" y="70">B</text>
+          <rect x="180" y="45" width="70" height="40" fill="#efe9f2" stroke="#6a3d7a"/><text x="215" y="70">C</text>
+          <rect x="250" y="45" width="70" height="40" fill="#e7f1ee" stroke="#1a6b5a"/><text x="285" y="70">A</text>
+          <rect x="320" y="45" width="70" height="40" fill="#fff5e6" stroke="#b8501f"/><text x="355" y="70">B</text>
+          <rect x="390" y="45" width="70" height="40" fill="#efe9f2" stroke="#6a3d7a"/><text x="425" y="70">C</text>
+          <rect x="460" y="45" width="70" height="40" fill="#e7f1ee" stroke="#1a6b5a"/><text x="495" y="70">A</text>
+        </g>
+        <line x1="40" y1="95" x2="530" y2="95" stroke="#6a6152" stroke-width="1.5"/>
+        <text x="40" y="112" font-size="9" fill="#6a6152">0</text>
+        <text x="180" y="112" font-size="9" fill="#6a6152">6</text>
+        <text x="530" y="112" font-size="9" fill="#6a6152">সময় →</text>
+        <text x="300" y="150" text-anchor="middle" font-size="10.5" fill="#6a6152">প্রত্যেকে একটু একটু করে চলে — কেউ বেশিক্ষণ অপেক্ষা করে না</text>
+        <text x="300" y="172" text-anchor="middle" font-size="10" fill="#b8501f">quantum ছোট → ভালো response, কিন্তু বেশি context switch overhead</text>
+      </svg>
+    </div><figcaption>Round Robin — সময়কে সমান টুকরোয় ভাগ করে পালা করে বণ্টন</figcaption></figure>
+    <h4>MLFQ — Multi-Level Feedback Queue (বাস্তব সিস্টেমের কাছাকাছি)</h4>
+    <p>বাস্তব OS (Linux, Windows-এর পুরনো সংস্করণ) এমন কিছু ব্যবহার করে। ধারণা: কয়েকটা priority queue, আর process-এর আচরণ দেখে তার priority সমন্বয় করা।</p>
+    <div class="box note"><span class="tag">🧠 MLFQ-র চতুর নিয়ম</span>
+    <strong>১.</strong> নতুন process সবচেয়ে উঁচু priority-তে ঢোকে।<br>
+    <strong>২.</strong> একটা process যদি তার পুরো time slice ব্যবহার করে ফেলে (CPU-লোভী), তাকে নিচু priority-তে নামানো হয়।<br>
+    <strong>৩.</strong> একটা process যদি time slice শেষের আগেই I/O-র জন্য ছেড়ে দেয় (ইন্টারঅ্যাক্টিভ), তাকে উঁচুতে রাখা হয়।<br>
+    <strong>ফলাফল:</strong> ইন্টারঅ্যাক্টিভ কাজ (টাইপিং, ক্লিক) দ্রুত সাড়া পায়, আর ভারী গণনা পেছনে চলে — অথচ আগে থেকে কিছু জানতে হয় না, আচরণ দেখেই OS শিখে নেয়। মাঝে মাঝে সবাইকে আবার উঁচুতে তুলে (priority boost) starvation ঠেকানো হয়।</div>
+    <table>
+      <tr><th>অ্যালগরিদম</th><th>সেরা দিক</th><th>দুর্বলতা</th></tr>
+      <tr><td>FCFS</td><td>সরল, ন্যায্য (ক্রমে)</td><td>convoy effect</td></tr>
+      <tr><td>SJF</td><td>সেরা গড় turnaround</td><td>ভবিষ্যৎ জানা কঠিন, starvation</td></tr>
+      <tr><td>Round Robin</td><td>ভালো response time</td><td>quantum ভুল হলে সমস্যা</td></tr>
+      <tr><td>MLFQ</td><td>ইন্টারঅ্যাক্টিভ+ব্যাচ ভারসাম্য</td><td>জটিল, টিউন করা কঠিন</td></tr>
+    </table>
+    <div class="box lab"><span class="tag">🛠 প্রজেক্ট আইডিয়া — scheduler simulator</span>
+    C-তে একটা ছোট প্রোগ্রাম লিখুন যেখানে কয়েকটা "কাজ" (arrival time + burst time সহ) আছে, আর FCFS, SJF, Round Robin প্রতিটার জন্য average waiting time ও turnaround time হিসাব করে তুলনা করুন। এটা scheduling-এর ট্রেড-অফগুলো হাতে-কলমে বুঝিয়ে দেবে।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Round Robin-এ quantum খুব ছোট হলে সমস্যা কী?</summary><p>অতিরিক্ত context switch — সময়ের বড় অংশ শুধু switch-এ চলে যায়, আসল কাজ কমে। খুব বড় হলে আবার Round Robin কার্যত FCFS হয়ে যায়।</p></details>
+    <details><summary>MLFQ কীভাবে ইন্টারঅ্যাক্টিভ কাজ চেনে — আগে থেকে না জেনেই?</summary><p>আচরণ দেখে। যে process time slice শেষের আগেই I/O-র জন্য ছেড়ে দেয়, সে সম্ভবত ইন্টারঅ্যাক্টিভ — তাকে উঁচু priority-তে রাখা হয়। CPU পুরো ব্যবহারকারীকে নিচে নামানো হয়।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch6">
+    <div class="ch-head"><span class="ch-num">০৬</span><div><h2>Thread — একই process, অনেক সুতো</h2><div class="ch-sub">threads</div></div></div>
+    <p class="lead">Process ভারী — প্রতিটার আলাদা memory। কিন্তু কখনো আমরা চাই একই কাজের কয়েকটা অংশ সমান্তরালে চলুক, একই ডেটা ভাগ করে। সেখানেই <strong>thread</strong>।</p>
+    <div class="box analogy"><span class="tag">🧵 উপমা — এক রান্নাঘরে অনেক রাঁধুনি</span>
+    Process যেন আলাদা আলাদা রান্নাঘর — প্রত্যেকের নিজের সব সরঞ্জাম, একে অপরেরটা দেখতে পায় না। Thread যেন <strong>একই রান্নাঘরে কয়েকজন রাঁধুনি</strong> — একই সরঞ্জাম ও উপকরণ (memory) ভাগ করে, কিন্তু প্রত্যেকে আলাদা কাজ করে। দ্রুত, কিন্তু সাবধান না হলে দুজন একই ছুরি একসাথে চাইতে পারে (পরের মডিউলের বিষয়)।</div>
+    <h3>Process vs Thread</h3>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <text x="150" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#7a4a1e">দুটো Process</text>
+        <text x="450" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#1a6b5a">এক Process, দুটো Thread</text>
+        <!-- two processes -->
+        <rect x="30" y="35" width="110" height="160" rx="8" fill="#fff5e6" stroke="#b8501f"/>
+        <rect x="160" y="35" width="110" height="160" rx="8" fill="#fff5e6" stroke="#b8501f"/>
+        <g font-size="8.5" text-anchor="middle" fill="#6a6152">
+          <rect x="42" y="48" width="86" height="20" fill="#fff" stroke="#b8501f"/><text x="85" y="62">নিজের memory</text>
+          <rect x="172" y="48" width="86" height="20" fill="#fff" stroke="#b8501f"/><text x="215" y="62">নিজের memory</text>
+          <rect x="42" y="150" width="86" height="34" fill="#e7f1ee" stroke="#1a6b5a"/><text x="85" y="170">thread</text>
+          <rect x="172" y="150" width="86" height="34" fill="#e7f1ee" stroke="#1a6b5a"/><text x="215" y="170">thread</text>
+        </g>
+        <!-- one process two threads -->
+        <rect x="340" y="35" width="220" height="160" rx="8" fill="#fff5e6" stroke="#b8501f"/>
+        <rect x="352" y="48" width="196" height="24" fill="#fff" stroke="#b8501f"/>
+        <text x="450" y="64" text-anchor="middle" font-size="8.5" fill="#6a6152">শেয়ার করা memory (code, data, heap)</text>
+        <rect x="360" y="150" width="86" height="34" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="403" y="170" text-anchor="middle" font-size="8.5">thread 1</text>
+        <rect x="454" y="150" width="86" height="34" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="497" y="170" text-anchor="middle" font-size="8.5">thread 2</text>
+        <text x="450" y="130" text-anchor="middle" font-size="8" fill="#6a6152">প্রতিটা thread-এর নিজের শুধু stack + register</text>
+      </svg>
+    </div><figcaption>Process আলাদা memory পায়; একই process-এর thread-রা memory ভাগ করে</figcaption></figure>
+    <p>Thread-রা একই process-এর code, data ও heap ভাগ করে, কিন্তু প্রত্যেকের <strong>নিজের stack ও register</strong> থাকে (কারণ প্রত্যেকে আলাদা function-এ থাকতে পারে)।</p>
+    <table>
+      <tr><th></th><th>Process</th><th>Thread</th></tr>
+      <tr><td>Memory</td><td>আলাদা</td><td>শেয়ার করা</td></tr>
+      <tr><td>তৈরির খরচ</td><td>বেশি</td><td>কম</td></tr>
+      <tr><td>যোগাযোগ</td><td>কঠিন (IPC লাগে)</td><td>সহজ (শেয়ার্ড memory)</td></tr>
+      <tr><td>একটা ক্র্যাশ করলে</td><td>অন্যরা নিরাপদ</td><td>পুরো process ঝুঁকিতে</td></tr>
+    </table>
+    <div class="box note"><span class="tag">💡 কখন কোনটা?</span>
+    <strong>Thread</strong> — যখন একই কাজের অংশগুলো ঘন ঘন ডেটা ভাগ করে (যেমন একটা ওয়েব সার্ভারে প্রতিটা request একটা thread)। <strong>Process</strong> — যখন বিচ্ছিন্নতা ও নিরাপত্তা জরুরি (যেমন ব্রাউজারের প্রতিটা tab আলাদা process, যাতে একটা ক্র্যাশ করলে বাকিগুলো টেকে)। শেয়ার্ড memory-র সুবিধাই thread-এর বিপদ — সেটাই মডিউল ৪ (Concurrency)-এর মূল বিষয়।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Thread-রা কী ভাগ করে, আর কী আলাদা রাখে?</summary><p>ভাগ করে: code, global data, heap, খোলা ফাইল। আলাদা: প্রত্যেকের নিজের stack ও register (program counter সহ)।</p></details>
+    <details><summary>ব্রাউজার প্রতিটা tab-এ আলাদা process কেন ব্যবহার করে?</summary><p>বিচ্ছিন্নতা — একটা tab ক্র্যাশ করলে বা কোনো সাইট দূষিত হলে বাকি tab ও পুরো ব্রাউজার নিরাপদ থাকে। thread হলে একটার সমস্যা সবাইকে নামিয়ে দিত।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch7">
+    <div class="ch-head"><span class="ch-num">০৭</span><div><h2>IPC — process-রা কীভাবে কথা বলে</h2><div class="ch-sub">inter-process-communication</div></div></div>
+    <p class="lead">Process-দের memory আলাদা, তাই তারা সরাসরি একে অপরের ডেটা দেখতে পায় না। কিন্তু প্রায়ই তাদের সহযোগিতা দরকার। OS কয়েকটা উপায় দেয় — এদের একসাথে বলে <strong>IPC</strong>।</p>
+    <h3>প্রধান উপায়গুলো</h3>
+    <table>
+      <tr><th>পদ্ধতি</th><th>ধারণা</th><th>উদাহরণ</th></tr>
+      <tr><td><strong>Pipe</strong></td><td>একটা একমুখী নল — একজন লেখে, একজন পড়ে</td><td><code>ls | grep txt</code></td></tr>
+      <tr><td><strong>Shared memory</strong></td><td>দুই process একই memory অঞ্চল দেখে</td><td>দ্রুততম, কিন্তু sync লাগে</td></tr>
+      <tr><td><strong>Message queue</strong></td><td>বার্তার সারি, OS পরিচালনা করে</td><td>কাঠামোবদ্ধ বার্তা</td></tr>
+      <tr><td><strong>Signal</strong></td><td>একটা ছোট সংকেত পাঠানো</td><td><code>Ctrl+C</code> = SIGINT</td></tr>
+      <tr><td><strong>Socket</strong></td><td>নেটওয়ার্ক বা লোকাল যোগাযোগ</td><td>ভিন্ন মেশিনেও চলে</td></tr>
+    </table>
+    <h3>Pipe — shell-এর | এর পেছনে</h3>
+    <p>আপনি যখন <code>ls | grep txt</code> লেখেন, shell একটা pipe তৈরি করে — <code>ls</code>-এর output সরাসরি <code>grep</code>-এর input-এ যায়, disk ছুঁয়ে না গিয়ে। এটা আপনার shell প্রজেক্টের একটা গুরুত্বপূর্ণ অংশ হবে।</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 580 130" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="pia" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7a4a1e"/></marker></defs>
+        <rect x="40" y="45" width="130" height="44" rx="8" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="105" y="65" text-anchor="middle" font-size="11" font-weight="600">ls</text>
+        <text x="105" y="81" text-anchor="middle" font-size="8.5" fill="#6a6152">লেখে (write end)</text>
+        <rect x="230" y="52" width="120" height="30" rx="15" fill="#fbf0e2" stroke="#7a4a1e"/>
+        <text x="290" y="72" text-anchor="middle" font-size="10" fill="#7a4a1e">pipe (নল)</text>
+        <rect x="410" y="45" width="130" height="44" rx="8" fill="#efe9f2" stroke="#6a3d7a"/>
+        <text x="475" y="65" text-anchor="middle" font-size="11" font-weight="600">grep</text>
+        <text x="475" y="81" text-anchor="middle" font-size="8.5" fill="#6a6152">পড়ে (read end)</text>
+        <line x1="170" y1="67" x2="228" y2="67" stroke="#7a4a1e" stroke-width="2" marker-end="url(#pia)"/>
+        <line x1="350" y1="67" x2="408" y2="67" stroke="#7a4a1e" stroke-width="2" marker-end="url(#pia)"/>
+        <text x="290" y="115" text-anchor="middle" font-size="9.5" fill="#6a6152">ls-এর output কখনো screen-এ যায় না, সরাসরি grep-এ যায়</text>
+      </svg>
+    </div><figcaption>Pipe — এক process-এর output আরেকটার input হয়ে যায়</figcaption></figure>
+    <div class="box deep"><span class="tag">🔬 গভীরে — file descriptor redirection</span>
+    এর মূলে আছে UNIX-এর একটা সুন্দর ধারণা: সব কিছুই "file" (file descriptor)। প্রতিটা process-এর তিনটা ডিফল্ট থাকে — <code>0</code> (stdin), <code>1</code> (stdout), <code>2</code> (stderr)। Pipe বানাতে shell একটা pipe তৈরি করে, তারপর <code>dup2()</code> দিয়ে <code>ls</code>-এর stdout-কে pipe-এর লেখার মুখে আর <code>grep</code>-এর stdin-কে pipe-এর পড়ার মুখে "বেঁধে" দেয়। এই fd হেরফেরটাই redirection (<code>&gt;</code>) আর pipe (<code>|</code>) — দুটোরই ভিত্তি। প্রজেক্টে এটাই কাজে লাগাবেন।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary><code>ls | grep txt</code>-এ ডেটা কি disk-এ যায়?</summary><p>না — pipe সরাসরি ls-এর output grep-এর input-এ পাঠায়, memory-র মধ্য দিয়ে। disk ছোঁয়ার দরকার নেই, তাই দ্রুত।</p></details>
+    <details><summary>stdin, stdout, stderr-এর file descriptor নম্বর?</summary><p>0 = stdin, 1 = stdout, 2 = stderr। redirection ও pipe এই fd গুলো <code>dup2()</code> দিয়ে বদলেই কাজ করে।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch8">
+    <div class="ch-head"><span class="ch-num">০৮</span><div><h2>প্রজেক্ট — নিজের Shell বানান</h2><div class="ch-sub">build-a-shell</div></div></div>
+    <p class="lead">এই মডিউলের সব ধারণা একসাথে জোড়া লাগানোর সময়। একটা shell আসলে একটা সরল কিন্তু গভীর প্রোগ্রাম — এটা বানালে process, fork/exec/wait, pipe, redirection সব পাকা হয়ে যাবে। এটাই সিস্টেম প্রোগ্রামিং-এর ক্লাসিক প্রজেক্ট।</p>
+    <div class="box note"><span class="tag">🎯 একটা shell আসলে কী করে</span>
+    একটা লুপ, বারবার: (১) prompt দেখাও, (২) ব্যবহারকারীর লাইন পড়ো, (৩) শব্দে ভাঙো (parse), (৪) fork করে child-এ exec দিয়ে কমান্ড চালাও, (৫) parent-এ wait করো, (৬) আবার শুরু। এটাই <strong>REPL</strong> (Read-Eval-Print Loop)।</div>
+    <h3>ধাপ ১ — সবচেয়ে সরল shell</h3>
+    <pre><span class="c">// tiny_shell.c — একটা কমান্ড চালাতে পারে</span>
+<span class="f">#include</span> <span class="s">&lt;stdio.h&gt;</span>
+<span class="f">#include</span> <span class="s">&lt;stdlib.h&gt;</span>
+<span class="f">#include</span> <span class="s">&lt;string.h&gt;</span>
+<span class="f">#include</span> <span class="s">&lt;unistd.h&gt;</span>
+<span class="f">#include</span> <span class="s">&lt;sys/wait.h&gt;</span>
+
+<span class="k">int</span> main() {
+    <span class="k">char</span> line[1024];
+    <span class="k">while</span> (1) {
+        printf(<span class="s">"myshell&gt; "</span>);              <span class="c">// ১. prompt</span>
+        <span class="k">if</span> (!fgets(line, <span class="k">sizeof</span>(line), stdin)) <span class="k">break</span>;  <span class="c">// ২. পড়া (Ctrl+D-তে শেষ)</span>
+        line[strcspn(line, <span class="s">"\n"</span>)] = 0;      <span class="c">// newline সরাও</span>
+
+        <span class="k">if</span> (strlen(line) == 0) <span class="k">continue</span>;      <span class="c">// খালি লাইন এড়াও</span>
+        <span class="k">if</span> (strcmp(line, <span class="s">"exit"</span>) == 0) <span class="k">break</span>; <span class="c">// built-in: exit</span>
+
+        <span class="c">// ৩. খুব সরল parse (শুধু কমান্ড, argument ছাড়া আপাতত)</span>
+        <span class="k">char</span> *args[] = { line, NULL };
+
+        <span class="k">int</span> pid = fork();                <span class="c">// ৪. fork</span>
+        <span class="k">if</span> (pid == 0) {
+            execvp(args[0], args);       <span class="c">// child: কমান্ড হয়ে যাও</span>
+            perror(<span class="s">"exec"</span>);              <span class="c">// এখানে এলে exec ব্যর্থ</span>
+            exit(1);
+        } <span class="k">else</span> {
+            wait(NULL);                  <span class="c">// ৫. parent: অপেক্ষা</span>
+        }
+    }
+    <span class="k">return</span> 0;
+}</pre>
+    <div class="box lab"><span class="tag">🛠 চালান</span>
+    <pre>gcc tiny_shell.c -o myshell
+./myshell
+myshell&gt; ls
+myshell&gt; date
+myshell&gt; exit</pre>
+    কাজ করছে! এটা fork+exec+wait-এর সরাসরি প্রয়োগ। তবে এখনো argument নিতে পারে না (<code>ls -l</code> চলবে না)।</div>
+    <h3>ধাপ ২ — argument parse করা</h3>
+    <p>লাইনটাকে স্পেস দিয়ে ভেঙে একটা argument array বানাতে হবে। <code>strtok()</code> দিয়ে:</p>
+    <pre><span class="c">// লাইনকে শব্দে ভাঙা</span>
+<span class="k">char</span> *args[64];
+<span class="k">int</span> i = 0;
+<span class="k">char</span> *token = strtok(line, <span class="s">" "</span>);
+<span class="k">while</span> (token != NULL &amp;&amp; i &lt; 63) {
+    args[i++] = token;
+    token = strtok(NULL, <span class="s">" "</span>);
+}
+args[i] = NULL;                    <span class="c">// execvp-এর জন্য NULL দিয়ে শেষ করা জরুরি</span>
+<span class="c">// এখন execvp(args[0], args) দিয়ে "ls -l" ও চলবে</span></pre>
+    <h3>ধাপে ধাপে বাড়ান — চ্যালেঞ্জ</h3>
+    <div class="box lab"><span class="tag">🛠 নিজে যোগ করুন (সহজ থেকে কঠিন)</span>
+    <ol style="margin:6px 0 0">
+      <li><strong>Built-in <code>cd</code>:</strong> <code>cd</code> কেন fork/exec দিয়ে হয় না? (কারণ directory বদলাতে হবে <em>shell-এর নিজের</em>, child-এর নয় — <code>chdir()</code> সরাসরি parent-এ ডাকতে হবে)</li>
+      <li><strong>Redirection <code>&gt;</code>:</strong> <code>ls &gt; out.txt</code> — child-এ exec-এর আগে stdout-কে ফাইলে redirect করুন (<code>open()</code> + <code>dup2()</code>)</li>
+      <li><strong>Pipe <code>|</code>:</strong> <code>ls | grep txt</code> — দুটো child, একটা pipe দিয়ে যুক্ত (<code>pipe()</code> + <code>dup2()</code>)</li>
+      <li><strong>Background <code>&amp;</code>:</strong> <code>sleep 5 &amp;</code> — parent wait করবে না, prompt সাথে সাথে ফিরে আসবে</li>
+      <li><strong>একাধিক কমান্ড:</strong> <code>;</code> দিয়ে আলাদা করা কমান্ড পরপর চালানো</li>
+    </ol></div>
+    <div class="box deep"><span class="tag">🔬 কেন cd built-in হতেই হবে</span>
+    এটা একটা চমৎকার শিক্ষা। আপনি যদি <code>cd</code>-কে fork করে child-এ চালান, তাহলে child-এর directory বদলাবে — কিন্তু child তো সাথে সাথে শেষ হয়ে যায়! parent shell যেখানে ছিল সেখানেই থাকে। তাই <code>cd</code>, <code>exit</code>, <code>export</code>-এর মতো কমান্ডগুলো shell-কে <strong>নিজেই</strong> চালাতে হয়, fork ছাড়া। এই কারণেই এগুলো "built-in"। ভেবে দেখলে বোঝা যায় — process-এর memory যে আলাদা, তারই সরাসরি পরিণতি এটা।</div>
+    <div class="box lab"><span class="tag">🛠 আরও এগোতে চাইলে</span>
+    কাজ করা shell হয়ে গেলে যোগ করুন: command history (উপর-তীর দিয়ে আগের কমান্ড), tab completion, environment variable (<code>$HOME</code>), signal handling (<code>Ctrl+C</code> যেন shell বন্ধ না করে শুধু চলমান কমান্ড থামায়)। এগুলো করতে করতে আপনি bash-এর অনেক আচরণ কেন সেভাবে, তা বুঝে যাবেন।</div>
+    <div class="box analogy" style="margin-top:40px;text-align:center;background:#e7f1ee;border-color:#1a6b5a">
+      <span class="tag" style="color:#1a6b5a">🎓 মডিউল ২ শেষ!</span>
+      আপনি এখন জানেন process কী, তার জীবনচক্র, fork/exec/wait কীভাবে নতুন process বানায়, context switch কীভাবে এক CPU-তে অনেক process চালায়, scheduler কীভাবে সিদ্ধান্ত নেয়, thread ও IPC কী — আর নিজে একটা কাজ করা shell বানিয়েছেন।<br><br>
+      পরের ধাপে <strong>মডিউল ৩ (Memory ও Virtual Memory)</strong> — প্রতিটা process কীভাবে মনে করে তার কাছে পুরো RAM আছে, paging কীভাবে কাজ করে, আর নিজে একটা <code>malloc</code> লিখবেন।
+    </div>
+  </section>
+</main>
+</div>
+<script>
+  const links=[...document.querySelectorAll('#toc a')];
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+  const onScroll=()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<=120)idx=i;});links.forEach(l=>l.classList.remove('active'));links[idx]&&links[idx].classList.add('active');};
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+</script>
+</body>
+</html>

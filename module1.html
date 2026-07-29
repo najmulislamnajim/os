@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>অপারেটিং সিস্টেম · মডিউল ১ — ভিত্তি</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#12100e;--paper:#f5f1e8;--paper2:#ece5d6;--line:#d6ccb6;--accent:#7a4a1e;--accent2:#b8501f;--teal:#1a6b5a;--blue:#25608f;--plum:#6a3d7a;--green:#3d6b2f;--muted:#6a6152;--code-bg:#1a1613;--code-ink:#e9e3d5}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:18px;line-height:1.82}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace}
+  .wrap{display:flex;min-height:100vh}
+  aside{width:296px;flex-shrink:0;background:var(--paper2);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 20px}
+  main{flex:1;max-width:880px;margin:0 auto;padding:50px 50px 130px}
+  aside .brand{font-weight:700;font-size:1.02rem;line-height:1.35;color:var(--accent)}
+  aside .brand small{display:block;font-weight:400;font-size:.66rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;margin-top:7px}
+  aside nav{margin-top:20px}
+  aside nav a{display:block;text-decoration:none;color:var(--ink);padding:6px 11px;border-radius:7px;font-size:.87rem;margin-bottom:1px}
+  aside nav a .n{color:var(--accent);font-weight:600;font-family:'JetBrains Mono';font-size:.73rem;margin-right:7px}
+  aside nav a:hover{background:var(--paper)}
+  aside nav a.active{background:var(--accent);color:#fff}
+  aside nav a.active .n{color:#e8c9a8}
+  aside .modtag{font-size:.67rem;background:var(--accent2);color:#fff;padding:2px 9px;border-radius:20px;letter-spacing:.07em;display:inline-block;margin-top:13px}
+  .hero{border-bottom:2px solid var(--ink);padding-bottom:30px;margin-bottom:44px}
+  .hero .eyebrow{font-family:'JetBrains Mono';font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:15px}
+  .hero h1{font-size:2.8rem;line-height:1.08;margin:0 0 15px;font-weight:700;letter-spacing:-.6px}
+  .hero p{font-size:1.1rem;color:var(--muted);max-width:60ch;margin:0}
+  section.chapter{margin-bottom:72px;scroll-margin-top:20px}
+  .ch-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:26px}
+  .ch-head .ch-num{font-family:'JetBrains Mono';font-size:2.1rem;font-weight:600;color:var(--accent);line-height:1}
+  .ch-head h2{font-size:1.72rem;margin:0;font-weight:700;letter-spacing:-.3px}
+  .ch-head .ch-sub{font-size:.79rem;color:var(--muted);font-family:'JetBrains Mono'}
+  h3{font-size:1.24rem;margin:34px 0 12px;font-weight:600}
+  h4{font-size:1.02rem;margin:22px 0 8px;font-weight:600;color:var(--accent)}
+  p{margin:12px 0}
+  .lead{font-size:1.04rem}
+  .box{border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.95rem;line-height:1.72}
+  .analogy{background:#fff5e6;border:1px solid #e6cb9c}
+  .analogy .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .note{background:#e7f1ee;border:1px solid #b2d4ca}
+  .note .tag{font-weight:700;color:var(--teal);font-size:.79rem;display:block;margin-bottom:5px}
+  .deep{background:#efe9f2;border:1px solid #cbb6d6}
+  .deep .tag{font-weight:700;color:var(--plum);font-size:.79rem;display:block;margin-bottom:5px}
+  .warn{background:#fceadf;border:1px solid #ecbb9d}
+  .warn .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .lab{background:#eaf1e4;border:1px solid #b6cfa2}
+  .lab .tag{font-weight:700;color:var(--green);font-size:.79rem;display:block;margin-bottom:5px}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:.81rem;line-height:1.62;margin:16px 0}
+  pre .c{color:#8a9b8f}
+  pre .k{color:#e0b080}
+  pre .s{color:#9ecb8a}
+  pre .f{color:#8fb8e0}
+  p code,li code,td code{background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.83em;color:var(--accent2)}
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.88rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--paper2);font-weight:600;font-size:.82rem}
+  tr:hover td{background:#fff8ee}
+  figure{margin:26px 0}
+  .diagram{background:#fffdf7;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center}
+  figcaption{font-size:.82rem;color:var(--muted);text-align:center;margin-top:10px;font-style:italic}
+  svg{max-width:100%;height:auto}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  .quiz{background:var(--paper2);border:1px dashed var(--accent);border-radius:12px;padding:18px 22px;margin:24px 0}
+  .quiz .tag{font-weight:700;color:var(--accent);display:block;margin-bottom:8px;font-size:.86rem}
+  .quiz summary{cursor:pointer;font-weight:500;margin:8px 0}
+  .quiz details p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
+  .toc-hint{color:var(--muted);font-size:.76rem;margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+  @media(max-width:900px){aside{display:none}main{padding:28px 20px 90px}.hero h1{font-size:1.95rem}body{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+  <div class="brand">অপারেটিং সিস্টেম<small>মডিউল ১ · ভিত্তি</small></div>
+  <span class="modtag">FOUNDATIONS</span>
+  <nav id="toc">
+    <a href="#ch0"><span class="n">০০</span>শুরুর কথা</a>
+    <a href="#ch1"><span class="n">০১</span>OS আসলে কী</a>
+    <a href="#ch2"><span class="n">০২</span>Kernel ও User Space</a>
+    <a href="#ch3"><span class="n">০৩</span>System Call</a>
+    <a href="#ch4"><span class="n">০৪</span>Interrupt ও Trap</a>
+    <a href="#ch5"><span class="n">০৫</span>OS-এর স্থাপত্য</a>
+    <a href="#ch6"><span class="n">০৬</span>Boot Process</a>
+    <a href="#ch7"><span class="n">০৭</span>প্রজেক্ট: strace</a>
+  </nav>
+  <div class="toc-hint">সবুজ = হাতে-কলমে ল্যাব। বেগুনি = গভীর প্রযুক্তিগত অংশ। প্রতিটা কোড নিজে চালিয়ে দেখুন।</div>
+</aside>
+<main>
+  <div class="hero">
+    <div class="eyebrow">মডিউল ১ · ভিত্তি স্থাপন</div>
+    <h1>অপারেটিং সিস্টেমের<br>ভিত্তি</h1>
+    <p>OS আসলে কী কাজ করে, হার্ডওয়্যারের সাথে কীভাবে কথা বলে, আর আপনার প্রোগ্রাম কীভাবে kernel-এর সাহায্য চায় — সব একদম গোড়া থেকে। এই মডিউলই বাকি সব মডিউলের ভিত্তি।</p>
+  </div>
+
+  <section class="chapter" id="ch0">
+    <div class="ch-head"><span class="ch-num">০০</span><div><h2>শুরুর কথা</h2><div class="ch-sub">orientation</div></div></div>
+    <p class="lead">রোডম্যাপে দেখেছি OS তিনটা বড় ধারণার চারপাশে ঘোরে — Virtualization, Concurrency, Persistence। কিন্তু এসবের আগে বুঝতে হবে OS জিনিসটা <strong>কী</strong>, আর সে হার্ডওয়্যারের সাথে <strong>কীভাবে</strong> কাজ করে।</p>
+    <div class="box note"><span class="tag">📐 বাক্সের ধরন</span>
+    <strong>কমলা (উপমা):</strong> দৈনন্দিন জীবনের মিল। <strong>সবুজ (ল্যাব):</strong> নিজে হাতে করার প্রজেক্ট। <strong>বেগুনি (গভীরে):</strong> বেশি প্রযুক্তিগত। <strong>নীল (নোট):</strong> জরুরি তথ্য। <strong>লালচে (সতর্কতা):</strong> সাধারণ ভুল।</div>
+    <div class="box lab"><span class="tag">🛠 আগে পরিবেশ ঠিক করুন</span>
+    এই মডিউলের কোড চালাতে একটা Linux পরিবেশ লাগবে। Windows-এ <code>wsl --install</code> দিয়ে WSL2 বসান; Mac-এ বেশিরভাগ চলবে তবে <code>strace</code>-এর জন্য একটা Linux VM ভালো। থাকলে <code>gcc</code>, <code>strace</code>, <code>gdb</code> ইনস্টল করে নিন: <code>sudo apt install gcc strace gdb</code></div>
+  </section>
+
+  <section class="chapter" id="ch1">
+    <div class="ch-head"><span class="ch-num">০১</span><div><h2>অপারেটিং সিস্টেম আসলে কী?</h2><div class="ch-sub">what-is-an-os</div></div></div>
+    <p class="lead">আপনি যখন একটা প্রোগ্রাম চালান, সেটা সরাসরি হার্ডওয়্যারে চলে না। মাঝখানে একজন <strong>মধ্যস্থতাকারী</strong> থাকে — অপারেটিং সিস্টেম। তার দুটো প্রধান কাজ।</p>
+    <div class="box analogy"><span class="tag">🏨 উপমা — হোটেলের ব্যবস্থাপক</span>
+    একটা হোটেলে অনেক অতিথি (প্রোগ্রাম), কিন্তু সীমিত রুম, লিফট, রান্নাঘর (হার্ডওয়্যার)। প্রতিটা অতিথি যদি সরাসরি রান্নাঘরে ঢুকে নিজের রান্না করতে চায়, বিশৃঙ্খলা হবে। তাই একজন <strong>ব্যবস্থাপক</strong> (OS) থাকে — সে ঠিক করে কে কোন রুম পাবে, কখন লিফট ব্যবহার করবে, আর কেউ যেন আরেকজনের রুমে ঢুকতে না পারে। অতিথিকে শুধু ব্যবস্থাপকের কাছে চাইতে হয়, বাকিটা সে সামলায়।</div>
+    <h3>OS-এর দুই প্রধান ভূমিকা</h3>
+    <h4>১. Resource Manager — সম্পদ ব্যবস্থাপক</h4>
+    <p>CPU, RAM, disk, নেটওয়ার্ক কার্ড — এগুলো সীমিত সম্পদ। অনেকগুলো প্রোগ্রাম একসাথে এগুলো চায়। OS ঠিক করে কে কখন কতটুকু পাবে, যাতে সবাই সুষ্ঠুভাবে চলে আর কেউ সব দখল করে না ফেলে।</p>
+    <h4>২. Hardware Abstraction — হার্ডওয়্যার আড়াল করা</h4>
+    <p>পৃথিবীতে হাজার রকম হার্ডওয়্যার — ভিন্ন ভিন্ন কোম্পানির disk, keyboard, GPU। প্রতিটা প্রোগ্রাম যদি প্রতিটা হার্ডওয়্যারের নিজস্ব ভাষা শিখতে হতো, প্রোগ্রামিং অসম্ভব হয়ে যেত। OS একটা <strong>সহজ, অভিন্ন ইন্টারফেস</strong> দেয় — আপনি শুধু <code>write()</code> বলেন, কোন ব্র্যান্ডের disk তা OS সামলায়।</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <text x="320" y="22" text-anchor="middle" font-size="13" font-weight="600">OS হলো প্রোগ্রাম আর হার্ডওয়্যারের মাঝের স্তর</text>
+        <!-- apps -->
+        <g font-size="11" text-anchor="middle">
+          <rect x="70" y="45" width="120" height="42" rx="8" fill="#fff5e6" stroke="#b8501f"/><text x="130" y="70" font-weight="600">ব্রাউজার</text>
+          <rect x="210" y="45" width="120" height="42" rx="8" fill="#fff5e6" stroke="#b8501f"/><text x="270" y="70" font-weight="600">গেম</text>
+          <rect x="350" y="45" width="120" height="42" rx="8" fill="#fff5e6" stroke="#b8501f"/><text x="410" y="70" font-weight="600">টেক্সট এডিটর</text>
+          <rect x="490" y="45" width="80" height="42" rx="8" fill="#fff5e6" stroke="#b8501f"/><text x="530" y="70" font-weight="600">...</text>
+        </g>
+        <text x="320" y="107" text-anchor="middle" font-size="10" fill="#6a6152">প্রতিটা প্রোগ্রাম OS-এর কাছে সাহায্য চায় (system call)</text>
+        <!-- OS layer -->
+        <rect x="70" y="118" width="500" height="60" rx="10" fill="#fbf0e2" stroke="#7a4a1e" stroke-width="2"/>
+        <text x="320" y="143" text-anchor="middle" font-size="14" font-weight="700" fill="#7a4a1e">অপারেটিং সিস্টেম (Kernel)</text>
+        <text x="320" y="163" text-anchor="middle" font-size="10" fill="#6a6152">সম্পদ ভাগ করে · হার্ডওয়্যার আড়াল করে · নিরাপত্তা দেয়</text>
+        <text x="320" y="198" text-anchor="middle" font-size="10" fill="#6a6152">OS হার্ডওয়্যারকে সরাসরি নিয়ন্ত্রণ করে (driver)</text>
+        <!-- hardware -->
+        <g font-size="11" text-anchor="middle">
+          <rect x="70" y="212" width="110" height="42" rx="8" fill="#e6eef5" stroke="#25608f"/><text x="125" y="237" font-weight="600">CPU</text>
+          <rect x="192" y="212" width="110" height="42" rx="8" fill="#e6eef5" stroke="#25608f"/><text x="247" y="237" font-weight="600">RAM</text>
+          <rect x="314" y="212" width="110" height="42" rx="8" fill="#e6eef5" stroke="#25608f"/><text x="369" y="237" font-weight="600">Disk</text>
+          <rect x="436" y="212" width="134" height="42" rx="8" fill="#e6eef5" stroke="#25608f"/><text x="503" y="237" font-weight="600">নেটওয়ার্ক কার্ড</text>
+        </g>
+        <line x1="320" y1="87" x2="320" y2="118" stroke="#7a4a1e" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="320" y1="178" x2="320" y2="212" stroke="#7a4a1e" stroke-width="1.5" stroke-dasharray="4 3"/>
+      </svg>
+    </div><figcaption>OS প্রোগ্রাম ও হার্ডওয়্যারের মাঝে বসে দুটোকে যুক্ত করে</figcaption></figure>
+    <div class="box note"><span class="tag">💡 মূল অন্তর্দৃষ্টি</span>
+    OS আসলে একটা প্রোগ্রাম — কিন্তু একটা <strong>বিশেষ</strong> প্রোগ্রাম যার হার্ডওয়্যারের উপর পূর্ণ নিয়ন্ত্রণ আছে। বাকি সব প্রোগ্রাম তার অনুমতি নিয়ে চলে। এই "বিশেষ ক্ষমতা"-র ব্যাপারটাই পরের অধ্যায়ের বিষয়।</p></div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>OS-এর দুটো প্রধান কাজ কী?</summary><p>(১) Resource manager — সীমিত হার্ডওয়্যার সম্পদ প্রোগ্রামগুলোর মধ্যে ভাগ করা। (২) Hardware abstraction — বিভিন্ন হার্ডওয়্যারকে একটা সহজ, অভিন্ন ইন্টারফেসের আড়ালে লুকানো।</p></details>
+    <details><summary>একটা প্রোগ্রাম কি সরাসরি disk-এ লিখতে পারে?</summary><p>না — তাকে OS-এর কাছে <code>write()</code> দিয়ে চাইতে হয়। OS-ই আসল হার্ডওয়্যার নিয়ন্ত্রণ করে। এটাই নিরাপত্তা ও শৃঙ্খলার ভিত্তি।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch2">
+    <div class="ch-head"><span class="ch-num">০২</span><div><h2>Kernel ও User Space</h2><div class="ch-sub">kernel-vs-user</div></div></div>
+    <p class="lead">এটা OS-এর সবচেয়ে মৌলিক ধারণা। CPU দুটো আলাদা "মোডে" চলতে পারে, আর এই দুই মোডের বিভাজনই আধুনিক কম্পিউটিং-এর নিরাপত্তার ভিত্তি।</p>
+    <div class="box analogy"><span class="tag">🔑 উপমা — ব্যাংকের কর্মী বনাম গ্রাহক</span>
+    ব্যাংকে গ্রাহক (user) কাউন্টারের সামনে দাঁড়িয়ে অনুরোধ করে — "৫০০০ টাকা তুলবো"। সে নিজে ভল্টে ঢুকতে পারে না। শুধু কর্মী (kernel) ভল্টে ঢোকার অধিকার রাখে। গ্রাহক চাইলে কর্মী যাচাই করে কাজটা করে দেয়। এভাবে ভল্ট (হার্ডওয়্যার) নিরাপদ থাকে — যে কেউ ইচ্ছেমতো ঢুকতে পারে না।</div>
+    <h3>দুটো মোড</h3>
+    <table>
+      <tr><th></th><th>Kernel Mode</th><th>User Mode</th></tr>
+      <tr><td>কে চলে</td><td>OS-এর মূল অংশ (kernel)</td><td>সাধারণ প্রোগ্রাম</td></tr>
+      <tr><td>ক্ষমতা</td><td>সম্পূর্ণ — সব হার্ডওয়্যার, সব instruction</td><td>সীমিত — সরাসরি হার্ডওয়্যার নিষিদ্ধ</td></tr>
+      <tr><td>Memory</td><td>সব memory দেখতে ও বদলাতে পারে</td><td>শুধু নিজের বরাদ্দ অংশ</td></tr>
+      <tr><td>ভুল হলে</td><td>পুরো সিস্টেম ক্র্যাশ (kernel panic)</td><td>শুধু ওই প্রোগ্রাম বন্ধ হয়</td></tr>
+    </table>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 620 260" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <!-- user space -->
+        <rect x="40" y="35" width="540" height="90" rx="10" fill="#fff5e6" stroke="#b8501f" stroke-width="1.5"/>
+        <text x="60" y="58" font-size="12" font-weight="700" fill="#b8501f">User Space (সীমিত ক্ষমতা)</text>
+        <g font-size="10.5" text-anchor="middle">
+          <rect x="60" y="70" width="100" height="40" rx="6" fill="#fff" stroke="#b8501f"/><text x="110" y="94">ব্রাউজার</text>
+          <rect x="175" y="70" width="100" height="40" rx="6" fill="#fff" stroke="#b8501f"/><text x="225" y="94">গেম</text>
+          <rect x="290" y="70" width="100" height="40" rx="6" fill="#fff" stroke="#b8501f"/><text x="340" y="94">এডিটর</text>
+          <rect x="405" y="70" width="155" height="40" rx="6" fill="#fff" stroke="#b8501f"/><text x="482" y="94">আপনার প্রোগ্রাম</text>
+        </g>
+        <!-- boundary -->
+        <rect x="40" y="130" width="540" height="26" rx="5" fill="#7a4a1e"/>
+        <text x="320" y="148" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">━━ নিরাপত্তা সীমানা (system call দিয়ে পার হওয়া যায়) ━━</text>
+        <!-- kernel space -->
+        <rect x="40" y="161" width="540" height="80" rx="10" fill="#fbf0e2" stroke="#7a4a1e" stroke-width="1.5"/>
+        <text x="60" y="184" font-size="12" font-weight="700" fill="#7a4a1e">Kernel Space (পূর্ণ ক্ষমতা)</text>
+        <g font-size="10.5" text-anchor="middle">
+          <rect x="60" y="196" width="115" height="34" rx="6" fill="#fff" stroke="#7a4a1e"/><text x="117" y="217">Scheduler</text>
+          <rect x="190" y="196" width="115" height="34" rx="6" fill="#fff" stroke="#7a4a1e"/><text x="247" y="217">Memory Mgr</text>
+          <rect x="320" y="196" width="115" height="34" rx="6" fill="#fff" stroke="#7a4a1e"/><text x="377" y="217">File System</text>
+          <rect x="450" y="196" width="110" height="34" rx="6" fill="#fff" stroke="#7a4a1e"/><text x="505" y="217">Drivers</text>
+        </g>
+      </svg>
+    </div><figcaption>দুটো আলাদা জগৎ — মাঝের সীমানা শুধু system call দিয়ে পার হওয়া যায়</figcaption></figure>
+    <div class="box deep"><span class="tag">🔬 গভীরে — CPU কীভাবে মোড জানে?</span>
+    CPU-র ভেতরে একটা বিশেষ বিট থাকে (x86-এ একে বলে "ring level" — ring 0 = kernel, ring 3 = user)। কিছু instruction (যেমন সরাসরি disk-এ লেখা, interrupt নিয়ন্ত্রণ করা) শুধু ring 0-তে চলে। User mode-এ থাকা প্রোগ্রাম যদি এই "privileged instruction" চালানোর চেষ্টা করে, CPU সাথে সাথে একটা <strong>exception</strong> তোলে আর OS প্রোগ্রামটাকে থামিয়ে দেয়। এই হার্ডওয়্যার-স্তরের বাধাই নিরাপত্তার আসল ভিত্তি — এটা সফটওয়্যার দিয়ে বাইপাস করা যায় না।</div>
+    <div class="box note"><span class="tag">💡 কেন এই বিভাজন এত গুরুত্বপূর্ণ?</span>
+    এই দুই-মোডের ব্যবস্থা না থাকলে যেকোনো প্রোগ্রাম যেকোনো সময় পুরো সিস্টেম নিয়ন্ত্রণ করতে পারত — একটা বাগি প্রোগ্রাম বা ভাইরাস পুরো মেশিন দখল করে নিত। এই বিভাজনের কারণেই একটা প্রোগ্রাম ক্র্যাশ করলে শুধু সেটাই বন্ধ হয়, পুরো কম্পিউটার নয়।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>User mode-এ একটা প্রোগ্রাম সরাসরি হার্ডওয়্যার ছুঁতে চাইলে কী হয়?</summary><p>CPU একটা exception তোলে, আর OS প্রোগ্রামটাকে থামিয়ে দেয় (সাধারণত segmentation fault বা অনুরূপ)। privileged instruction শুধু kernel mode-এ চলে।</p></details>
+    <details><summary>Kernel-এ বাগ থাকলে আর user প্রোগ্রামে বাগ থাকলে — পার্থক্য?</summary><p>User প্রোগ্রামের বাগে শুধু সেই প্রোগ্রাম ক্র্যাশ করে। Kernel-এর বাগে পুরো সিস্টেম ক্র্যাশ করতে পারে (kernel panic / BSOD), কারণ kernel-এর পূর্ণ ক্ষমতা।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch3">
+    <div class="ch-head"><span class="ch-num">০৩</span><div><h2>System Call — kernel-এর দরজা</h2><div class="ch-sub">system-calls</div></div></div>
+    <p class="lead">User প্রোগ্রাম নিজে হার্ডওয়্যার ছুঁতে পারে না। তাহলে ফাইল পড়বে কীভাবে, নেটওয়ার্কে পাঠাবে কীভাবে? উত্তর — <strong>system call</strong>। এটাই user space থেকে kernel-এ ঢোকার একমাত্র বৈধ দরজা।</p>
+    <div class="box analogy"><span class="tag">🪟 উপমা — অফিসের সার্ভিস উইন্ডো</span>
+    সরকারি অফিসে আপনি ভেতরে ঢুকতে পারেন না, কিন্তু একটা নির্দিষ্ট জানালা আছে। সেখানে গিয়ে নির্দিষ্ট ফর্ম পূরণ করে অনুরোধ করেন। ভেতরের কর্মী যাচাই করে কাজটা করে ফলাফল ফিরিয়ে দেয়। System call হলো সেই জানালা — নির্দিষ্ট কিছু অনুরোধ, নির্দিষ্ট নিয়মে।</div>
+    <h3>কিছু সাধারণ system call</h3>
+    <table>
+      <tr><th>System Call</th><th>কাজ</th></tr>
+      <tr><td><code>read()</code> / <code>write()</code></td><td>ফাইল বা ডিভাইস থেকে পড়া / লেখা</td></tr>
+      <tr><td><code>open()</code> / <code>close()</code></td><td>ফাইল খোলা / বন্ধ করা</td></tr>
+      <tr><td><code>fork()</code></td><td>নতুন process তৈরি</td></tr>
+      <tr><td><code>exec()</code></td><td>নতুন প্রোগ্রাম চালানো</td></tr>
+      <tr><td><code>exit()</code></td><td>process শেষ করা</td></tr>
+      <tr><td><code>mmap()</code></td><td>memory বরাদ্দ / ফাইল ম্যাপ</td></tr>
+    </table>
+    <h3>একটা system call-এ ঠিক কী ঘটে</h3>
+    <p>আপনি যখন C-তে <code>printf("Hello")</code> লেখেন, তার নিচে শেষ পর্যন্ত একটা <code>write()</code> system call ঘটে। ধাপগুলো দেখুন:</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="sa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7a4a1e"/></marker></defs>
+        <!-- user side -->
+        <rect x="30" y="30" width="270" height="240" rx="10" fill="#fff5e6" stroke="#b8501f" stroke-dasharray="5 4"/>
+        <text x="165" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#b8501f">User Mode</text>
+        <!-- kernel side -->
+        <rect x="340" y="30" width="270" height="240" rx="10" fill="#fbf0e2" stroke="#7a4a1e" stroke-dasharray="5 4"/>
+        <text x="475" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#7a4a1e">Kernel Mode</text>
+        <g font-size="10.5">
+          <rect x="55" y="70" width="220" height="34" rx="6" fill="#fff" stroke="#b8501f"/><text x="165" y="91" text-anchor="middle">১. printf("Hello") ডাকা</text>
+          <rect x="55" y="118" width="220" height="34" rx="6" fill="#fff" stroke="#b8501f"/><text x="165" y="139" text-anchor="middle">২. write() syscall প্রস্তুত</text>
+          <rect x="55" y="166" width="220" height="34" rx="6" fill="#fff" stroke="#b8501f"/><text x="165" y="187" text-anchor="middle">৩. syscall instruction (trap)</text>
+          <rect x="55" y="228" width="220" height="34" rx="6" fill="#fff" stroke="#b8501f"/><text x="165" y="249" text-anchor="middle">৭. ফলাফল নিয়ে ফেরত</text>
+          <rect x="365" y="118" width="220" height="34" rx="6" fill="#fff" stroke="#7a4a1e"/><text x="475" y="139" text-anchor="middle">৪. kernel-এ লাফ (mode switch)</text>
+          <rect x="365" y="166" width="220" height="34" rx="6" fill="#fff" stroke="#7a4a1e"/><text x="475" y="187" text-anchor="middle">৫. আসল কাজ (screen-এ লেখা)</text>
+          <rect x="365" y="214" width="220" height="34" rx="6" fill="#fff" stroke="#7a4a1e"/><text x="475" y="235" text-anchor="middle">৬. user mode-এ ফেরা</text>
+        </g>
+        <line x1="275" y1="183" x2="363" y2="135" stroke="#7a4a1e" stroke-width="1.6" marker-end="url(#sa)"/>
+        <line x1="475" y1="200" x2="475" y2="214" stroke="#7a4a1e" stroke-width="1.6" marker-end="url(#sa)"/>
+        <line x1="363" y1="231" x2="277" y2="245" stroke="#7a4a1e" stroke-width="1.6" marker-end="url(#sa)"/>
+      </svg>
+    </div><figcaption>একটা system call-এ user ও kernel mode-এর মধ্যে যাওয়া-আসা</figcaption></figure>
+    <div class="box deep"><span class="tag">🔬 গভীরে — "trap" জিনিসটা কী?</span>
+    System call আসলে একটা নিয়ন্ত্রিত "trap" — একটা বিশেষ CPU instruction (x86-64 Linux-এ <code>syscall</code>)। এটা চালালে CPU নিজে থেকে kernel mode-এ চলে যায় আর একটা পূর্বনির্ধারিত জায়গায় (system call handler) লাফ দেয়। প্রোগ্রাম একটা সংখ্যা দিয়ে বলে কোন syscall চায় (যেমন Linux x86-64-এ <code>write</code> = 1), আর register-এ argument রাখে। এই পুরো প্রক্রিয়াটা হার্ডওয়্যার + OS মিলে নিয়ন্ত্রণ করে, তাই user প্রোগ্রাম "ইচ্ছেমতো" kernel-এ ঢুকতে পারে না — শুধু এই নির্দিষ্ট দরজা দিয়ে।</div>
+    <div class="box warn"><span class="tag">⚠️ system call ব্যয়বহুল</span>
+    Mode switch-এ খরচ আছে — register সংরক্ষণ, mode বদল, cache-এর প্রভাব। এজন্য বেশি system call = ধীর প্রোগ্রাম। এই কারণেই <code>printf</code> ভেতরে ডেটা <strong>buffer</strong> করে রাখে আর একবারে অনেকটা লেখে, প্রতিটা অক্ষরে আলাদা <code>write()</code> করে না। পরের প্রজেক্টে <code>strace</code> দিয়ে এটা নিজ চোখে দেখবেন।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>System call কেন দরকar, প্রোগ্রাম সরাসরি কাজ করলেই তো হয়?</summary><p>কারণ user প্রোগ্রামের হার্ডওয়্যার ছোঁয়ার অধিকার নেই (নিরাপত্তা)। System call হলো নিয়ন্ত্রিত একটা দরজা, যেখানে kernel অনুরোধ যাচাই করে নিরাপদে কাজটা করে দেয়।</p></details>
+    <details><summary><code>printf</code> কেন সরাসরি প্রতি অক্ষরে write() করে না?</summary><p>System call ব্যয়বহুল (mode switch)। তাই printf ডেটা buffer করে একবারে লেখে — performance বাঁচাতে।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch4">
+    <div class="ch-head"><span class="ch-num">০৪</span><div><h2>Interrupt ও Trap</h2><div class="ch-sub">interrupts-and-traps</div></div></div>
+    <p class="lead">CPU একটা সময়ে একটা কাজ করে। কিন্তু keyboard চাপলে, নেটওয়ার্কে প্যাকেট এলে, বা timer বেজে উঠলে — CPU কীভাবে জানে? সে বারবার জিজ্ঞেস করে না; বরং হার্ডওয়্যার তাকে <strong>interrupt</strong> দিয়ে ডাকে।</p>
+    <div class="box analogy"><span class="tag">🔔 উপমা — কলিং বেল বনাম বারবার দরজা দেখা</span>
+    আপনি কাজ করছেন। অতিথি এলো কিনা জানতে দুটো উপায়: (১) প্রতি মিনিটে উঠে দরজা দেখা — সময়ের অপচয় (একে বলে polling); (২) একটা কলিং বেল লাগানো — অতিথি এলে বেল বাজবে, আপনি তখনই যাবেন (এটাই interrupt)। CPU দ্বিতীয় পদ্ধতি ব্যবহার করে — কাজ করতে থাকে, দরকার হলে হার্ডওয়্যার "বেল বাজায়"।</div>
+    <h3>তিন ধরনের "বাধা"</h3>
+    <table>
+      <tr><th>ধরন</th><th>উৎস</th><th>উদাহরণ</th></tr>
+      <tr><td><strong>Interrupt</strong> (hardware)</td><td>বাইরের ডিভাইস</td><td>keyboard চাপ, প্যাকেট আসা, timer</td></tr>
+      <tr><td><strong>Trap</strong> (software)</td><td>প্রোগ্রাম নিজে ইচ্ছাকৃত</td><td>system call</td></tr>
+      <tr><td><strong>Exception / Fault</strong></td><td>প্রোগ্রামের ভুল</td><td>শূন্য দিয়ে ভাগ, ভুল memory অ্যাক্সেস</td></tr>
+    </table>
+    <h3>Interrupt এলে কী ঘটে</h3>
+    <p>CPU বর্তমান কাজ থামায়, বর্তমান অবস্থা (register) সংরক্ষণ করে, kernel-এর একটা নির্দিষ্ট <strong>interrupt handler</strong>-এ লাফ দেয়, সেটা কাজ সারে, তারপর CPU আগের জায়গায় ফিরে যেন কিছুই হয়নি এমনভাবে কাজ চালিয়ে যায়।</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 620 220" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="ia" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#b8501f"/></marker></defs>
+        <!-- main task line -->
+        <rect x="40" y="50" width="150" height="34" rx="6" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="115" y="72" text-anchor="middle" font-size="10.5">প্রোগ্রাম চলছে</text>
+        <rect x="440" y="50" width="150" height="34" rx="6" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="515" y="72" text-anchor="middle" font-size="10.5">আবার চলছে</text>
+        <!-- interrupt -->
+        <text x="230" y="35" font-size="11" fill="#b8501f" font-weight="600">⚡ keyboard চাপ!</text>
+        <rect x="230" y="120" width="170" height="50" rx="6" fill="#fceadf" stroke="#b8501f"/>
+        <text x="315" y="140" text-anchor="middle" font-size="10.5" font-weight="600">Interrupt Handler</text>
+        <text x="315" y="157" text-anchor="middle" font-size="9" fill="#6a6152">(kernel-এ, দ্রুত)</text>
+        <line x1="190" y1="67" x2="228" y2="67" stroke="#1a6b5a" stroke-width="2"/>
+        <line x1="230" y1="60" x2="290" y2="118" stroke="#b8501f" stroke-width="1.8" marker-end="url(#ia)"/>
+        <text x="235" y="105" font-size="9" fill="#b8501f">১. থামো, লাফ দাও</text>
+        <line x1="360" y1="118" x2="438" y2="72" stroke="#b8501f" stroke-width="1.8" marker-end="url(#ia)"/>
+        <text x="380" y="105" font-size="9" fill="#b8501f">২. সেরে ফিরে এসো</text>
+        <text x="315" y="200" text-anchor="middle" font-size="10" fill="#6a6152">প্রোগ্রাম টেরও পায় না যে মাঝখানে একটা interrupt ঘটেছে</text>
+      </svg>
+    </div><figcaption>Interrupt এলে CPU সাময়িকভাবে সরে গিয়ে কাজ সেরে আবার ফিরে আসে</figcaption></figure>
+    <div class="box note"><span class="tag">⏰ Timer interrupt — OS-এর সবচেয়ে জরুরি interrupt</span>
+    একটা হার্ডওয়্যার timer নিয়মিত (যেমন প্রতি ১০ মিলিসেকেন্ডে) CPU-কে interrupt করে। এটাই OS-কে নিয়ন্ত্রণ ফিরিয়ে দেয় — নাহলে একটা প্রোগ্রাম CPU দখল করে বসে থাকলে OS কখনো তাকে থামাতে পারত না। এই timer interrupt-ই <strong>multitasking</strong>-এর ভিত্তি (মডিউল ২-তে বিস্তারিত): প্রতিবার timer বাজলে OS সিদ্ধান্ত নিতে পারে "এবার কি অন্য প্রোগ্রামকে সুযোগ দেবো?"।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Polling আর interrupt-এর মধ্যে কোনটা দক্ষ, কেন?</summary><p>Interrupt। Polling-এ CPU বারবার জিজ্ঞেস করে সময় নষ্ট করে; interrupt-এ CPU কাজ করতে থাকে আর দরকার হলে হার্ডওয়্যার তাকে ডাকে।</p></details>
+    <details><summary>Timer interrupt না থাকলে কী সমস্যা হতো?</summary><p>একটা প্রোগ্রাম CPU দখল করে বসে থাকলে (যেমন infinite loop) OS কখনো নিয়ন্ত্রণ ফিরে পেত না — multitasking অসম্ভব হতো।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch5">
+    <div class="ch-head"><span class="ch-num">০৫</span><div><h2>OS-এর স্থাপত্য</h2><div class="ch-sub">os-architecture</div></div></div>
+    <p class="lead">সব OS একইভাবে বানানো নয়। মূল প্রশ্ন — kernel-এর ভেতরে কতটুকু থাকবে? এই সিদ্ধান্তই monolithic ও microkernel-এর পার্থক্য গড়ে দেয়।</p>
+    <h3>দুটো প্রধান নকশা</h3>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <text x="160" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#7a4a1e">Monolithic (Linux)</text>
+        <text x="480" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#25608f">Microkernel (Minix)</text>
+        <!-- monolithic -->
+        <rect x="40" y="35" width="240" height="40" rx="7" fill="#fff5e6" stroke="#b8501f"/>
+        <text x="160" y="60" text-anchor="middle" font-size="10.5">User প্রোগ্রাম</text>
+        <rect x="40" y="82" width="240" height="140" rx="7" fill="#fbf0e2" stroke="#7a4a1e" stroke-width="1.5"/>
+        <text x="160" y="100" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7a4a1e">Kernel (সব একসাথে)</text>
+        <g font-size="9" text-anchor="middle">
+          <rect x="55" y="110" width="95" height="28" rx="4" fill="#fff" stroke="#7a4a1e"/><text x="102" y="128">Scheduler</text>
+          <rect x="160" y="110" width="105" height="28" rx="4" fill="#fff" stroke="#7a4a1e"/><text x="212" y="128">Memory</text>
+          <rect x="55" y="144" width="95" height="28" rx="4" fill="#fff" stroke="#7a4a1e"/><text x="102" y="162">File Sys</text>
+          <rect x="160" y="144" width="105" height="28" rx="4" fill="#fff" stroke="#7a4a1e"/><text x="212" y="162">Drivers</text>
+          <rect x="55" y="178" width="210" height="28" rx="4" fill="#fff" stroke="#7a4a1e"/><text x="160" y="196">Network Stack</text>
+        </g>
+        <!-- microkernel -->
+        <rect x="360" y="35" width="240" height="70" rx="7" fill="#fff5e6" stroke="#b8501f"/>
+        <text x="480" y="52" text-anchor="middle" font-size="10" font-weight="600" fill="#b8501f">User Space-এ সার্ভিস</text>
+        <g font-size="8.5" text-anchor="middle">
+          <rect x="372" y="60" width="70" height="24" rx="4" fill="#fff" stroke="#b8501f"/><text x="407" y="76">File Sys</text>
+          <rect x="447" y="60" width="70" height="24" rx="4" fill="#fff" stroke="#b8501f"/><text x="482" y="76">Drivers</text>
+          <rect x="522" y="60" width="66" height="24" rx="4" fill="#fff" stroke="#b8501f"/><text x="555" y="76">Network</text>
+        </g>
+        <rect x="360" y="112" width="240" height="60" rx="7" fill="#e6eef5" stroke="#25608f" stroke-width="1.5"/>
+        <text x="480" y="135" text-anchor="middle" font-size="10.5" font-weight="700" fill="#25608f">Microkernel (শুধু মূল)</text>
+        <text x="480" y="153" text-anchor="middle" font-size="8.5" fill="#6a6152">IPC · scheduling · basic memory</text>
+        <text x="480" y="192" text-anchor="middle" font-size="9" fill="#6a6152">বাকি সব user space-এ, বার্তা দিয়ে কথা বলে</text>
+      </svg>
+    </div><figcaption>Monolithic — সব kernel-এ; Microkernel — শুধু মূল অংশ kernel-এ, বাকি user space-এ</figcaption></figure>
+    <table>
+      <tr><th></th><th>Monolithic</th><th>Microkernel</th></tr>
+      <tr><td>kernel-এ কী</td><td>প্রায় সব (driver, FS, network)</td><td>শুধু ন্যূনতম (IPC, scheduling)</td></tr>
+      <tr><td>গতি</td><td>দ্রুত (সব একসাথে, সরাসরি ডাক)</td><td>ধীর (বার্তা পাঠানোর খরচ)</td></tr>
+      <tr><td>নির্ভরযোগ্যতা</td><td>একটা driver ক্র্যাশে পুরো kernel ঝুঁকিতে</td><td>একটা সার্ভিস ক্র্যাশ করলেও kernel টিকে থাকে</td></tr>
+      <tr><td>উদাহরণ</td><td>Linux, বেশিরভাগ UNIX</td><td>Minix, QNX, seL4</td></tr>
+    </table>
+    <div class="box note"><span class="tag">💡 বাস্তবতা — hybrid</span>
+    বিশুদ্ধ কোনোটাই বেশিরভাগ ক্ষেত্রে ব্যবহৃত হয় না। Linux "monolithic" কিন্তু <strong>loadable kernel module</strong> দিয়ে চলতে চলতে driver যোগ করা যায়। Windows ও macOS মূলত hybrid — কিছু জিনিস kernel-এ, কিছু বাইরে। বাস্তব প্রকৌশল সবসময় বিশুদ্ধ তত্ত্বের চেয়ে ব্যবহারিক সমঝোতা।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Microkernel-এ একটা driver ক্র্যাশ করলে পুরো সিস্টেম ক্র্যাশ করে না কেন?</summary><p>কারণ driver kernel-এর বাইরে, user space-এ চলে। তাই সেটা ক্র্যাশ করলে শুধু ওই সার্ভিস বন্ধ হয় (এবং প্রায়ই পুনরায় চালু করা যায়), kernel অক্ষত থাকে।</p></details>
+    <details><summary>Monolithic কেন দ্রুত?</summary><p>সব উপাদান একই kernel space-এ, তাই তারা সরাসরি ফাংশন কল দিয়ে কথা বলে। Microkernel-এ উপাদানগুলো আলাদা, বার্তা (IPC) পাঠিয়ে কথা বলতে হয় — যা ধীর।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch6">
+    <div class="ch-head"><span class="ch-num">০৬</span><div><h2>Boot Process — চালু হওয়ার গল্প</h2><div class="ch-sub">boot-process</div></div></div>
+    <p class="lead">পাওয়ার বাটন চাপার পর, OS লোড হওয়ার আগে অনেক কিছু ঘটে। এই যাত্রাটা বোঝা জরুরি — কারণ এটাই দেখায় কীভাবে "কিছু নেই" থেকে একটা চলন্ত সিস্টেম তৈরি হয়।</p>
+    <div class="box analogy"><span class="tag">🌅 উপমা — সকালে ঘুম থেকে ওঠা</span>
+    ঘুম থেকে উঠে আপনি একবারে দৌড় শুরু করেন না। প্রথমে চোখ খোলেন (হার্ডওয়্যার চেক), তারপর বিছানা ছাড়েন (bootloader), মুখ ধোন (kernel লোড), জামা পরেন (সার্ভিস চালু), তারপর কাজ শুরু (user login)। কম্পিউটারও ধাপে ধাপে "জাগে"।</div>
+    <h3>চারটা ধাপ</h3>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="ba" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7a4a1e"/></marker></defs>
+        <g font-size="11">
+          <rect x="60" y="40" width="200" height="46" rx="8" fill="#e6eef5" stroke="#25608f"/>
+          <text x="160" y="60" text-anchor="middle" font-weight="600" fill="#25608f">১. BIOS / UEFI (firmware)</text>
+          <text x="160" y="77" text-anchor="middle" font-size="9" fill="#6a6152">হার্ডওয়্যার চেক (POST)</text>
+          <rect x="380" y="40" width="200" height="46" rx="8" fill="#fff5e6" stroke="#b8501f"/>
+          <text x="480" y="60" text-anchor="middle" font-weight="600" fill="#b8501f">২. Bootloader (GRUB)</text>
+          <text x="480" y="77" text-anchor="middle" font-size="9" fill="#6a6152">kernel খুঁজে RAM-এ লোড</text>
+          <rect x="380" y="130" width="200" height="46" rx="8" fill="#fbf0e2" stroke="#7a4a1e"/>
+          <text x="480" y="150" text-anchor="middle" font-weight="600" fill="#7a4a1e">৩. Kernel চালু</text>
+          <text x="480" y="167" text-anchor="middle" font-size="9" fill="#6a6152">driver, memory, scheduler সেটআপ</text>
+          <rect x="60" y="130" width="200" height="46" rx="8" fill="#e7f1ee" stroke="#1a6b5a"/>
+          <text x="160" y="150" text-anchor="middle" font-weight="600" fill="#1a6b5a">৪. Init (systemd)</text>
+          <text x="160" y="167" text-anchor="middle" font-size="9" fill="#6a6152">সার্ভিস চালু, login স্ক্রিন</text>
+        </g>
+        <line x1="260" y1="63" x2="378" y2="63" stroke="#7a4a1e" stroke-width="1.8" marker-end="url(#ba)"/>
+        <line x1="480" y1="86" x2="480" y2="128" stroke="#7a4a1e" stroke-width="1.8" marker-end="url(#ba)"/>
+        <line x1="378" y1="153" x2="262" y2="153" stroke="#7a4a1e" stroke-width="1.8" marker-end="url(#ba)"/>
+        <rect x="180" y="210" width="280" height="34" rx="7" fill="#eaf1e4" stroke="#3d6b2f"/>
+        <text x="320" y="232" text-anchor="middle" font-size="10.5" fill="#3d6b2f">✓ সিস্টেম প্রস্তুত — আপনি লগইন করতে পারেন</text>
+        <line x1="160" y1="176" x2="230" y2="210" stroke="#3d6b2f" stroke-width="1.5" marker-end="url(#ba)"/>
+      </svg>
+    </div><figcaption>পাওয়ার বাটন থেকে login স্ক্রিন — চারটা ধাপ</figcaption></figure>
+    <h4>ধাপগুলো বিস্তারিত</h4>
+    <p><strong>১. BIOS/UEFI:</strong> মাদারবোর্ডের firmware চালু হয়, হার্ডওয়্যার ঠিক আছে কিনা পরীক্ষা করে (POST — Power-On Self-Test), তারপর কোন disk থেকে boot হবে ঠিক করে।</p>
+    <p><strong>২. Bootloader:</strong> disk-এর নির্দিষ্ট জায়গা থেকে একটা ছোট প্রোগ্রাম (GRUB) চলে, যার একমাত্র কাজ — kernel-কে খুঁজে RAM-এ লোড করা ও তার হাতে নিয়ন্ত্রণ দেওয়া।</p>
+    <p><strong>৩. Kernel:</strong> এবার আসল OS জাগে — memory ব্যবস্থাপনা সেটআপ, driver লোড, scheduler চালু, সব হার্ডওয়্যার প্রস্তুত।</p>
+    <p><strong>৪. Init:</strong> kernel প্রথম user-space প্রোগ্রাম চালায় (Linux-এ <code>systemd</code>, PID 1), যা বাকি সব সার্ভিস (নেটওয়ার্ক, লগইন) চালু করে।</p>
+    <div class="box deep"><span class="tag">🔬 গভীরে — "bootstrapping" শব্দটা কোথা থেকে</span>
+    "Boot" এসেছে "bootstrapping" থেকে — একটা পুরনো প্রবাদ "নিজের জুতোর ফিতা টেনে নিজেকে তোলা" (একটা অসম্ভব কাজ)। কম্পিউটারের boot ঠিক এই আপাত-অসম্ভব সমস্যা সমাধান করে: OS চালাতে OS দরকar, কিন্তু OS তো এখনো চালু হয়নি! সমাধান — একটা ছোট প্রোগ্রাম একটা বড় প্রোগ্রাম লোড করে, সেটা আরও বড় একটা লোড করে, ধাপে ধাপে। প্রতিটা ধাপ পরেরটাকে "টেনে তোলে"।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Bootloader-এর মূল কাজ কী?</summary><p>Disk থেকে kernel খুঁজে RAM-এ লোড করা এবং তার হাতে নিয়ন্ত্রণ হস্তান্তর করা। GRUB একটা সাধারণ উদাহরণ।</p></details>
+    <details><summary>Linux-এ প্রথম user-space প্রোগ্রামের PID কত?</summary><p>PID 1 — সাধারণত <code>systemd</code> (বা পুরনো সিস্টেমে <code>init</code>)। এটাই বাকি সব process-এর পূর্বপুরুষ।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch7">
+    <div class="ch-head"><span class="ch-num">০৭</span><div><h2>প্রজেক্ট — strace দিয়ে গোয়েন্দাগিরি</h2><div class="ch-sub">hands-on-strace</div></div></div>
+    <p class="lead">এবার তত্ত্ব থেকে বাস্তবে। <code>strace</code> একটা জাদুকরী টুল যা দেখায় একটা প্রোগ্রাম ঠিক কোন কোন system call করছে — অর্থাৎ user/kernel সীমানা কতবার পার হচ্ছে। এটা চালালে এই মডিউলের সব তত্ত্ব চোখের সামনে জীবন্ত হয়ে উঠবে।</p>
+    <div class="box lab"><span class="tag">🛠 ধাপ ১ — একটা সাধারণ কমান্ড দেখুন</span>
+    টার্মিনালে চালান:
+    <pre><span class="k">strace</span> ls</pre>
+    আপনি দেখবেন <code>ls</code> চালাতে কত রকম system call হয় — <code>openat</code> (ফাইল খোলা), <code>read</code>, <code>write</code> (স্ক্রিনে দেখানো), <code>close</code>। একটা সাধারণ কমান্ডের নিচে এত কাজ!</div>
+    <div class="box lab"><span class="tag">🛠 ধাপ ২ — শুধু গুনে দেখুন</span>
+    <pre><span class="k">strace</span> -c ls</pre>
+    <code>-c</code> ফ্ল্যাগ প্রতিটা system call কতবার হলো তার একটা সারাংশ টেবিল দেখায়। কোনটা সবচেয়ে বেশি হচ্ছে লক্ষ্য করুন।</div>
+    <h3>নিজে একটা প্রোগ্রাম লিখে দেখুন</h3>
+    <p>এবার C-তে একটা প্রোগ্রাম লিখে দেখি <code>printf</code>-এর নিচে সত্যিই <code>write()</code> system call ঘটে কিনা:</p>
+    <pre><span class="c">// hello.c</span>
+<span class="f">#include</span> <span class="s">&lt;stdio.h&gt;</span>
+<span class="f">#include</span> <span class="s">&lt;unistd.h&gt;</span>
+
+<span class="k">int</span> main() {
+    <span class="c">// উপায় ১: printf (ভেতরে buffer করে, তারপর write syscall)</span>
+    printf(<span class="s">"Hello via printf\n"</span>);
+
+    <span class="c">// উপায় ২: সরাসরি write() system call</span>
+    write(1, <span class="s">"Hello via write\n"</span>, 16);
+    <span class="c">//    1 = stdout (screen), 16 = কত byte</span>
+
+    <span class="k">return</span> 0;
+}</pre>
+    <div class="box lab"><span class="tag">🛠 ধাপ ৩ — compile করে strace দিয়ে চালান</span>
+    <pre>gcc hello.c -o hello
+<span class="k">strace</span> ./hello</pre>
+    আউটপুটের একদম নিচে দুটো <code>write</code> লাইন খুঁজুন:
+    <pre><span class="k">write</span>(1, <span class="s">"Hello via printf\n"</span>, 17) = 17
+<span class="k">write</span>(1, <span class="s">"Hello via write\n"</span>, 16)  = 16</pre>
+    লক্ষ্য করুন — দুটো ভিন্ন উপায়ই শেষ পর্যন্ত একই <code>write()</code> system call-এ পৌঁছেছে! <code>printf</code> শুধু একটা সুবিধাজনক মোড়ক।</div>
+    <div class="box deep"><span class="tag">🔬 আরও গভীরে — buffering প্রমাণ করুন</span>
+    একটা মজার পরীক্ষা: প্রোগ্রামে অনেকগুলো <code>printf</code> পরপর দিন (newline ছাড়া), তারপর strace করুন। দেখবেন সবগুলো <strong>একটাই</strong> <code>write()</code>-এ একসাথে গেছে — কারণ printf ডেটা জমিয়ে রেখে একবারে পাঠিয়েছে। এটাই অধ্যায় ৩-এ শেখা buffering, নিজ চোখে দেখা। এভাবে তত্ত্ব ও বাস্তব মিলিয়ে দেখাই সিস্টেম প্রোগ্রামিং শেখার আসল উপায়।</div>
+    <div class="box lab"><span class="tag">🛠 চ্যালেঞ্জ — নিজে করুন</span>
+    <ol style="margin:6px 0 0">
+      <li>একটা ফাইল খুলে তাতে কিছু লিখুন (<code>fopen</code>/<code>fwrite</code>), strace করে <code>openat</code>, <code>write</code>, <code>close</code> খুঁজুন।</li>
+      <li><code>strace -c</code> দিয়ে <code>ls</code> আর <code>cat</code>-এর system call সংখ্যা তুলনা করুন।</li>
+      <li>খুঁজে বের করুন: একটা প্রোগ্রাম শুরু হওয়ার সময় কোন system call দিয়ে kernel তাকে চালু করে? (ইঙ্গিত: <code>execve</code>)</li>
+    </ol></div>
+    <div class="box analogy" style="margin-top:40px;text-align:center;background:#fbf0e2;border-color:#7a4a1e">
+      <span class="tag" style="color:#7a4a1e">🎓 মডিউল ১ শেষ!</span>
+      আপনি এখন জানেন OS কী কাজ করে, kernel ও user space কেন আলাদা, system call কীভাবে সেই সীমানা পার করে, interrupt কীভাবে হার্ডওয়্যারকে সাড়া দিতে দেয়, OS-এর দুই নকশা, আর একটা কম্পিউটার কীভাবে boot করে। আর <code>strace</code> দিয়ে এসব নিজ চোখে দেখেছেন।<br><br>
+      এই ভিত্তির উপর দাঁড়িয়ে <strong>মডিউল ২ (Process ও Scheduling)</strong>-এ ঢুকবো — কীভাবে একটা CPU অনেকগুলো প্রোগ্রামকে একসাথে চালায়, fork/exec কীভাবে কাজ করে, আর নিজের একটা shell বানাবো।
+    </div>
+  </section>
+</main>
+</div>
+<script>
+  const links=[...document.querySelectorAll('#toc a')];
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+  const onScroll=()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<=120)idx=i;});links.forEach(l=>l.classList.remove('active'));links[idx]&&links[idx].classList.add('active');};
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+</script>
+</body>
+</html>
