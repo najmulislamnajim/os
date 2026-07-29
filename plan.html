@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>অপারেটিং সিস্টেম শেখার রোডম্যাপ</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#12100e;--paper:#f5f1e8;--paper2:#ece5d6;--paper3:#e5ddca;--line:#d6ccb6;--accent:#7a4a1e;--accent2:#b8501f;--teal:#1a6b5a;--blue:#25608f;--plum:#6a3d7a;--green:#3d6b2f;--muted:#6a6152;--code-bg:#1a1613;--code-ink:#e9e3d5}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:18px;line-height:1.82}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace}
+  .wrap{display:flex;min-height:100vh}
+  aside{width:290px;flex-shrink:0;background:var(--paper2);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 20px}
+  main{flex:1;max-width:900px;margin:0 auto;padding:50px 50px 130px}
+  aside .brand{font-weight:700;font-size:1.02rem;line-height:1.35;color:var(--accent)}
+  aside .brand small{display:block;font-weight:400;font-size:.66rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;margin-top:7px}
+  aside nav{margin-top:20px}
+  aside nav a{display:block;text-decoration:none;color:var(--ink);padding:6px 11px;border-radius:7px;font-size:.87rem;margin-bottom:1px}
+  aside nav a .n{color:var(--accent);font-weight:600;font-family:'JetBrains Mono';font-size:.73rem;margin-right:7px}
+  aside nav a:hover{background:var(--paper)}
+  aside nav a.active{background:var(--accent);color:#fff}
+  aside nav a.active .n{color:#e8c9a8}
+  aside .modtag{font-size:.67rem;background:var(--accent2);color:#fff;padding:2px 9px;border-radius:20px;letter-spacing:.07em;display:inline-block;margin-top:13px}
+  .hero{border-bottom:2px solid var(--ink);padding-bottom:30px;margin-bottom:44px}
+  .hero .eyebrow{font-family:'JetBrains Mono';font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:15px}
+  .hero h1{font-size:2.85rem;line-height:1.08;margin:0 0 15px;font-weight:700;letter-spacing:-.6px}
+  .hero p{font-size:1.1rem;color:var(--muted);max-width:60ch;margin:0}
+  section.blk{margin-bottom:70px;scroll-margin-top:20px}
+  .blk-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:26px}
+  .blk-head .bn{font-family:'JetBrains Mono';font-size:2rem;font-weight:600;color:var(--accent);line-height:1}
+  .blk-head h2{font-size:1.7rem;margin:0;font-weight:700;letter-spacing:-.3px}
+  .blk-head .bs{font-size:.78rem;color:var(--muted);font-family:'JetBrains Mono'}
+  h3{font-size:1.24rem;margin:34px 0 12px;font-weight:600}
+  h4{font-size:1.02rem;margin:22px 0 8px;font-weight:600;color:var(--accent)}
+  p{margin:12px 0}
+  .lead{font-size:1.04rem}
+  .box{border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.95rem;line-height:1.72}
+  .why{background:#fbf0e2;border:1px solid #e6c99f}
+  .why .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .note{background:#e7f1ee;border:1px solid #b2d4ca}
+  .note .tag{font-weight:700;color:var(--teal);font-size:.79rem;display:block;margin-bottom:5px}
+  .res{background:#e6eef5;border:1px solid #adc9dc}
+  .res .tag{font-weight:700;color:var(--blue);font-size:.79rem;display:block;margin-bottom:5px}
+  .warn{background:#fceadf;border:1px solid #ecbb9d}
+  .warn .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .lab{background:#eaf1e4;border:1px solid #b6cfa2}
+  .lab .tag{font-weight:700;color:var(--green);font-size:.79rem;display:block;margin-bottom:5px}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:.81rem;line-height:1.6;margin:16px 0}
+  pre .c{color:#8a9b8f}
+  pre .k{color:#e0b080}
+  p code,li code,td code{background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.83em;color:var(--accent2)}
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.88rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--paper2);font-weight:600;font-size:.82rem}
+  tr:hover td{background:#fff8ee}
+  figure{margin:26px 0}
+  .diagram{background:#fffdf7;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center}
+  figcaption{font-size:.82rem;color:var(--muted);text-align:center;margin-top:10px;font-style:italic}
+  svg{max-width:100%;height:auto}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  .modcard{background:#fffdf7;border:1px solid var(--line);border-left:4px solid var(--mc,var(--accent));border-radius:12px;padding:20px 22px;margin:18px 0}
+  .modcard .mc-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .modcard .mc-num{font-family:'JetBrains Mono';font-size:1.5rem;font-weight:600;color:var(--mc,var(--accent))}
+  .modcard h4{margin:0;font-size:1.14rem;color:var(--ink)}
+  .modcard .mc-tag{font-size:.68rem;font-family:'JetBrains Mono';letter-spacing:.06em;background:var(--mc,var(--accent));color:#fff;padding:2px 9px;border-radius:20px;margin-left:auto}
+  .modcard .topics{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0}
+  .modcard .topics span{font-size:.76rem;background:var(--paper2);border:1px solid var(--line);padding:3px 10px;border-radius:6px;color:var(--ink)}
+  .checklist{list-style:none;padding-left:0}
+  .checklist li{padding-left:28px;position:relative;margin:8px 0}
+  .checklist li::before{content:"▢";position:absolute;left:0;color:var(--accent);font-size:1.1rem}
+  .toc-hint{color:var(--muted);font-size:.76rem;margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+  @media(max-width:900px){aside{display:none}main{padding:28px 20px 90px}.hero h1{font-size:1.95rem}body{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+  <div class="brand">অপারেটিং সিস্টেম<small>শেখার রোডম্যাপ</small></div>
+  <span class="modtag">PLAN · পূর্ণ mastery</span>
+  <nav id="toc">
+    <a href="#intro"><span class="n">০০</span>কেন ও কীভাবে</a>
+    <a href="#map"><span class="n">০১</span>সম্পূর্ণ মানচিত্র</a>
+    <a href="#m1"><span class="n">০২</span>মডিউল ১: ভিত্তি</a>
+    <a href="#m2"><span class="n">০৩</span>মডিউল ২: Process</a>
+    <a href="#m3"><span class="n">০৪</span>মডিউল ৩: Memory</a>
+    <a href="#m4"><span class="n">০৫</span>মডিউল ৪: Concurrency</a>
+    <a href="#m5"><span class="n">০৬</span>মডিউল ৫: Storage</a>
+    <a href="#m6"><span class="n">০৬</span>মডিউল ৬: নিজে বানানো</a>
+    <a href="#schedule"><span class="n">০৭</span>সময়সূচি</a>
+    <a href="#resources"><span class="n">০৮</span>রিসোর্স</a>
+  </nav>
+  <div class="toc-hint">এটা প্ল্যান। এরপর প্রতিটা মডিউল আলাদা কোর্স হিসেবে বানানো হবে — নেটওয়ার্কিং-এর মতো।</div>
+</aside>
+<main>
+  <div class="hero">
+    <div class="eyebrow">রোডম্যাপ · Theory + Hands-on</div>
+    <h1>অপারেটিং সিস্টেম<br>শেখার পূর্ণ পরিকল্পনা</h1>
+    <p>কম্পিউটার হার্ডওয়্যার আর আপনার প্রোগ্রামের মাঝে যে জাদু ঘটে — সেটাই OS। এই রোডম্যাপে theory ও hands-on দুটো সমান্তরালে, C-ভিত্তিক প্রজেক্ট সহ, শূন্য থেকে নিজের kernel বানানো পর্যন্ত।</p>
+  </div>
+ <section class="blk" id="intro">
+    <div class="blk-head"><span class="bn">০০</span><div><h2>কেন OS শিখবেন, কীভাবে</h2><div class="bs">why-and-how</div></div></div>
+    <p class="lead"><strong>সীমিত হার্ডওয়্যার (এক CPU, কিছু RAM) দিয়ে অনেকগুলো প্রোগ্রাম একসাথে কীভাবে চালানো যায়, নিরাপদে ও দক্ষভাবে?</strong></p>
+    <div class="box why"><span class="tag">🎯 কেন এটা সবচেয়ে গুরুত্বপূর্ণ CS বিষয়</span>
+    OS শেখা মানে শুধু একটা বিষয় শেখা নয় — এটা <strong>বাকি সবকিছুর নিচের স্তর</strong> বোঝা। কেন আপনার প্রোগ্রাম ধীর? কেন memory leak হয়? deadlock কী? কেন multithreading কঠিন? database কেন এভাবে ডিজাইন করা? — সব উত্তর OS-এ। সিস্টেম ডিজাইন ইন্টারভিউ, পারফরম্যান্স টিউনিং, ব্যাকএন্ড আর্কিটেকচার — সবকিছুর ভিত্তি এটাই।</div>
+    <h3>দুটো দিক, একসাথে চালাবো</h3>
+    <p>OS শেখার দুটো দিক আছে, আর ভালো শেখার জন্য দুটোই সমান্তরালে চালানো দরকার — একটা পড়লে অন্যটা হাতে করা:</p>
+    <table>
+      <tr><th>দিক</th><th>কী শেখায়</th><th>কীভাবে</th></tr>
+      <tr><td><strong>Theory / Concept</strong></td><td>process, scheduling, virtual memory, concurrency, file system — কীভাবে কাজ করে</td><td>পড়া, ডায়াগ্রাম, ভিডিও</td></tr>
+      <tr><td><strong>Hands-on / Systems</strong></td><td>system call, C দিয়ে OS প্রোগ্রামিং, নিজে ছোট OS বানানো</td><td>কোড লেখা, প্রজেক্ট, xv6</td></tr>
+    </table>
+    <div class="box note"><span class="tag">💡 আমার সুপারিশকৃত পদ্ধতি</span>
+    প্রতিটা ধারণা পড়ার সাথে সাথে সেটা <strong>C-তে বাস্তবায়ন</strong> করুন। যেমন — scheduling পড়ার পর একটা ছোট scheduler simulate করুন; virtual memory পড়ার পর <code>mmap</code> নিয়ে খেলুন। "পড়লাম কিন্তু বানালাম না" — OS-এ এই ফাঁদ সবচেয়ে বড়। <strong>যা বানাতে পারবেন না, তা বুঝেছেন বলে ধরবেন না।</strong></div>
+    <div class="box res"><span class="tag">📚 দুটো কিংবদন্তি রিসোর্স (শুরুতেই জেনে রাখুন)</span>
+    <strong>OSTEP</strong> (Operating Systems: Three Easy Pieces) — বিনামূল্যে অনলাইন বই, সবচেয়ে সহজ ও সেরা শুরুর জায়গা। তিন ভাগ: Virtualization, Concurrency, Persistence।<br>
+    <strong>xv6</strong> — MIT-র একটা ছোট শিক্ষামূলক OS (C-তে, ~৯০০০ লাইন), যেটা পড়ে ও পরিবর্তন করে আসল kernel কীভাবে কাজ করে বোঝা যায়। MIT 6.1810 কোর্সের ভিত্তি।</div>
+  </section>
+
+  <section class="blk" id="map">
+    <div class="blk-head"><span class="bn">০১</span><div><h2>সম্পূর্ণ মানচিত্র</h2><div class="bs">the-full-map</div></div></div>
+    <p class="lead">পুরো যাত্রাটা ৬টা মডিউলে ভাগ করেছি। প্রতিটা আগেরটার উপর দাঁড়িয়ে। নিচে এক নজরে পুরো পথ:</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="oa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7a4a1e"/></marker></defs>
+        <!-- vertical flow -->
+        <g font-size="12">
+          <rect x="240" y="20" width="200" height="46" rx="9" fill="#fbf0e2" stroke="#7a4a1e" stroke-width="1.5"/>
+          <text x="340" y="40" text-anchor="middle" font-weight="700" fill="#7a4a1e">মডিউল ১ · ভিত্তি</text>
+          <text x="340" y="57" text-anchor="middle" font-size="10" fill="#6a6152">OS কী, kernel, system call</text>
+
+          <rect x="240" y="86" width="200" height="46" rx="9" fill="#e7f1ee" stroke="#1a6b5a" stroke-width="1.5"/>
+          <text x="340" y="106" text-anchor="middle" font-weight="700" fill="#1a6b5a">মডিউল ২ · Process</text>
+          <text x="340" y="123" text-anchor="middle" font-size="10" fill="#6a6152">process, thread, scheduling</text>
+
+          <rect x="240" y="152" width="200" height="46" rx="9" fill="#e6eef5" stroke="#25608f" stroke-width="1.5"/>
+          <text x="340" y="172" text-anchor="middle" font-weight="700" fill="#25608f">মডিউল ৩ · Memory</text>
+          <text x="340" y="189" text-anchor="middle" font-size="10" fill="#6a6152">virtual memory, paging</text>
+
+          <rect x="240" y="218" width="200" height="46" rx="9" fill="#efe9f2" stroke="#6a3d7a" stroke-width="1.5"/>
+          <text x="340" y="238" text-anchor="middle" font-weight="700" fill="#6a3d7a">মডিউল ৪ · Concurrency</text>
+          <text x="340" y="255" text-anchor="middle" font-size="10" fill="#6a6152">thread, lock, deadlock</text>
+
+          <rect x="240" y="284" width="200" height="46" rx="9" fill="#eaf1e4" stroke="#3d6b2f" stroke-width="1.5"/>
+          <text x="340" y="304" text-anchor="middle" font-weight="700" fill="#3d6b2f">মডিউল ৫ · Storage</text>
+          <text x="340" y="321" text-anchor="middle" font-size="10" fill="#6a6152">file system, disk, I/O</text>
+
+          <rect x="240" y="350" width="200" height="46" rx="9" fill="#fceadf" stroke="#b8501f" stroke-width="1.5"/>
+          <text x="340" y="370" text-anchor="middle" font-weight="700" fill="#b8501f">মডিউল ৬ · নিজে বানানো</text>
+          <text x="340" y="387" text-anchor="middle" font-size="10" fill="#6a6152">xv6, kernel hacking</text>
+        </g>
+        <line x1="340" y1="66" x2="340" y2="86" stroke="#7a4a1e" stroke-width="2" marker-end="url(#oa)"/>
+        <line x1="340" y1="132" x2="340" y2="152" stroke="#7a4a1e" stroke-width="2" marker-end="url(#oa)"/>
+        <line x1="340" y1="198" x2="340" y2="218" stroke="#7a4a1e" stroke-width="2" marker-end="url(#oa)"/>
+        <line x1="340" y1="264" x2="340" y2="284" stroke="#7a4a1e" stroke-width="2" marker-end="url(#oa)"/>
+        <line x1="340" y1="330" x2="340" y2="350" stroke="#7a4a1e" stroke-width="2" marker-end="url(#oa)"/>
+        <!-- side labels -->
+        <text x="150" y="112" text-anchor="end" font-size="11" fill="#1a6b5a" font-weight="600">Virtualization</text>
+        <path d="M160 100 Q200 100 235 108" stroke="#1a6b5a" stroke-width="1" fill="none" opacity=".5"/>
+        <path d="M160 105 Q200 150 235 175" stroke="#1a6b5a" stroke-width="1" fill="none" opacity=".5"/>
+        <text x="530" y="244" text-anchor="start" font-size="11" fill="#6a3d7a" font-weight="600">Concurrency</text>
+        <path d="M520 240 Q490 240 445 240" stroke="#6a3d7a" stroke-width="1" fill="none" opacity=".5"/>
+        <text x="530" y="310" text-anchor="start" font-size="11" fill="#3d6b2f" font-weight="600">Persistence</text>
+        <path d="M520 306 Q490 306 445 306" stroke="#3d6b2f" stroke-width="1" fill="none" opacity=".5"/>
+      </svg>
+    </div><figcaption>ছয় মডিউলের পথ — OSTEP-এর তিন স্তম্ভ (Virtualization, Concurrency, Persistence) এর সাথে মিলিয়ে</figcaption></figure>
+    <div class="box note"><span class="tag">🧭 তিন স্তম্ভ মনে রাখুন</span>
+    পুরো OS আসলে তিনটা বড় ধারণার চারপাশে ঘোরে: <strong>Virtualization</strong> (একটা CPU/RAM-কে অনেকভাবে দেখানো — process ও virtual memory), <strong>Concurrency</strong> (একসাথে অনেক কাজ সামলানো), <strong>Persistence</strong> (বিদ্যুৎ গেলেও ডেটা রাখা — file system)। প্রতিটা মডিউল এই কোনো না কোনো স্তম্ভের অংশ।</div>
+  </section>
+   <section class="blk" id="m1">
+    <div class="blk-head"><span class="bn">০২</span><div><h2>মডিউল ১ — ভিত্তি</h2><div class="bs">foundations</div></div></div>
+    <p class="lead">OS আসলে কী, কেন দরকার, আর হার্ডওয়্যারের সাথে কীভাবে কথা বলে। এই মডিউল ছাড়া বাকিগুলো ধোঁয়াশা থাকবে।</p>
+    <div class="modcard" style="--mc:#7a4a1e">
+      <div class="mc-top"><span class="mc-num">১</span><h4>OS-এর ভূমিকা ও গঠন</h4><span class="mc-tag">১-২ সপ্তাহ</span></div>
+      <p style="margin:0;font-size:.94rem;color:var(--muted)">OS কী কাজ করে (resource manager + hardware abstraction), kernel vs user space, monolithic vs microkernel, boot process।</p>
+      <div class="topics"><span>kernel/user mode</span><span>system call</span><span>interrupt</span><span>boot process</span><span>OS-এর ইতিহাস</span></div>
+    </div>
+    <h4>যা যা শিখবেন</h4>
+    <ul>
+      <li><strong>Kernel vs User space:</strong> কেন দুটো আলাদা "মোড", আর কেন এটাই নিরাপত্তার ভিত্তি</li>
+      <li><strong>System call:</strong> আপনার প্রোগ্রাম কীভাবে kernel-এর কাছে সাহায্য চায় (<code>read</code>, <code>write</code>, <code>fork</code>) — user থেকে kernel-এ ঢোকার একমাত্র বৈধ দরজা</li>
+      <li><strong>Interrupt ও trap:</strong> হার্ডওয়্যার কীভাবে CPU-র মনোযোগ কাড়ে</li>
+      <li><strong>OS-এর স্থাপত্য:</strong> monolithic (Linux) vs microkernel (Minix) — সুবিধা-অসুবিধা</li>
+    </ul>
+    <div class="box lab"><span class="tag">🛠 হাতে-কলমে প্রজেক্ট</span>
+    <strong>strace দিয়ে গোয়েন্দাগিরি:</strong> <code>strace ls</code> চালিয়ে দেখুন একটা সাধারণ কমান্ড কতগুলো system call করে। তারপর C-তে সরাসরি system call ব্যবহার করে (glibc ছাড়া, <code>syscall()</code> দিয়ে) একটা ছোট প্রোগ্রাম লিখুন যা "Hello" প্রিন্ট করে — বুঝবেন <code>printf</code>-এর নিচে কী ঘটে।</div>
+    <div class="box res"><span class="tag">📚 রিসোর্স</span>
+    OSTEP অধ্যায় 1-6 · MIT 6.1810 Lecture 1 · "Operating Systems: Three Easy Pieces" — Intro to Dialogue</div>
+  </section>
+
+  <section class="blk" id="m2">
+    <div class="blk-head"><span class="bn">০৩</span><div><h2>মডিউল ২ — Process ও Scheduling</h2><div class="bs">virtualizing-cpu</div></div></div>
+    <p class="lead">Virtualization-এর প্রথম অংশ: একটা CPU-কে কীভাবে অনেকগুলো প্রোগ্রামের মধ্যে ভাগ করা হয়, যাতে প্রত্যেকে মনে করে সে একাই CPU পাচ্ছে।</p>
+    <div class="modcard" style="--mc:#1a6b5a">
+      <div class="mc-top"><span class="mc-num">২</span><h4>Process, Thread ও CPU Scheduling</h4><span class="mc-tag">২-৩ সপ্তাহ</span></div>
+      <p style="margin:0;font-size:.94rem;color:var(--muted)">Process কী, কীভাবে তৈরি হয় (fork/exec), state machine, context switch, আর কোন process কখন CPU পাবে তার অ্যালগরিদম।</p>
+      <div class="topics"><span>process state</span><span>fork/exec/wait</span><span>context switch</span><span>PCB</span><span>FCFS/RR/MLFQ</span><span>IPC</span></div>
+    </div>
+    <h4>যা যা শিখবেন</h4>
+    <ul>
+      <li><strong>Process lifecycle:</strong> new → ready → running → waiting → terminated, আর PCB (Process Control Block)-এ কী থাকে</li>
+      <li><strong>fork/exec/wait:</strong> UNIX-এর process তৈরির মডেল — কেন <code>fork</code> দুবার return করে, কেন <code>exec</code> আলাদা</li>
+      <li><strong>Context switch:</strong> এক process থেকে আরেকটায় যেতে কী সংরক্ষণ করতে হয়, আর কেন এটা ব্যয়বহুল</li>
+      <li><strong>Scheduling অ্যালগরিদম:</strong> FCFS, SJF, Round Robin, Priority, আর বাস্তব MLFQ (Multi-Level Feedback Queue)</li>
+      <li><strong>IPC:</strong> pipe, shared memory, message passing — process-রা কীভাবে কথা বলে</li>
+    </ul>
+    <div class="box lab"><span class="tag">🛠 হাতে-কলমে প্রজেক্ট</span>
+    <strong>নিজের shell বানান:</strong> C-তে একটা ছোট shell লিখুন যা <code>fork</code> + <code>exec</code> + <code>wait</code> দিয়ে কমান্ড চালায়, pipe (<code>|</code>) সামলায়, আর background job (<code>&</code>) সাপোর্ট করে। এটা একটা ক্লাসিক প্রজেক্ট — process নিয়ে সব ধারণা একসাথে পাকা হয়ে যাবে।<br><br>
+    <strong>বোনাস:</strong> একটা scheduler simulator লিখুন যা বিভিন্ন অ্যালগরিদমের average waiting time তুলনা করে।</div>
+    <div class="box res"><span class="tag">📚 রিসোর্স</span>
+    OSTEP অধ্যায় 4-10 (Virtualization: CPU) · MIT 6.1810 Lab: system calls · "নিজের shell" — বহু বিশ্ববিদ্যালয়ের ক্লাসিক অ্যাসাইনমেন্ট</div>
+  </section>
+
+  <section class="blk" id="m3">
+    <div class="blk-head"><span class="bn">০৪</span><div><h2>মডিউল ৩ — Memory ও Virtual Memory</h2><div class="bs">virtualizing-memory</div></div></div>
+    <p class="lead">Virtualization-এর দ্বিতীয় অংশ, আর OS-এর সবচেয়ে সুন্দর ধারণা: প্রতিটা process মনে করে তার কাছে পুরো RAM আছে, অথচ বাস্তবে সবাই ভাগ করে নিচ্ছে।</p>
+    <div class="modcard" style="--mc:#25608f">
+      <div class="mc-top"><span class="mc-num">৩</span><h4>Address Space, Paging ও TLB</h4><span class="mc-tag">২-৩ সপ্তাহ</span></div>
+      <p style="margin:0;font-size:.94rem;color:var(--muted)">Virtual address কীভাবে physical address-এ অনুবাদ হয়, page table, TLB, page fault, আর swap।</p>
+      <div class="topics"><span>virtual address</span><span>paging</span><span>page table</span><span>TLB</span><span>page fault</span><span>swap</span><span>segmentation</span></div>
+    </div>
+    <h4>যা যা শিখবেন</h4>
+    <ul>
+      <li><strong>কেন virtual memory:</strong> নিরাপত্তা (এক process আরেকটার memory ছুঁতে পারে না), সরলতা (প্রতিটা program মনে করে ০ থেকে শুরু), দক্ষতা</li>
+      <li><strong>Paging:</strong> memory-কে fixed-size page-এ ভাগ, page table দিয়ে virtual → physical অনুবাদ</li>
+      <li><strong>TLB:</strong> প্রতিটা অ্যাক্সেসে page table দেখা ধীর, তাই একটা hardware cache — TLB miss কেন performance-এ বড় প্রভাব ফেলে</li>
+      <li><strong>Multi-level page table:</strong> পুরো page table RAM-এ রাখা অবাস্তব, তাই স্তরে স্তরে</li>
+      <li><strong>Page replacement:</strong> RAM ভরে গেলে কোন page swap করবে — LRU, Clock অ্যালগরিদম</li>
+    </ul>
+    <div class="box lab"><span class="tag">🛠 হাতে-কলমে প্রজেক্ট</span>
+    <strong>malloc নিজে লিখুন:</strong> একটা সরল memory allocator বানান (<code>my_malloc</code>/<code>my_free</code>) — free list, splitting, coalescing সহ। বুঝবেন heap কীভাবে কাজ করে, fragmentation কী।<br><br>
+    <strong>আরও:</strong> <code>mmap</code> দিয়ে একটা ফাইলকে memory-তে map করে দেখুন; page fault handler নিয়ে খেলুন (<code>SIGSEGV</code> ধরে)।</div>
+    <div class="box res"><span class="tag">📚 রিসোর্স</span>
+    OSTEP অধ্যায় 13-24 (Virtualization: Memory) · MIT 6.1810 Lab: page tables · CS:APP অধ্যায় 9 (Virtual Memory)</div>
+  </section>
+
+  <section class="blk" id="m4">
+    <div class="blk-head"><span class="bn">০৫</span><div><h2>মডিউল ৪ — Concurrency</h2><div class="bs">concurrency</div></div></div>
+    <p class="lead">OSTEP-এর দ্বিতীয় স্তম্ভ, আর সবচেয়ে কঠিন অংশ। একসাথে অনেক thread চললে জিনিস কীভাবে ভাঙে, আর কীভাবে ঠিক করা যায়।</p>
+    <div class="modcard" style="--mc:#6a3d7a">
+      <div class="mc-top"><span class="mc-num">৪</span><h4>Thread, Lock, Deadlock ও Synchronization</h4><span class="mc-tag">৩ সপ্তাহ</span></div>
+      <p style="margin:0;font-size:.94rem;color:var(--muted)">Race condition, mutex, semaphore, condition variable, deadlock — আর কেন concurrency এত কঠিন।</p>
+      <div class="topics"><span>race condition</span><span>mutex</span><span>semaphore</span><span>condition variable</span><span>deadlock</span><span>producer-consumer</span></div>
+    </div>
+    <h4>যা যা শিখবেন</h4>
+    <ul>
+      <li><strong>Race condition:</strong> কেন <code>counter++</code> দুটো thread-এ চললে ভুল হয় (এটা আসলে তিনটা অপারেশন)</li>
+      <li><strong>Mutex ও lock:</strong> critical section রক্ষা করা, আর lock-এর খরচ</li>
+      <li><strong>Semaphore ও condition variable:</strong> শুধু রক্ষা নয়, thread-দের সমন্বয় করা</li>
+      <li><strong>Deadlock:</strong> চারটা শর্ত (mutual exclusion, hold-and-wait, no preemption, circular wait) আর কীভাবে ভাঙা যায়</li>
+      <li><strong>ক্লাসিক সমস্যা:</strong> producer-consumer, readers-writers, dining philosophers</li>
+    </ul>
+    <div class="box lab"><span class="tag">🛠 হাতে-কলমে প্রজেক্ট</span>
+    <strong>Thread-safe কিছু বানান:</strong> pthread দিয়ে একটা thread-safe queue, বা একটা bounded buffer (producer-consumer) implement করুন mutex + condition variable দিয়ে। ইচ্ছাকৃতভাবে lock ছাড়া চালিয়ে race condition দেখুন, তারপর ঠিক করুন।<br><br>
+    <strong>চ্যালেঞ্জ:</strong> dining philosophers সমাধান করুন deadlock ছাড়া।</div>
+    <div class="box warn"><span class="tag">⚠️ এখানে ধীরে চলুন</span>
+    Concurrency-র বাগ ভয়ংকর কারণ সেগুলো <strong>অনির্দিষ্ট</strong> — কখনো হয়, কখনো হয় না। এই মডিউলে তাড়াহুড়ো করবেন না; প্রতিটা ধারণা কোডে দেখে নিশ্চিত হন। এটাই বাস্তব চাকরিতে সবচেয়ে বেশি কাজে লাগবে (multithreaded ব্যাকএন্ড, database)।</div>
+    <div class="box res"><span class="tag">📚 রিসোর্স</span>
+    OSTEP অধ্যায় 25-34 (Concurrency) · "Little Book of Semaphores" (বিনামূল্যে) · pthread tutorial</div>
+  </section>
+
+  <section class="blk" id="m5">
+    <div class="blk-head"><span class="bn">০৬</span><div><h2>মডিউল ৫ — Storage ও File System</h2><div class="bs">persistence</div></div></div>
+    <p class="lead">তৃতীয় স্তম্ভ: Persistence। বিদ্যুৎ চলে গেলেও ডেটা কীভাবে থাকে, আর disk-এর ধীরগতি কীভাবে সামলানো হয়।</p>
+    <div class="modcard" style="--mc:#3d6b2f">
+      <div class="mc-top"><span class="mc-num">৫</span><h4>File System, Disk ও I/O</h4><span class="mc-tag">২-৩ সপ্তাহ</span></div>
+      <p style="margin:0;font-size:.94rem;color:var(--muted)">File কীভাবে disk-এ সংরক্ষিত হয়, inode, directory, journaling, আর I/O কীভাবে দ্রুত করা হয়।</p>
+      <div class="topics"><span>inode</span><span>directory</span><span>FAT/ext</span><span>journaling</span><span>disk scheduling</span><span>buffer cache</span><span>RAID</span></div>
+    </div>
+    <h4>যা যা শিখবেন</h4>
+    <ul>
+      <li><strong>File system-এর গঠন:</strong> inode (metadata), data block, directory কীভাবে নাম থেকে inode-এ ম্যাপ করে</li>
+      <li><strong>কীভাবে একটা ফাইল খোঁজা হয়:</strong> path থেকে block পর্যন্ত পুরো যাত্রা</li>
+      <li><strong>Crash consistency:</strong> লেখার মাঝে বিদ্যুৎ গেলে কী হয়, journaling কীভাবে বাঁচায়</li>
+      <li><strong>Disk scheduling:</strong> HDD-তে head movement কমানো (SCAN, C-SCAN), আর SSD কেন আলাদা</li>
+      <li><strong>Buffer cache:</strong> কেন OS ডিস্ক ডেটা RAM-এ ক্যাশ করে</li>
+    </ul>
+    <div class="box lab"><span class="tag">🛠 হাতে-কলমে প্রজেক্ট</span>
+    <strong>ছোট file system বানান:</strong> একটা ফাইলকে "ভার্চুয়াল ডিস্ক" ধরে তার উপর একটা সরল file system implement করুন — superblock, inode, data block সহ। <code>create</code>, <code>read</code>, <code>write</code>, <code>ls</code> সাপোর্ট করুন। এটা persistence-এর সব ধারণা একসাথে পাকা করবে।<br><br>
+    <strong>সহজ শুরু:</strong> FUSE ব্যবহার করে একটা toy file system, যা userspace-এ চলে।</div>
+    <div class="box res"><span class="tag">📚 রিসোর্স</span>
+    OSTEP অধ্যায় 35-43 (Persistence) · MIT 6.1810 Lab: file system · "Practical File System Design" (উন্নত)</div>
+  </section>
+
+  <section class="blk" id="m6">
+    <div class="blk-head"><span class="bn">০৬</span><div><h2>মডিউল ৬ — নিজের OS বানানো</h2><div class="bs">build-your-own</div></div></div>
+    <p class="lead">সব ধারণা একসাথে জোড়া লাগানোর সময়। একটা আসল (ছোট) OS-এর কোড পড়ে, পরিবর্তন করে, আর নিজে কিছু বানিয়ে আপনি "বুঝেছি" থেকে "পারি"-তে যাবেন।</p>
+    <div class="modcard" style="--mc:#b8501f">
+      <div class="mc-top"><span class="mc-num">৬</span><h4>xv6 ও Kernel Hacking</h4><span class="mc-tag">৪-৬ সপ্তাহ</span></div>
+      <p style="margin:0;font-size:.94rem;color:var(--muted)">MIT-র xv6 (একটা শিক্ষামূলক UNIX-সদৃশ OS) পড়া, বোঝা, আর তাতে নতুন feature যোগ করা।</p>
+      <div class="topics"><span>xv6 source</span><span>bootloader</span><span>syscall যোগ</span><span>scheduler বদল</span><span>QEMU</span><span>debugging</span></div>
+    </div>
+    <h4>যা যা করবেন</h4>
+    <ul>
+      <li><strong>xv6 পড়া:</strong> ~৯০০০ লাইনের একটা সম্পূর্ণ OS — boot থেকে shell পর্যন্ত সব দেখা যায়</li>
+      <li><strong>নতুন system call যোগ:</strong> নিজে একটা syscall লিখে kernel-এ ঢোকানো</li>
+      <li><strong>Scheduler পরিবর্তন:</strong> xv6-র সরল scheduler-কে MLFQ বা lottery scheduling-এ বদলানো</li>
+      <li><strong>QEMU-তে চালানো ও GDB দিয়ে debug করা:</strong> আসল kernel debugging-এর অভিজ্ঞতা</li>
+    </ul>
+    <div class="box lab"><span class="tag">🛠 চূড়ান্ত পথ — দুটো বিকল্প</span>
+    <strong>পথ ক (সুপারিশকৃত):</strong> MIT 6.1810-র সব lab করুন — এগুলো xv6-এর উপর ভিত্তি করে, ধাপে ধাপে আপনাকে kernel hacking শেখায়। বিনামূল্যে, বিশ্বমানের।<br><br>
+    <strong>পথ খ (উচ্চাভিলাষী):</strong> "OSDev" উইকি অনুসরণ করে একদম শূন্য থেকে নিজের OS লিখুন — bootloader থেকে। কঠিন, কিন্তু অসাধারণ শিক্ষা। শুধু যথেষ্ট সময় থাকলে।</div>
+    <div class="box res"><span class="tag">📚 রিসোর্স</span>
+    MIT 6.1810 (পুরো কোর্স, বিনামূল্যে) · xv6 book (MIT থেকে বিনামূল্যে PDF) · OSDev wiki · "Writing an OS in Rust" (আধুনিক বিকল্প)</div>
+  </section>
+   <section class="blk" id="schedule">
+    <div class="blk-head"><span class="bn">০৭</span><div><h2>সময়সূচি ও রুটিন</h2><div class="bs">schedule</div></div></div>
+    <p class="lead">জ্ঞান থাকলেই হয় না — ধারাবাহিকতা লাগে। এখানে দুটো গতির পরিকল্পনা, আপনার সময় অনুযায়ী বেছে নিন।</p>
+    <h3>দুটো গতি</h3>
+    <table>
+      <tr><th>মডিউল</th><th>নিবিড় (full-time)</th><th>ধীর (সপ্তাহে ১০ ঘণ্টা)</th></tr>
+      <tr><td>১ · ভিত্তি</td><td>১ সপ্তাহ</td><td>২ সপ্তাহ</td></tr>
+      <tr><td>২ · Process</td><td>২ সপ্তাহ</td><td>৩-৪ সপ্তাহ</td></tr>
+      <tr><td>৩ · Memory</td><td>২ সপ্তাহ</td><td>৩-৪ সপ্তাহ</td></tr>
+      <tr><td>৪ · Concurrency</td><td>২ সপ্তাহ</td><td>৪ সপ্তাহ</td></tr>
+      <tr><td>৫ · Storage</td><td>২ সপ্তাহ</td><td>৩ সপ্তাহ</td></tr>
+      <tr><td>৬ · নিজে বানানো</td><td>৩-৪ সপ্তাহ</td><td>৬-৮ সপ্তাহ</td></tr>
+      <tr><td><strong>মোট</strong></td><td><strong>~৩ মাস</strong></td><td><strong>~৬ মাস</strong></td></tr>
+    </table>
+    <h3>প্রতিদিন/সপ্তাহের রুটিন</h3>
+    <div class="box note"><span class="tag">📅 আদর্শ সাপ্তাহিক ছন্দ</span>
+    <strong>৪০% পড়া</strong> (OSTEP অধ্যায় + লেকচার) → <strong>৪০% কোড</strong> (সেই সপ্তাহের প্রজেক্ট) → <strong>২০% রিভিশন</strong> (আগের ধারণা ঝালাই, ছোট প্রশ্নের উত্তর)। মূলনীতি: <strong>একটা মডিউল "শেষ" ততক্ষণ নয়, যতক্ষণ না তার প্রজেক্টটা কাজ করছে।</strong></div>
+    <h3>অগ্রগতি ট্র্যাক করুন</h3>
+    <ul class="checklist">
+      <li>মডিউল ১: strace বিশ্লেষণ + raw syscall প্রোগ্রাম কাজ করছে</li>
+      <li>মডিউল ২: নিজের shell (pipe + background job সহ) কাজ করছে</li>
+      <li>মডিউল ৩: my_malloc (coalescing সহ) কাজ করছে</li>
+      <li>মডিউল ৪: thread-safe producer-consumer + dining philosophers deadlock-মুক্ত</li>
+      <li>মডিউল ৫: toy file system (create/read/write/ls) কাজ করছে</li>
+      <li>মডিউল ৬: xv6-তে নতুন syscall + পরিবর্তিত scheduler কাজ করছে</li>
+    </ul>
+    <div class="box warn"><span class="tag">⚠️ সবচেয়ে বড় দুটো ফাঁদ</span>
+    <strong>১. শুধু পড়া, না বানানো:</strong> OS ভিডিও দেখে "বুঝেছি" মনে হয়, কিন্তু কোড না লিখলে সেটা মুছে যায়। প্রতিটা মডিউলের প্রজেক্ট বাধ্যতামূলক ধরুন।<br>
+    <strong>২. সব একসাথে শেখার চেষ্টা:</strong> OS বিশাল। ক্রম মেনে একটা একটা করে যান — Concurrency বোঝার আগে Process না বুঝলে হোঁচট খাবেন।</div>
+  </section>
+
+  <section class="blk" id="resources">
+    <div class="blk-head"><span class="bn">০৮</span><div><h2>রিসোর্স — এক জায়গায়</h2><div class="bs">resources</div></div></div>
+    <p class="lead">সব রিসোর্স বিনামূল্যে বা সহজলভ্য। বেশি রিসোর্স নয় — অল্প কিন্তু সেরাগুলোতে লেগে থাকুন।</p>
+    <h3>মূল বই ও কোর্স</h3>
+    <table>
+      <tr><th>নাম</th><th>কী</th><th>কেন</th></tr>
+      <tr><td><strong>OSTEP</strong></td><td>বিনামূল্যে অনলাইন বই</td><td>সবচেয়ে সহজ ও সম্পূর্ণ শুরু — পুরো পথের মেরুদণ্ড</td></tr>
+      <tr><td><strong>MIT 6.1810</strong></td><td>বিনামূল্যে কোর্স + lab</td><td>xv6 দিয়ে হাতে-কলমে kernel — video, lab সব উন্মুক্ত</td></tr>
+      <tr><td><strong>xv6 book</strong></td><td>বিনামূল্যে PDF</td><td>একটা আসল ছোট OS-এর ভাষ্য</td></tr>
+      <tr><td>CS:APP</td><td>বই</td><td>hardware-software সীমানা গভীরভাবে (বিশেষত memory)</td></tr>
+      <tr><td>Little Book of Semaphores</td><td>বিনামূল্যে PDF</td><td>concurrency সমস্যা অনুশীলনের জন্য সেরা</td></tr>
+    </table>
+    <h3>টুল যা লাগবে</h3>
+    <p><strong>C compiler</strong> (gcc/clang), <strong>Linux</strong> (বা WSL/VM), <strong>gdb</strong> (debugging), <strong>QEMU</strong> (xv6 চালাতে), <strong>strace/ltrace</strong> (syscall দেখতে), <strong>make</strong>। সবই বিনামূল্যে ও ওপেন সোর্স।</p>
+    <div class="box note"><span class="tag">🐧 Linux না থাকলে</span>
+    Windows-এ WSL2 (Windows Subsystem for Linux) যথেষ্ট। Mac-এ বেশিরভাগ কাজ চলে, তবে কিছু জিনিস (যেমন <code>strace</code>) Linux-নির্দিষ্ট — সেক্ষেত্রে একটা হালকা Linux VM (UTM/VirtualBox) রাখুন।</div>
+
+    <!-- <div class="box why" style="margin-top:40px;text-align:center;background:#fbf0e2;border-color:#7a4a1e">
+      <span class="tag" style="color:#7a4a1e">🚀 এরপর কী?</span>
+      এটা ছিল রোডম্যাপ। এখন আপনার নেটওয়ার্কিং কোর্সের মতো, আমি এই প্রতিটা মডিউলকে <strong>আলাদা বিস্তারিত বাংলা কোর্স</strong> হিসেবে বানিয়ে দিতে পারি — ডায়াগ্রাম, উদাহরণ, C কোড, আর অনুশীলন সহ।<br><br>
+      বলুন কোন মডিউল দিয়ে শুরু করবো — <strong>মডিউল ১ (ভিত্তি)</strong> দিয়ে শুরু করাই স্বাভাবিক, কিন্তু আপনি চাইলে যেকোনোটা থেকে শুরু করতে পারি।
+    </div> -->
+  </section>
+</main>
+</div>
+<script>
+  const links=[...document.querySelectorAll('#toc a')];
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+  const onScroll=()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<=120)idx=i;});links.forEach(l=>l.classList.remove('active'));links[idx]&&links[idx].classList.add('active');};
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+</script>
+</body>
+</html>
