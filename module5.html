@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>অপারেটিং সিস্টেম · মডিউল ৫ — Storage ও File System</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#12100e;--paper:#f5f1e8;--paper2:#ece5d6;--line:#d6ccb6;--accent:#3d6b2f;--accent2:#b8501f;--brown:#7a4a1e;--teal:#1a6b5a;--blue:#25608f;--plum:#6a3d7a;--muted:#6a6152;--code-bg:#151a13;--code-ink:#e6ece3}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:18px;line-height:1.82}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace}
+  .wrap{display:flex;min-height:100vh}
+  aside{width:296px;flex-shrink:0;background:var(--paper2);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 20px}
+  main{flex:1;max-width:880px;margin:0 auto;padding:50px 50px 130px}
+  aside .brand{font-weight:700;font-size:1.02rem;line-height:1.35;color:var(--accent)}
+  aside .brand small{display:block;font-weight:400;font-size:.66rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;margin-top:7px}
+  aside nav{margin-top:20px}
+  aside nav a{display:block;text-decoration:none;color:var(--ink);padding:6px 11px;border-radius:7px;font-size:.87rem;margin-bottom:1px}
+  aside nav a .n{color:var(--accent);font-weight:600;font-family:'JetBrains Mono';font-size:.73rem;margin-right:7px}
+  aside nav a:hover{background:var(--paper)}
+  aside nav a.active{background:var(--accent);color:#fff}
+  aside nav a.active .n{color:#c9e0bd}
+  aside .modtag{font-size:.67rem;background:var(--accent2);color:#fff;padding:2px 9px;border-radius:20px;letter-spacing:.07em;display:inline-block;margin-top:13px}
+  .hero{border-bottom:2px solid var(--ink);padding-bottom:30px;margin-bottom:44px}
+  .hero .eyebrow{font-family:'JetBrains Mono';font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:15px}
+  .hero h1{font-size:2.8rem;line-height:1.08;margin:0 0 15px;font-weight:700;letter-spacing:-.6px}
+  .hero p{font-size:1.1rem;color:var(--muted);max-width:60ch;margin:0}
+  section.chapter{margin-bottom:72px;scroll-margin-top:20px}
+  .ch-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:26px}
+  .ch-head .ch-num{font-family:'JetBrains Mono';font-size:2.1rem;font-weight:600;color:var(--accent);line-height:1}
+  .ch-head h2{font-size:1.72rem;margin:0;font-weight:700;letter-spacing:-.3px}
+  .ch-head .ch-sub{font-size:.79rem;color:var(--muted);font-family:'JetBrains Mono'}
+  h3{font-size:1.24rem;margin:34px 0 12px;font-weight:600}
+  h4{font-size:1.02rem;margin:22px 0 8px;font-weight:600;color:var(--accent)}
+  p{margin:12px 0}
+  .lead{font-size:1.04rem}
+  .box{border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.95rem;line-height:1.72}
+  .analogy{background:#fff5e6;border:1px solid #e6cb9c}
+  .analogy .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .note{background:#eaf1e4;border:1px solid #b6cfa2}
+  .note .tag{font-weight:700;color:var(--accent);font-size:.79rem;display:block;margin-bottom:5px}
+  .deep{background:#e6eef5;border:1px solid #adc9dc}
+  .deep .tag{font-weight:700;color:var(--blue);font-size:.79rem;display:block;margin-bottom:5px}
+  .warn{background:#fceadf;border:1px solid #ecbb9d}
+  .warn .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .lab{background:#efe9f2;border:1px solid #cbb6d6}
+  .lab .tag{font-weight:700;color:var(--plum);font-size:.79rem;display:block;margin-bottom:5px}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:.81rem;line-height:1.62;margin:16px 0}
+  pre .c{color:#8f9b8a}
+  pre .k{color:#a8cd8a}
+  pre .s{color:#c8b88a}
+  pre .f{color:#8fb8e0}
+  p code,li code,td code{background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.83em;color:var(--accent2)}
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.88rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--paper2);font-weight:600;font-size:.82rem}
+  tr:hover td{background:#fff8ee}
+  figure{margin:26px 0}
+  .diagram{background:#fffdf7;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center}
+  figcaption{font-size:.82rem;color:var(--muted);text-align:center;margin-top:10px;font-style:italic}
+  svg{max-width:100%;height:auto}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  .quiz{background:var(--paper2);border:1px dashed var(--accent);border-radius:12px;padding:18px 22px;margin:24px 0}
+  .quiz .tag{font-weight:700;color:var(--accent);display:block;margin-bottom:8px;font-size:.86rem}
+  .quiz summary{cursor:pointer;font-weight:500;margin:8px 0}
+  .quiz details p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
+  .toc-hint{color:var(--muted);font-size:.76rem;margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+  @media(max-width:900px){aside{display:none}main{padding:28px 20px 90px}.hero h1{font-size:1.95rem}body{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+  <div class="brand">অপারেটিং সিস্টেম<small>মডিউল ৫ · Storage</small></div>
+  <span class="modtag">PERSISTENCE</span>
+  <nav id="toc">
+    <a href="#ch0"><span class="n">০০</span>শুরুর কথা</a>
+    <a href="#ch1"><span class="n">০১</span>Disk-এর বাস্তবতা</a>
+    <a href="#ch2"><span class="n">০২</span>File ও Directory</a>
+    <a href="#ch3"><span class="n">০৩</span>inode</a>
+    <a href="#ch4"><span class="n">০৪</span>একটা ফাইল খোঁজা</a>
+    <a href="#ch5"><span class="n">০৫</span>Crash ও Journaling</a>
+    <a href="#ch6"><span class="n">০৬</span>Disk Scheduling</a>
+    <a href="#ch7"><span class="n">০৭</span>Buffer Cache</a>
+    <a href="#ch8"><span class="n">০৮</span>প্রজেক্ট: toy FS</a>
+  </nav>
+  <div class="toc-hint">সবুজ = জরুরি নোট। বেগুনি = হাতে-কলমে ল্যাব। নীল = গভীর প্রযুক্তিগত অংশ।</div>
+</aside>
+<main>
+  <div class="hero">
+    <div class="eyebrow">মডিউল ৫ · তৃতীয় স্তম্ভ</div>
+    <h1>Storage ও<br>File System</h1>
+    <p>RAM-এর সব মুছে যায় বিদ্যুৎ গেলে। তাহলে আপনার ফাইল, ছবি, কোড টিকে থাকে কীভাবে? এই মডিউলে দেখবো disk কীভাবে কাজ করে, file system কীভাবে বিশৃঙ্খল block-কে গোছানো ফাইলে রূপ দেয়, আর crash-এও ডেটা কীভাবে বাঁচে।</p>
+  </div>
+
+  <section class="chapter" id="ch0">
+    <div class="ch-head"><span class="ch-num">০০</span><div><h2>শুরুর কথা</h2><div class="ch-sub">orientation</div></div></div>
+    <p class="lead">এতক্ষণ Virtualization (CPU, memory) আর Concurrency দেখেছি। এবার শেষ স্তম্ভ — <strong>Persistence</strong>। মূল পার্থক্য: RAM <em>volatile</em> (বিদ্যুৎ গেলে মুছে যায়), কিন্তু disk <em>persistent</em> (থেকে যায়)। এই স্থায়িত্ব সামলানোই file system-এর কাজ।</p>
+    <div class="box note"><span class="tag">🧭 এই মডিউলের কেন্দ্রীয় প্রশ্ন</span>
+    Disk আসলে শুধু একটা বিশাল সংখ্যক অভিন্ন block (যেমন ৫১২ byte বা ৪ KB করে)। এই সমতল, নম্বরযুক্ত block-এর সমুদ্র থেকে কীভাবে "ফোল্ডার", "ফাইল", "নাম", "সাইজ" — এই গোছানো ধারণাগুলো তৈরি হয়? সেটাই file system-এর জাদু, আর এই মডিউলের বিষয়।</div>
+    <div class="box lab"><span class="tag">🛠 পরিবেশ</span>
+    আগের মতোই Linux/WSL2 + <code>gcc</code>। প্রজেক্টে একটা সাধারণ ফাইলকে "ভার্চুয়াল ডিস্ক" ধরে তার উপর file system বানাবেন — কোনো আসল disk বা root অ্যাক্সেস লাগবে না। চাইলে <code>FUSE</code> (<code>sudo apt install libfuse-dev</code>) দিয়ে আরও এগোতে পারবেন।</div>
+  </section>
+
+  <section class="chapter" id="ch1">
+    <div class="ch-head"><span class="ch-num">০১</span><div><h2>Disk-এর বাস্তবতা</h2><div class="ch-sub">how-disks-work</div></div></div>
+    <p class="lead">File system বোঝার আগে বুঝতে হবে সে কীসের উপর কাজ করছে। Disk-এর একটা মৌলিক বৈশিষ্ট্য পুরো file system ডিজাইনকে আকার দেয়: <strong>disk ভয়ংকর ধীর</strong>, আর HDD-তে সেটা অসম।</p>
+    <h3>HDD — ঘূর্ণায়মান থালা</h3>
+    <p>ঐতিহ্যবাহী hard disk-এ ঘূর্ণায়মান চাকতি (platter) আর একটা নড়াচড়া করা হাত (head)। একটা নির্দিষ্ট জায়গার ডেটা পড়তে দুটো দেরি হয়:</p>
+    <table>
+      <tr><th>দেরি</th><th>কী</th><th>কেন ধীর</th></tr>
+      <tr><td><strong>Seek time</strong></td><td>head-কে সঠিক track-এ সরানো</td><td>যান্ত্রিক নড়াচড়া — সবচেয়ে ধীর</td></tr>
+      <tr><td><strong>Rotational delay</strong></td><td>সঠিক sector ঘুরে head-এর নিচে আসা</td><td>চাকতির ঘূর্ণনের অপেক্ষা</td></tr>
+      <tr><td><strong>Transfer time</strong></td><td>আসল ডেটা পড়া</td><td>তুলনামূলক দ্রুত</td></tr>
+    </table>
+    <div class="box warn"><span class="tag">⚠️ সংখ্যায় দেখুন — কত ধীর</span>
+    একটা সাধারণ HDD seek-এ প্রায় ১০ মিলিসেকেন্ড লাগে। CPU সেই ১০ ms-এ কোটি কোটি instruction চালাতে পারত! অর্থাৎ একটা random disk অ্যাক্সেস RAM অ্যাক্সেসের চেয়ে প্রায় <strong>লক্ষ গুণ</strong> ধীর। এজন্যই file system-এর মূল লক্ষ্য: যতটা সম্ভব <strong>কম</strong> ও <strong>ক্রমিক (sequential)</strong> disk অ্যাক্সেস করা।</div>
+    <div class="box analogy"><span class="tag">📀 উপমা — পুরনো জুকবক্স</span>
+    HDD যেন একটা জুকবক্স — একটা যান্ত্রিক হাত রেকর্ড খুঁজে সুচ নামায়। এক গান থেকে আরেক গানে লাফ দিতে হাত সরাতে হয় (seek), তারপর সঠিক জায়গা ঘুরে আসার অপেক্ষা (rotation)। পাশাপাশি গান শুনলে দ্রুত, কিন্তু এলোমেলো লাফালে প্রতিবার দেরি। disk-ও তাই — sequential দ্রুত, random ধীর।</div>
+    <h3>SSD — কোনো নড়াচড়া নেই</h3>
+    <p>আধুনিক SSD-তে কোনো যান্ত্রিক অংশ নেই — সব ইলেকট্রনিক (flash memory)। তাই seek time প্রায় নেই, random অ্যাক্সেস অনেক দ্রুত। কিন্তু SSD-রও নিজস্ব বৈশিষ্ট্য আছে:</p>
+    <div class="box deep"><span class="tag">🔬 গভীরে — SSD কেন আলাদা</span>
+    SSD পড়া ও লেখা করে "page" এককে, কিন্তু <strong>মুছতে</strong> হয় বড় "block" এককে (কয়েকটা page মিলে)। আর প্রতিটা cell সীমিতবার লেখা যায় (wear)। তাই SSD-র controller <strong>wear leveling</strong> করে (লেখা সব cell-এ ছড়িয়ে দেয়) আর <strong>TRIM</strong> ব্যবহার করে (কোন block আর লাগবে না তা জানায়)। ফলে HDD-র জন্য অপ্টিমাইজ করা কিছু কৌশল (যেমন ডেটা পাশাপাশি রাখা) SSD-তে কম গুরুত্বপূর্ণ, কিন্তু "কম লেখা" এখন আরও জরুরি (cell আয়ু বাঁচাতে)।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>HDD-তে seek time কেন সবচেয়ে ধীর অংশ?</summary><p>এটা যান্ত্রিক নড়াচড়া — head-কে ফিজিক্যালি সঠিক track-এ সরাতে হয়। ইলেকট্রনিক অপারেশনের চেয়ে যান্ত্রিক নড়াচড়া বহুগুণ ধীর।</p></details>
+    <details><summary>File system কেন sequential অ্যাক্সেস পছন্দ করে?</summary><p>Sequential-এ head একই জায়গায় থাকে বা পাশে সরে (কম seek), তাই দ্রুত। Random অ্যাক্সেসে বারবার seek লাগে, যা লক্ষ গুণ ধীর হতে পারে।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch2">
+    <div class="ch-head"><span class="ch-num">০২</span><div><h2>File ও Directory</h2><div class="ch-sub">files-and-directories</div></div></div>
+    <p class="lead">Disk শুধু নম্বরযুক্ত block-এর সমুদ্র। File system সেই সমুদ্রের উপর দুটো মূল বিমূর্ততা (abstraction) তৈরি করে — <strong>file</strong> (byte-এর একটা নামযুক্ত সিকোয়েন্স) আর <strong>directory</strong> (ফাইলের একটা সংগ্রহ)।</p>
+    <div class="box analogy"><span class="tag">🗂️ উপমা — অফিসের ফাইলিং ক্যাবিনেট</span>
+    Disk যেন একটা বিশাল গুদাম ভরা সংখ্যাযুক্ত বাক্স (block)। একা এই বাক্সগুলো অর্থহীন। File system একজন গ্রন্থাগারিকের মতো — সে একটা <strong>সূচি</strong> রাখে: "প্রকল্প রিপোর্ট" নামের নথিটা ১২, ৪৫, ৪৬ নম্বর বাক্সে আছে। আপনি নাম বলেন, সে বাক্সগুলো খুঁজে দেয়। directory হলো এই সূচির ফোল্ডার-কাঠামো।</div>
+    <h3>File — শুধু byte, বাকিটা ব্যাখ্যা</h3>
+    <p>OS-এর কাছে একটা ফাইল শুধু byte-এর একটা সিকোয়েন্স — সে জানে না ওটা ছবি না টেক্সট না ভিডিও। সেই ব্যাখ্যা করে অ্যাপ্লিকেশন (এক্সটেনশন বা ভেতরের গঠন দেখে)। OS শুধু জানে: ফাইলটা কত বড়, কোন block-এ আছে, কার অনুমতি আছে।</p>
+    <h3>Directory — নাম থেকে inode-এর ম্যাপ</h3>
+    <p>মজার ব্যাপার — একটা directory আসলে নিজেই একটা বিশেষ ফাইল! তার ভেতরের ডেটা হলো একটা তালিকা: প্রতিটা এন্ট্রিতে একটা <strong>নাম</strong> আর একটা <strong>inode নম্বর</strong> (ফাইলটার আসল তথ্য কোথায়, পরের অধ্যায়)।</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <text x="280" y="20" text-anchor="middle" font-size="12" font-weight="600">একটা directory-র ভেতরে যা থাকে</text>
+        <rect x="120" y="40" width="320" height="140" rx="8" fill="#fffdf7" stroke="#3d6b2f"/>
+        <text x="280" y="60" text-anchor="middle" font-size="11" font-weight="700" fill="#3d6b2f">Directory: /home/rahim</text>
+        <g font-size="10">
+          <line x1="140" y1="72" x2="420" y2="72" stroke="#d6ccb6"/>
+          <text x="160" y="90" font-weight="600">নাম</text>
+          <text x="340" y="90" font-weight="600">inode নম্বর</text>
+          <line x1="140" y1="98" x2="420" y2="98" stroke="#d6ccb6"/>
+          <text x="160" y="118">notes.txt</text><text x="360" y="118" font-family="JetBrains Mono" fill="#25608f">247</text>
+          <text x="160" y="140">photo.jpg</text><text x="360" y="140" font-family="JetBrains Mono" fill="#25608f">1893</text>
+          <text x="160" y="162">code/</text><text x="360" y="162" font-family="JetBrains Mono" fill="#25608f">512</text>
+        </g>
+        <text x="280" y="195" text-anchor="middle" font-size="9" fill="#6a6152">শুধু নাম→নম্বর ম্যাপিং; আসল ডেটা নয়</text>
+      </svg>
+    </div><figcaption>Directory একটা টেবিল — শুধু নাম আর inode নম্বর রাখে</figcaption></figure>
+    <div class="box note"><span class="tag">💡 এই বিভাজন কেন গুরুত্বপূর্ণ</span>
+    নাম (directory-তে) আর ফাইলের আসল তথ্য (inode-এ) আলাদা রাখার একটা সুন্দর পরিণতি: একই ফাইলের <strong>একাধিক নাম</strong> থাকতে পারে (hard link) — দুটো directory এন্ট্রি একই inode নম্বরে নির্দেশ করে। ফাইল সরানো (rename) মানে শুধু directory এন্ট্রি বদলানো, আসল ডেটা এক byte-ও নড়ে না। এই মার্জিত বিভাজনই UNIX file system-এর ভিত্তি।</div>
+    <div class="box deep"><span class="tag">🔬 গভীরে — . এবং .. কী?</span>
+    প্রতিটা directory-তে দুটো বিশেষ এন্ট্রি স্বয়ংক্রিয়ভাবে থাকে: <code>.</code> (নিজের inode-এ নির্দেশ করে) আর <code>..</code> (parent directory-র inode-এ)। এজন্যই <code>cd ..</code> কাজ করে — এটা আসলে <code>..</code> এন্ট্রি দেখে parent-এ যায়। root directory (<code>/</code>)-এ <code>..</code> নিজের দিকেই নির্দেশ করে (উপরে আর কিছু নেই)। ছোট্ট কিন্তু গভীর ডিজাইন।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>একটা directory আসলে কী?</summary><p>একটা বিশেষ ফাইল, যার ডেটা হলো নাম→inode নম্বরের একটা তালিকা। এটা ফাইলের আসল বিষয়বস্তু রাখে না, শুধু "কোন নামের ফাইলের তথ্য কোন inode-এ" তা রাখে।</p></details>
+    <details><summary>ফাইলের নাম আর ফাইলের তথ্য আলাদা রাখার একটা সুবিধা?</summary><p>একই ফাইলের একাধিক নাম সম্ভব (hard link), আর rename করতে শুধু directory এন্ট্রি বদলালেই হয় — আসল ডেটা সরাতে হয় না।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch3">
+    <div class="ch-head"><span class="ch-num">০৩</span><div><h2>inode — ফাইলের আসল পরিচয়</h2><div class="ch-sub">inode</div></div></div>
+    <p class="lead">Directory নাম থেকে একটা inode নম্বর দেয়। কিন্তু <strong>inode</strong> কী? এটাই একটা ফাইলের সম্পূর্ণ পরিচয়পত্র — নাম বাদে ফাইল সম্পর্কে সব তথ্য এখানে।</p>
+    <h3>একটা inode-এ কী থাকে</h3>
+    <table>
+      <tr><th>তথ্য</th><th>উদাহরণ</th></tr>
+      <tr><td>ফাইলের ধরন</td><td>সাধারণ ফাইল / directory / link</td></tr>
+      <tr><td>সাইজ</td><td>কত byte</td></tr>
+      <tr><td>অনুমতি</td><td>কে পড়তে/লিখতে/চালাতে পারে (rwx)</td></tr>
+      <tr><td>মালিক</td><td>user ও group ID</td></tr>
+      <tr><td>সময়</td><td>তৈরি, শেষ পরিবর্তন, শেষ অ্যাক্সেস</td></tr>
+      <tr><td>link count</td><td>কতগুলো নাম এই inode-এ নির্দেশ করছে</td></tr>
+      <tr><td><strong>block pointer</strong></td><td>আসল ডেটা কোন কোন block-এ (সবচেয়ে জরুরি)</td></tr>
+    </table>
+    <div class="box warn"><span class="tag">⚠️ লক্ষ্য করুন — নাম নেই!</span>
+    inode-এ ফাইলের <strong>নাম নেই</strong>। নাম থাকে directory-তে। এটা প্রথমে অদ্ভুত লাগে, কিন্তু এটাই hard link-কে সম্ভব করে — একটা inode-এর অনেক নাম থাকতে পারে বিভিন্ন directory-তে, আর inode শুধু গোনে কতগুলো নাম তাকে নির্দেশ করছে (link count)। শেষ নামটা মুছলে (link count = 0) তবেই আসল ডেটা মুছে যায়।</div>
+    <h3>Block pointer — বড় ফাইলের চতুর সমাধান</h3>
+    <p>একটা inode-এ সীমিত জায়গা, কিন্তু ফাইল বিশাল হতে পারে (GB)। সব block-এর নম্বর কীভাবে রাখবে? সমাধান — <strong>multi-level (indirect) pointer</strong>:</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 580 260" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="ia" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#3d6b2f"/></marker></defs>
+        <rect x="20" y="60" width="120" height="150" rx="8" fill="#eaf1e4" stroke="#3d6b2f"/>
+        <text x="80" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#3d6b2f">inode</text>
+        <g font-size="8" text-anchor="middle">
+          <rect x="30" y="90" width="100" height="18" fill="#fff" stroke="#3d6b2f"/><text x="80" y="103">direct → block</text>
+          <rect x="30" y="110" width="100" height="18" fill="#fff" stroke="#3d6b2f"/><text x="80" y="123">direct → block</text>
+          <rect x="30" y="130" width="100" height="18" fill="#fff" stroke="#3d6b2f"/><text x="80" y="143">... (আরও direct)</text>
+          <rect x="30" y="155" width="100" height="18" fill="#e6eef5" stroke="#25608f"/><text x="80" y="168">single indirect</text>
+          <rect x="30" y="177" width="100" height="18" fill="#efe9f2" stroke="#6a3d7a"/><text x="80" y="190">double indirect</text>
+        </g>
+        <!-- direct blocks -->
+        <rect x="200" y="70" width="70" height="22" rx="3" fill="#fff5e6" stroke="#b8501f"/>
+        <text x="235" y="85" text-anchor="middle" font-size="8">ডেটা</text>
+        <rect x="200" y="98" width="70" height="22" rx="3" fill="#fff5e6" stroke="#b8501f"/>
+        <text x="235" y="113" text-anchor="middle" font-size="8">ডেটা</text>
+        <line x1="130" y1="99" x2="198" y2="82" stroke="#3d6b2f" stroke-width="1.2" marker-end="url(#ia)"/>
+        <line x1="130" y1="119" x2="198" y2="109" stroke="#3d6b2f" stroke-width="1.2" marker-end="url(#ia)"/>
+        <!-- indirect block -->
+        <rect x="200" y="150" width="90" height="55" rx="4" fill="#e6eef5" stroke="#25608f"/>
+        <text x="245" y="165" text-anchor="middle" font-size="8" font-weight="600">indirect block</text>
+        <text x="245" y="180" text-anchor="middle" font-size="7.5" fill="#6a6152">শুধু pointer-এ ভরা</text>
+        <text x="245" y="193" text-anchor="middle" font-size="7.5" fill="#6a6152">→ শত শত block</text>
+        <line x1="130" y1="164" x2="198" y2="168" stroke="#25608f" stroke-width="1.2" marker-end="url(#ia)"/>
+        <rect x="330" y="150" width="60" height="18" rx="3" fill="#fff5e6" stroke="#b8501f"/><text x="360" y="163" text-anchor="middle" font-size="7.5">ডেটা</text>
+        <rect x="330" y="172" width="60" height="18" rx="3" fill="#fff5e6" stroke="#b8501f"/><text x="360" y="185" text-anchor="middle" font-size="7.5">ডেটা</text>
+        <line x1="290" y1="172" x2="328" y2="162" stroke="#25608f" stroke-width="1" marker-end="url(#ia)"/>
+        <line x1="290" y1="182" x2="328" y2="181" stroke="#25608f" stroke-width="1" marker-end="url(#ia)"/>
+        <text x="290" y="240" text-anchor="middle" font-size="9" fill="#6a6152">ছোট ফাইল = শুধু direct (দ্রুত); বড় ফাইল = indirect স্তর যোগ হয়</text>
+      </svg>
+    </div><figcaption>inode-এর multi-level pointer — ছোট ফাইল সরাসরি, বড় ফাইল indirect block দিয়ে</figcaption></figure>
+    <div class="box note"><span class="tag">💡 কেন এই ডিজাইন চমৎকার</span>
+    বেশিরভাগ ফাইল <strong>ছোট</strong>। তাই inode-এ কয়েকটা <strong>direct pointer</strong> (সরাসরি ডেটা block-এ) — ছোট ফাইলের জন্য এতেই যথেষ্ট, দ্রুত। ফাইল বড় হলে <strong>indirect pointer</strong> ব্যবহার হয় — একটা block ভরা থাকে আরও pointer দিয়ে, যা শত শত block নির্দেশ করে। আরও বড় হলে double/triple indirect। ফলে ছোট ফাইলে কোনো overhead নেই, অথচ বিশাল ফাইলও সামলানো যায়। এটা মডিউল ৩-এর multi-level page table-এর মতোই ধারণা!</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>inode-এ কী নেই যা directory-তে আছে?</summary><p>ফাইলের নাম। inode-এ সাইজ, অনুমতি, block pointer সব আছে — কিন্তু নাম থাকে directory এন্ট্রিতে।</p></details>
+    <details><summary>ছোট ফাইলে indirect block লাগে না কেন?</summary><p>ছোট ফাইলের block সংখ্যা কম, তাই inode-এর কয়েকটা direct pointer-এই ধরে যায়। indirect block শুধু বড় ফাইলে দরকার হয় — এতে ছোট ফাইলে কোনো বাড়তি খরচ নেই।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch4">
+    <div class="ch-head"><span class="ch-num">০৪</span><div><h2>একটা ফাইল খোঁজার পুরো যাত্রা</h2><div class="ch-sub">path-resolution</div></div></div>
+    <p class="lead">এবার সব একসাথে জোড়া লাগাই। আপনি <code>/home/rahim/notes.txt</code> খুললে, disk-এ ঠিক কী কী ঘটে? এই যাত্রাটা inode আর directory কীভাবে একসাথে কাজ করে তা দেখায়।</p>
+    <h3>Disk-এর সাধারণ কাঠামো</h3>
+    <p>একটা file system disk-কে কয়েকটা অঞ্চলে ভাগ করে:</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 580 110" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <rect x="20" y="35" width="90" height="45" rx="4" fill="#eaf1e4" stroke="#3d6b2f"/>
+        <text x="65" y="54" text-anchor="middle" font-size="9.5" font-weight="600">Super</text>
+        <text x="65" y="68" text-anchor="middle" font-size="8" fill="#6a6152">block</text>
+        <rect x="115" y="35" width="90" height="45" rx="4" fill="#e6eef5" stroke="#25608f"/>
+        <text x="160" y="54" text-anchor="middle" font-size="9.5" font-weight="600">Bitmaps</text>
+        <text x="160" y="68" text-anchor="middle" font-size="8" fill="#6a6152">কোনটা খালি</text>
+        <rect x="210" y="35" width="120" height="45" rx="4" fill="#efe9f2" stroke="#6a3d7a"/>
+        <text x="270" y="54" text-anchor="middle" font-size="9.5" font-weight="600">inode টেবিল</text>
+        <text x="270" y="68" text-anchor="middle" font-size="8" fill="#6a6152">সব inode</text>
+        <rect x="335" y="35" width="225" height="45" rx="4" fill="#fff5e6" stroke="#b8501f"/>
+        <text x="447" y="54" text-anchor="middle" font-size="9.5" font-weight="600">Data Blocks</text>
+        <text x="447" y="68" text-anchor="middle" font-size="8" fill="#6a6152">আসল ফাইলের বিষয়বস্তু (বেশিরভাগ জায়গা)</text>
+        <text x="290" y="22" text-anchor="middle" font-size="10" fill="#6a6152">একটা সাধারণ file system-এর disk লেআউট</text>
+      </svg>
+    </div><figcaption>Superblock (মেটাডেটা) → bitmap (খালি হিসাব) → inode টেবিল → data block</figcaption></figure>
+    <p><strong>Superblock:</strong> পুরো file system সম্পর্কে তথ্য (কত বড়, কতগুলো inode, কোথায় কী)। <strong>Bitmap:</strong> কোন inode ও data block খালি, কোনটা ব্যবহৃত। <strong>inode টেবিল:</strong> সব inode একসাথে। <strong>Data block:</strong> আসল ফাইলের বিষয়বস্তু।</p>
+    <h3><code>/home/rahim/notes.txt</code> খোলার ধাপ</h3>
+    <div class="box note"><span class="tag">🔍 নাম থেকে ডেটা — ধাপে ধাপে</span>
+    <strong>১.</strong> root inode (<code>/</code>) সবসময় জানা (যেমন inode ২)। সেটা পড়ো।<br>
+    <strong>২.</strong> root-এর data block পড়ো (এটা একটা directory) → <code>home</code> খুঁজে তার inode নম্বর পাও।<br>
+    <strong>৩.</strong> <code>home</code>-এর inode পড়ো → তার data block পড়ো → <code>rahim</code>-এর inode নম্বর পাও।<br>
+    <strong>৪.</strong> <code>rahim</code>-এর inode পড়ো → data block পড়ো → <code>notes.txt</code>-এর inode নম্বর পাও।<br>
+    <strong>৫.</strong> <code>notes.txt</code>-এর inode পড়ো → এতে আছে block pointer → সেই data block পড়ো → <strong>অবশেষে আসল বিষয়বস্তু!</strong></div>
+    <div class="box warn"><span class="tag">⚠️ কত disk অ্যাক্সেস!</span>
+    লক্ষ্য করুন — একটা ফাইল খুলতে path-এর প্রতিটা অংশের জন্য inode ও data block পড়তে হলো। গভীর path (<code>/a/b/c/d/e/file</code>) মানে অনেক disk অ্যাক্সেস। এজন্যই OS এগুলো cache করে (অধ্যায় ৭) — একবার খোঁজা path পরে দ্রুত হয়। এটাও বোঝায় কেন খুব গভীর directory কাঠামো একটু ধীর।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Path resolution root থেকে শুরু হয় কেন?</summary><p>কারণ শুধু root inode-এর অবস্থান আগে থেকে জানা (fixed)। বাকি প্রতিটা অংশ খুঁজতে তার parent directory পড়তে হয় — তাই root থেকে ধাপে ধাপে নামতে হয়।</p></details>
+    <details><summary>গভীর directory path কেন একটু ধীর?</summary><p>path-এর প্রতিটা অংশের জন্য একটা directory-র inode ও data block পড়তে হয়। যত গভীর, তত বেশি disk অ্যাক্সেস — যদিও cache এটা অনেকটা কমায়।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch5">
+    <div class="ch-head"><span class="ch-num">০৫</span><div><h2>Crash ও Journaling</h2><div class="ch-sub">crash-consistency</div></div></div>
+    <p class="lead">একটা ভয়ংকর প্রশ্ন: ফাইল লেখার <strong>মাঝখানে</strong> যদি বিদ্যুৎ চলে যায়? file system অর্ধেক-লেখা, অসংগত অবস্থায় থেকে যেতে পারে। এই সমস্যা সমাধানই আধুনিক file system-এর সবচেয়ে গুরুত্বপূর্ণ কাজগুলোর একটা।</p>
+    <h3>সমস্যা — একটা কাজ, অনেক ধাপ</h3>
+    <p>একটা ফাইলে নতুন ডেটা যোগ করতে file system-কে কয়েকটা আলাদা জায়গায় লিখতে হয়: (১) data block-এ আসল ডেটা, (২) inode-এ নতুন সাইজ ও block pointer, (৩) bitmap-এ "এই block এখন ব্যবহৃত"। এই তিনটা লেখার <strong>মাঝখানে</strong> crash হলে?</p>
+    <div class="box warn"><span class="tag">⚠️ অসংগত অবস্থার উদাহরণ</span>
+    ধরুন bitmap-এ block-টা "ব্যবহৃত" চিহ্নিত হলো, কিন্তু inode-এ pointer লেখার আগেই crash। এখন ওই block "ব্যবহৃত" দেখাচ্ছে অথচ কোনো ফাইল সেটা ব্যবহার করছে না — চিরতরে হারানো জায়গা (leak)। আরও খারাপ: inode-এ pointer লেখা হলো কিন্তু bitmap আপডেট হলো না — একই block পরে অন্য ফাইলকেও দেওয়া হতে পারে, দুই ফাইল একই জায়গা ভাগ করবে, ডেটা নষ্ট!</div>
+    <div class="box analogy"><span class="tag">📒 উপমা — হিসাবের খাতা</span>
+    ব্যাংক টাকা সরানোর আগে খাতায় লিখে রাখে "A থেকে B-তে ৫০০ যাবে" (journal)। তারপর আসল কাজ করে। মাঝপথে বিভ্রাট হলেও খাতা দেখে বোঝা যায় কাজটা সম্পূর্ণ হয়েছিল কিনা, আর দরকারে আবার করা যায়। Journaling file system ঠিক এই কৌশল ব্যবহার করে।</div>
+    <h3>সমাধান — Journaling (Write-Ahead Logging)</h3>
+    <p>মূল ধারণা: আসল জায়গায় লেখার <strong>আগে</strong>, একটা আলাদা "journal" অঞ্চলে লিখে রাখো "আমি কী কী করতে যাচ্ছি"। ধাপ:</p>
+    <div class="box note"><span class="tag">🔧 Journaling-এর ধাপ</span>
+    <strong>১.</strong> journal-এ লেখো: "এই block, এই inode, এই bitmap আপডেট করব" (এটা একটা transaction)।<br>
+    <strong>২.</strong> journal-এ একটা "commit" চিহ্ন লেখো (transaction সম্পূর্ণ লেখা হয়েছে)।<br>
+    <strong>৩.</strong> এবার আসল জায়গায় পরিবর্তনগুলো করো (checkpoint)।<br>
+    <strong>৪.</strong> সফল হলে journal থেকে transaction মুছে দাও।<br><br>
+    <strong>Crash হলে:</strong> রিবুটের পর OS journal দেখে। commit চিহ্ন থাকলে কাজটা আবার করে (redo) — সম্পূর্ণ হয়। commit না থাকলে অসম্পূর্ণ transaction বাতিল করে। কোনো অবস্থাতেই file system অসংগত থাকে না।</div>
+    <div class="box deep"><span class="tag">🔬 গভীরে — সব কি journal করতে হয়?</span>
+    পুরো ডেটা journal করলে সবকিছু <strong>দুবার</strong> লেখা হয় (একবার journal-এ, একবার আসল জায়গায়) — ধীর। তাই বেশিরভাগ file system (যেমন Linux-এর ext4) ডিফল্টে শুধু <strong>metadata</strong> (inode, bitmap, directory) journal করে, আসল ফাইল ডেটা নয় (<code>ordered</code> mode)। এতে file system-এর কাঠামো সবসময় সংগত থাকে (crash-এ file system ভাঙে না), যদিও কিছু সাম্প্রতিক ফাইল ডেটা হারাতে পারে। এটা নিরাপত্তা ও গতির একটা ব্যবহারিক সমঝোতা — সম্পূর্ণ data journaling সম্ভব কিন্তু ধীর।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Journaling ছাড়া crash হলে file system-এর কী সমস্যা?</summary><p>একাধিক ধাপের লেখার মাঝে crash হলে অসংগত অবস্থা — যেমন block "ব্যবহৃত" চিহ্নিত অথচ কোনো ফাইল ব্যবহার করছে না (leak), বা একই block দুই ফাইলকে দেওয়া (ডেটা নষ্ট)।</p></details>
+    <details><summary>ext4 কেন শুধু metadata journal করে, সব ডেটা নয়?</summary><p>সব ডেটা journal করলে সবকিছু দুবার লেখা হয় — ধীর। শুধু metadata journal করলে file system-এর কাঠামো সংগত থাকে, অথচ গতি ভালো থাকে। এটা একটা সমঝোতা।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch6">
+    <div class="ch-head"><span class="ch-num">০৬</span><div><h2>Disk Scheduling</h2><div class="ch-sub">disk-scheduling</div></div></div>
+    <p class="lead">অনেকগুলো disk request একসাথে অপেক্ষা করছে (বিভিন্ন process থেকে)। HDD-তে head-এর নড়াচড়া ধীর, তাই কোন request আগে সারালে মোট head movement কম হয় — এই সিদ্ধান্তই disk scheduling।</p>
+    <div class="box analogy"><span class="tag">🛗 উপমা — লিফট</span>
+    একটা লিফটে বিভিন্ন তলার বোতাম চাপা। লিফট কি চাপার ক্রমে যাবে (এলোমেলো, অদক্ষ)? না — এক দিকে যেতে যেতে পথের সব তলা সারে, তারপর উল্টো দিকে ফেরে। disk-এর SCAN অ্যালগরিদম ঠিক এই "লিফট" পদ্ধতি — head এক দিকে যেতে যেতে পথের সব request সারে।</div>
+    <h3>মূল অ্যালগরিদম</h3>
+    <table>
+      <tr><th>অ্যালগরিদম</th><th>ধারণা</th><th>সমস্যা</th></tr>
+      <tr><td><strong>FCFS</strong></td><td>আসার ক্রমে</td><td>head বেশি নড়ে, অদক্ষ</td></tr>
+      <tr><td><strong>SSTF</strong></td><td>সবচেয়ে কাছের request আগে</td><td>দূরের request starve করতে পারে</td></tr>
+      <tr><td><strong>SCAN</strong> (লিফট)</td><td>এক দিকে গিয়ে পথের সব সারে, তারপর ফেরে</td><td>প্রান্তের request বেশি অপেক্ষা করে</td></tr>
+      <tr><td><strong>C-SCAN</strong></td><td>এক দিকে গিয়ে শেষে সরাসরি শুরুতে ফিরে আবার</td><td>আরও সুষম অপেক্ষা</td></tr>
+    </table>
+    <div class="box note"><span class="tag">💡 SSD-তে এটা কম গুরুত্বপূর্ণ</span>
+    এই সব অ্যালগরিদম HDD-র জন্য — যেখানে ফিজিক্যাল head movement বড় খরচ। SSD-তে কোনো head নেই, random অ্যাক্সেস প্রায় সমান দ্রুত, তাই disk scheduling-এর গুরুত্ব অনেক কম। আধুনিক OS টের পায় নিচে HDD না SSD, আর সেই অনুযায়ী কৌশল বদলায়। এটা একটা ভালো উদাহরণ — হার্ডওয়্যার বদলালে OS-এর কৌশলও বদলাতে হয়।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>SCAN অ্যালগরিদম কেন "লিফট" নামে পরিচিত?</summary><p>লিফটের মতো — head এক দিকে যেতে যেতে পথের সব request সারে, প্রান্তে পৌঁছে উল্টো দিকে ফেরে। এতে অপ্রয়োজনীয় আগে-পিছে নড়াচড়া কমে।</p></details>
+    <details><summary>SSTF-এ starvation কেন হতে পারে?</summary><p>সবসময় কাছের request আগে সারলে, নতুন কাছের request আসতেই থাকলে দূরের একটা request কখনো সুযোগ না-ও পেতে পারে।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch7">
+    <div class="ch-head"><span class="ch-num">০৭</span><div><h2>Buffer Cache</h2><div class="ch-sub">buffer-cache</div></div></div>
+    <p class="lead">Disk লক্ষ গুণ ধীর RAM-এর চেয়ে। তাই OS একটা সহজ কিন্তু শক্তিশালী কৌশল ব্যবহার করে: সম্প্রতি পড়া/লেখা disk block RAM-এ রেখে দেওয়া। এটাই buffer cache (বা page cache)।</p>
+    <div class="box analogy"><span class="tag">🧊 উপমা — রান্নাঘরের হাতের কাছের তাক</span>
+    গুদাম (disk) থেকে প্রতিবার মসলা আনা ঝামেলা। তাই যেগুলো বারবার লাগে সেগুলো রান্নাঘরের হাতের কাছের তাকে (RAM cache) রাখেন। পরেরবার গুদামে না গিয়ে সাথে সাথে পান। disk block-ও তাই — একবার পড়লে RAM-এ থাকে, পরের বার সরাসরি।</div>
+    <h3>দুটো বড় সুবিধা</h3>
+    <p><strong>Read caching:</strong> একবার পড়া block RAM-এ থাকে, বারবার পড়লে disk ছুঁতে হয় না। এজন্যই একটা প্রোগ্রাম দ্বিতীয়বার চালালে দ্রুত খোলে — তার ফাইল তখন cache-এ।</p>
+    <p><strong>Write buffering:</strong> লেখা সাথে সাথে disk-এ না গিয়ে প্রথমে cache-এ জমা হয়, OS পরে একসাথে লেখে। এতে অনেক ছোট লেখা একত্র হয়, আর একই জায়গায় বারবার লিখলে শুধু শেষটা disk-এ যায়।</p>
+    <div class="box warn"><span class="tag">⚠️ Write buffering-এর ঝুঁকি — আর তাই fsync</span>
+    লেখা cache-এ থাকা মানে disk-এ এখনো যায়নি। এই সময় crash হলে সেই ডেটা হারিয়ে যায়! এজন্য গুরুত্বপূর্ণ ডেটায় (যেমন database একটা লেনদেন) প্রোগ্রাম <code>fsync()</code> ডাকে — যা OS-কে বাধ্য করে cache-এর ডেটা এখনই disk-এ লিখতে। এই কারণেই "সেভ হয়েছে" দেখানোর পরও হঠাৎ পাওয়ার গেলে কখনো শেষ কিছু কাজ হারায় — buffer এখনো disk-এ যায়নি। <code>fsync</code> কখন ডাকতে হবে জানা সিস্টেম প্রোগ্রামিং-এর একটা গুরুত্বপূর্ণ দক্ষতা।</div>
+    <div class="box deep"><span class="tag">🔬 গভীরে — cache কতটা RAM নেয়?</span>
+    Linux-এ buffer/page cache <strong>খালি RAM-এর প্রায় সবটাই</strong> ব্যবহার করে — কারণ অব্যবহৃত RAM অপচয়। এজন্য <code>free -h</code> চালালে দেখবেন অনেক RAM "used" কিন্তু আসলে বেশিরভাগ cache, যা দরকার হলে সাথে সাথে ছেড়ে দেওয়া হয়। "Linux আমার সব RAM খেয়ে ফেলেছে!" — এই ভয় সাধারণত ভুল বোঝাবুঝি; ওটা cache, আপনার সুবিধার জন্যই। এটাই "unused RAM is wasted RAM" নীতি।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>একটা প্রোগ্রাম দ্বিতীয়বার দ্রুত খোলে কেন?</summary><p>প্রথমবার পড়ার সময় তার ফাইল buffer cache-এ চলে আসে (RAM-এ)। দ্বিতীয়বার disk ছুঁতে হয় না, সরাসরি cache থেকে — তাই দ্রুত।</p></details>
+    <details><summary><code>fsync()</code> কখন দরকার?</summary><p>যখন নিশ্চিত হতে হবে ডেটা সত্যিই disk-এ লেখা হয়েছে (crash-এও থাকবে) — যেমন database লেনদেন। এটা buffer cache-এর ডেটা এখনই disk-এ লিখতে বাধ্য করে।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch8">
+    <div class="ch-head"><span class="ch-num">০৮</span><div><h2>প্রজেক্ট — নিজের toy File System</h2><div class="ch-sub">build-a-filesystem</div></div></div>
+    <p class="lead">এই মডিউলের সব ধারণা একসাথে জোড়া লাগানোর সময়। একটা সাধারণ ফাইলকে "ভার্চুয়াল ডিস্ক" ধরে তার উপর একটা কাজ করা file system বানাবেন — superblock, inode, data block সহ। এটা persistence-এর সব ধারণা পাকা করবে।</p>
+    <div class="box note"><span class="tag">🎯 মূল ধারণা — ফাইলের ভেতরে file system</span>
+    আসল disk নিয়ে খেলা ঝুঁকিপূর্ণ ও কঠিন। তাই কৌশল: একটা বড় সাধারণ ফাইল (যেমন <code>disk.img</code>, ১০ MB) তৈরি করুন — এটাই আপনার "ভার্চুয়াল ডিস্ক"। এর ভেতরটা block-এ ভাগ করুন, আর সেখানে আপনার file system-এর কাঠামো বসান। সব নিরাপদে userspace-এ চলে।</div>
+    <h3>ধাপ ১ — ডিস্কের কাঠামো ঠিক করুন</h3>
+    <pre><span class="c">// সরল লেআউট: ব্লক সাইজ 4KB ধরে</span>
+<span class="c">// block 0: superblock</span>
+<span class="c">// block 1: inode bitmap</span>
+<span class="c">// block 2: data bitmap</span>
+<span class="c">// block 3..N: inode টেবিল</span>
+<span class="c">// block N+1..: data blocks</span>
+
+<span class="f">#define</span> BLOCK_SIZE 4096
+<span class="f">#define</span> MAX_INODES 128
+
+<span class="k">typedef struct</span> {
+    <span class="k">int</span> size;                <span class="c">// ফাইল কত byte</span>
+    <span class="k">int</span> type;                <span class="c">// 0 = খালি, 1 = ফাইল, 2 = directory</span>
+    <span class="k">int</span> blocks[12];          <span class="c">// direct block pointer (সরল রাখলাম)</span>
+} inode_t;
+
+<span class="k">typedef struct</span> {
+    <span class="k">int</span> total_blocks;
+    <span class="k">int</span> total_inodes;
+    <span class="k">int</span> data_start;          <span class="c">// data block কোথা থেকে শুরু</span>
+} superblock_t;</pre>
+    <h3>ধাপ ২ — মূল অপারেশন</h3>
+    <div class="box lab"><span class="tag">🛠 যা যা implement করবেন</span>
+    <ol style="margin:6px 0 0">
+      <li><strong><code>fs_format()</code>:</strong> disk.img তৈরি করে superblock ও খালি bitmap লেখো</li>
+      <li><strong><code>fs_create(name)</code>:</strong> একটা খালি inode খুঁজে (bitmap দেখে) নতুন ফাইল বানাও, root directory-তে নাম→inode যোগ করো</li>
+      <li><strong><code>fs_write(name, data)</code>:</strong> খালি data block বরাদ্দ করো, ডেটা লেখো, inode-এ pointer ও সাইজ আপডেট করো</li>
+      <li><strong><code>fs_read(name)</code>:</strong> নাম থেকে inode খুঁজে, তার block pointer ধরে ডেটা পড়ো</li>
+      <li><strong><code>fs_ls()</code>:</strong> root directory-র সব এন্ট্রি দেখাও</li>
+      <li><strong><code>fs_delete(name)</code>:</strong> inode ও data block "খালি" চিহ্নিত করো (bitmap আপডেট), directory থেকে এন্ট্রি সরাও</li>
+    </ol></div>
+    <div class="box deep"><span class="tag">🔬 এই প্রজেক্ট যা শেখায়</span>
+    নিজে file system লিখলে হঠাৎ পরিষ্কার হয়: কেন <code>delete</code> আসলে ডেটা মোছে না (শুধু bitmap-এ "খালি" চিহ্নিত করে — এজন্যই deleted ফাইল কখনো recover করা যায়!), কেন fragmentation হয় (খালি block ছড়িয়ে-ছিটিয়ে থাকে), কেন directory নিজেও একটা ফাইল, আর কেন প্রতিটা অপারেশনে একাধিক জায়গায় (bitmap + inode + data) লিখতে হয় — যা journaling-এর প্রয়োজনীয়তা বোঝায়। তত্ত্বে পড়া সব ধারণা কোডে জীবন্ত হয়ে ওঠে।</div>
+    <div class="box lab"><span class="tag">🛠 চ্যালেঞ্জ — আরও এগিয়ে</span>
+    <ol style="margin:6px 0 0">
+      <li><strong>Subdirectory:</strong> শুধু root নয়, nested directory সাপোর্ট করুন (<code>/a/b/file</code>)</li>
+      <li><strong>Indirect block:</strong> ১২ block-এর বেশি বড় ফাইলের জন্য single indirect যোগ করুন</li>
+      <li><strong>Persistence যাচাই:</strong> প্রোগ্রাম বন্ধ করে আবার চালিয়ে দেখুন ফাইল টিকে আছে (আসল persistence!)</li>
+      <li><strong>FUSE দিয়ে mount:</strong> libfuse ব্যবহার করে আপনার FS-কে সত্যিকারের mount করুন — <code>ls</code>, <code>cat</code> দিয়ে ব্যবহার করুন যেন আসল file system!</li>
+    </ol></div>
+    <div class="box lab"><span class="tag">🛠 আসল file system পরীক্ষা করুন</span>
+    নিজেরটা বানানোর পাশাপাশি Linux টুল দিয়ে আসলটা দেখুন: <code>stat file.txt</code> (inode-এর তথ্য), <code>ls -i</code> (inode নম্বর), <code>df</code> (disk ব্যবহার), <code>du</code> (ফাইলের সাইজ)। <code>stat</code>-এর আউটপুটে inode নম্বর, block সংখ্যা, link count — সব এই মডিউলে শেখা জিনিস চিনতে পারবেন।</div>
+    <div class="box analogy" style="margin-top:40px;text-align:center;background:#eaf1e4;border-color:#3d6b2f">
+      <span class="tag" style="color:#3d6b2f">🎓 মডিউল ৫ শেষ — তিন স্তম্ভ সম্পূর্ণ!</span>
+      আপনি এখন জানেন disk কেন ধীর, file ও directory কীভাবে block-এর উপর তৈরি হয়, inode কী, একটা ফাইল খোঁজার পুরো যাত্রা, journaling কীভাবে crash থেকে বাঁচায়, disk scheduling, buffer cache — আর নিজে একটা file system বানিয়েছেন।<br><br>
+      এর সাথে <strong>Persistence</strong> স্তম্ভ শেষ, আর OSTEP-এর তিন স্তম্ভই (Virtualization, Concurrency, Persistence) সম্পূর্ণ! শেষ ধাপ <strong>মডিউল ৬ (নিজের OS বানানো)</strong> — xv6 পড়া, kernel hacking, নতুন syscall যোগ, আর MIT 6.1810-র পথ। সেখানে এই সব ধারণা একসাথে একটা আসল kernel-এ দেখবেন।
+    </div>
+  </section>
+</main>
+</div>
+<script>
+  const links=[...document.querySelectorAll('#toc a')];
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+  const onScroll=()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<=120)idx=i;});links.forEach(l=>l.classList.remove('active'));links[idx]&&links[idx].classList.add('active');};
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+</script>
+</body>
+</html>
