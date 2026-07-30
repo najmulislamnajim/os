@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>অপারেটিং সিস্টেম · মডিউল ৪ — Concurrency</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#12100e;--paper:#f5f1e8;--paper2:#ece5d6;--line:#d6ccb6;--accent:#6a3d7a;--accent2:#b8501f;--brown:#7a4a1e;--teal:#1a6b5a;--blue:#25608f;--green:#3d6b2f;--muted:#6a6152;--code-bg:#1a161c;--code-ink:#e9e3ee}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:18px;line-height:1.82}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace}
+  .wrap{display:flex;min-height:100vh}
+  aside{width:296px;flex-shrink:0;background:var(--paper2);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 20px}
+  main{flex:1;max-width:880px;margin:0 auto;padding:50px 50px 130px}
+  aside .brand{font-weight:700;font-size:1.02rem;line-height:1.35;color:var(--accent)}
+  aside .brand small{display:block;font-weight:400;font-size:.66rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;margin-top:7px}
+  aside nav{margin-top:20px}
+  aside nav a{display:block;text-decoration:none;color:var(--ink);padding:6px 11px;border-radius:7px;font-size:.87rem;margin-bottom:1px}
+  aside nav a .n{color:var(--accent);font-weight:600;font-family:'JetBrains Mono';font-size:.73rem;margin-right:7px}
+  aside nav a:hover{background:var(--paper)}
+  aside nav a.active{background:var(--accent);color:#fff}
+  aside nav a.active .n{color:#dcc9e6}
+  aside .modtag{font-size:.67rem;background:var(--accent2);color:#fff;padding:2px 9px;border-radius:20px;letter-spacing:.07em;display:inline-block;margin-top:13px}
+  .hero{border-bottom:2px solid var(--ink);padding-bottom:30px;margin-bottom:44px}
+  .hero .eyebrow{font-family:'JetBrains Mono';font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:15px}
+  .hero h1{font-size:2.8rem;line-height:1.08;margin:0 0 15px;font-weight:700;letter-spacing:-.6px}
+  .hero p{font-size:1.1rem;color:var(--muted);max-width:60ch;margin:0}
+  section.chapter{margin-bottom:72px;scroll-margin-top:20px}
+  .ch-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:26px}
+  .ch-head .ch-num{font-family:'JetBrains Mono';font-size:2.1rem;font-weight:600;color:var(--accent);line-height:1}
+  .ch-head h2{font-size:1.72rem;margin:0;font-weight:700;letter-spacing:-.3px}
+  .ch-head .ch-sub{font-size:.79rem;color:var(--muted);font-family:'JetBrains Mono'}
+  h3{font-size:1.24rem;margin:34px 0 12px;font-weight:600}
+  h4{font-size:1.02rem;margin:22px 0 8px;font-weight:600;color:var(--accent)}
+  p{margin:12px 0}
+  .lead{font-size:1.04rem}
+  .box{border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.95rem;line-height:1.72}
+  .analogy{background:#fff5e6;border:1px solid #e6cb9c}
+  .analogy .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .note{background:#efe9f2;border:1px solid #cbb6d6}
+  .note .tag{font-weight:700;color:var(--accent);font-size:.79rem;display:block;margin-bottom:5px}
+  .deep{background:#e6eef5;border:1px solid #adc9dc}
+  .deep .tag{font-weight:700;color:var(--blue);font-size:.79rem;display:block;margin-bottom:5px}
+  .warn{background:#fceadf;border:1px solid #ecbb9d}
+  .warn .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .lab{background:#eaf1e4;border:1px solid #b6cfa2}
+  .lab .tag{font-weight:700;color:var(--green);font-size:.79rem;display:block;margin-bottom:5px}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:.81rem;line-height:1.62;margin:16px 0}
+  pre .c{color:#9b8fa0}
+  pre .k{color:#c9a0d6}
+  pre .s{color:#c8b88a}
+  pre .f{color:#8fb8e0}
+  p code,li code,td code{background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.83em;color:var(--accent2)}
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.88rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--paper2);font-weight:600;font-size:.82rem}
+  tr:hover td{background:#fff8ee}
+  figure{margin:26px 0}
+  .diagram{background:#fffdf7;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center}
+  figcaption{font-size:.82rem;color:var(--muted);text-align:center;margin-top:10px;font-style:italic}
+  svg{max-width:100%;height:auto}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  .quiz{background:var(--paper2);border:1px dashed var(--accent);border-radius:12px;padding:18px 22px;margin:24px 0}
+  .quiz .tag{font-weight:700;color:var(--accent);display:block;margin-bottom:8px;font-size:.86rem}
+  .quiz summary{cursor:pointer;font-weight:500;margin:8px 0}
+  .quiz details p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
+  .toc-hint{color:var(--muted);font-size:.76rem;margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+  @media(max-width:900px){aside{display:none}main{padding:28px 20px 90px}.hero h1{font-size:1.95rem}body{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+  <div class="brand">অপারেটিং সিস্টেম<small>মডিউল ৪ · Concurrency</small></div>
+  <span class="modtag">CONCURRENCY</span>
+  <nav id="toc">
+    <a href="#ch0"><span class="n">০০</span>শুরুর কথা</a>
+    <a href="#ch1"><span class="n">০১</span>Race Condition</a>
+    <a href="#ch2"><span class="n">০২</span>Critical Section</a>
+    <a href="#ch3"><span class="n">০৩</span>Lock ও Mutex</a>
+    <a href="#ch4"><span class="n">০৪</span>Condition Variable</a>
+    <a href="#ch5"><span class="n">০৫</span>Semaphore</a>
+    <a href="#ch6"><span class="n">০৬</span>Deadlock</a>
+    <a href="#ch7"><span class="n">০৭</span>ক্লাসিক সমস্যা</a>
+    <a href="#ch8"><span class="n">০৮</span>প্রজেক্ট</a>
+  </nav>
+  <div class="toc-hint">সবুজ = হাতে-কলমে ল্যাব। নীল = গভীর প্রযুক্তিগত অংশ। এই মডিউলে ধীরে চলুন — এটা কঠিন।</div>
+</aside>
+<main>
+  <div class="hero">
+    <div class="eyebrow">মডিউল ৪ · দ্বিতীয় স্তম্ভ</div>
+    <h1>Concurrency</h1>
+    <p>একসাথে অনেক thread চললে গতি বাড়ে — কিন্তু জিনিস ভয়ংকরভাবে ভাঙতেও পারে। এই মডিউলে দেখবো কেন <code>counter++</code>-ও বিপজ্জনক হতে পারে, কীভাবে lock দিয়ে বাঁচানো যায়, আর deadlock কী। OS-এর সবচেয়ে কঠিন কিন্তু বাস্তবিক অংশ।</p>
+  </div>
+
+  <section class="chapter" id="ch0">
+    <div class="ch-head"><span class="ch-num">০০</span><div><h2>শুরুর কথা</h2><div class="ch-sub">orientation</div></div></div>
+    <p class="lead">মডিউল ২-তে thread-এর সাথে পরিচয় হয়েছে — একই process-এর ভেতরে অনেক সুতো, যারা memory ভাগ করে। সেই "memory ভাগ করা"-ই thread-এর শক্তি, আবার তার সবচেয়ে বড় বিপদ। এই মডিউল পুরোটাই সেই বিপদ ও তার সমাধান নিয়ে।</p>
+    <div class="box note"><span class="tag">🧭 কেন এই মডিউল আলাদাভাবে গুরুত্বপূর্ণ</span>
+    রোডম্যাপে বলেছিলাম — এটা বাস্তব চাকরিতে সবচেয়ে বেশি কাজে লাগে। যেকোনো multithreaded ব্যাকএন্ড, database, ওয়েব সার্ভার, এমনকি আধুনিক ফ্রন্টএন্ড — সবখানে concurrency। আর concurrency-র বাগ সবচেয়ে কুখ্যাত, কারণ সেগুলো <strong>অনিয়মিত</strong> — কখনো ধরা পড়ে, কখনো না। তাই ধারণাগুলো শক্ত করে বুঝুন।</div>
+    <div class="box lab"><span class="tag">🛠 পরিবেশ — pthread</span>
+    এই মডিউলের কোড POSIX threads (pthread) ব্যবহার করে, যা Linux-এ বিল্ট-ইন। compile করার সময় <code>-pthread</code> ফ্ল্যাগ লাগবে: <code>gcc prog.c -o prog -pthread</code>। Mac-এও চলবে। প্রতিটা উদাহরণ নিজে চালিয়ে দেখুন — বিশেষত race condition-এরগুলো কয়েকবার চালালে ভিন্ন ফল দেখবেন।</div>
+  </section>
+
+  <section class="chapter" id="ch1">
+    <div class="ch-head"><span class="ch-num">০১</span><div><h2>Race Condition</h2><div class="ch-sub">race-condition</div></div></div>
+    <p class="lead">শুরু করি একটা আপাত-নিরীহ কোড দিয়ে, যা ভয়ংকরভাবে ভুল ফল দেয়। দুটো thread একটা সাধারণ counter বাড়াচ্ছে — কী সমস্যা হতে পারে?</p>
+    <pre><span class="c">// দুটো thread, প্রত্যেকে counter ১০ লক্ষ বার বাড়ায়</span>
+<span class="f">#include</span> <span class="s">&lt;pthread.h&gt;</span>
+<span class="f">#include</span> <span class="s">&lt;stdio.h&gt;</span>
+
+<span class="k">int</span> counter = 0;   <span class="c">// দুই thread শেয়ার করে</span>
+
+<span class="k">void</span> *worker(<span class="k">void</span> *arg) {
+    <span class="k">for</span> (<span class="k">int</span> i = 0; i &lt; 1000000; i++) {
+        counter++;      <span class="c">// দেখতে সরল, কিন্তু বিপজ্জনক!</span>
+    }
+    <span class="k">return</span> NULL;
+}
+
+<span class="k">int</span> main() {
+    pthread_t t1, t2;
+    pthread_create(&amp;t1, NULL, worker, NULL);
+    pthread_create(&amp;t2, NULL, worker, NULL);
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+    printf(<span class="s">"counter = %d\n"</span>, counter);   <span class="c">// আশা করি 2000000?</span>
+    <span class="k">return</span> 0;
+}</pre>
+    <div class="box warn"><span class="tag">⚠️ ফলাফল আপনাকে অবাক করবে</span>
+    আশা করেছিলেন <code>2000000</code>। কিন্তু চালালে পাবেন এলোমেলো সংখ্যা — <code>1487213</code>, <code>1892043</code>, প্রতিবার আলাদা! কিছু বৃদ্ধি "হারিয়ে" যাচ্ছে। কেন? উত্তরটাই concurrency-র মূল সমস্যা।</div>
+    <h3>কেন — counter++ আসলে তিনটা ধাপ</h3>
+    <p><code>counter++</code> একটা অবিভাজ্য কাজ মনে হলেও, CPU-র জন্য এটা <strong>তিনটা আলাদা instruction</strong>:</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 600 260" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <text x="300" y="20" text-anchor="middle" font-size="12" font-weight="600">counter++ = তিনটা ধাপ, আর মাঝখানে বিপদ</text>
+        <text x="150" y="48" text-anchor="middle" font-size="11" font-weight="700" fill="#1a6b5a">Thread A</text>
+        <text x="450" y="48" text-anchor="middle" font-size="11" font-weight="700" fill="#b8501f">Thread B</text>
+        <g font-size="9.5" text-anchor="middle">
+          <rect x="60" y="60" width="180" height="26" rx="4" fill="#e7f1ee" stroke="#1a6b5a"/><text x="150" y="77">১. counter পড়ো (পেল 5)</text>
+          <rect x="60" y="92" width="180" height="26" rx="4" fill="#e7f1ee" stroke="#1a6b5a"/><text x="150" y="109">২. ১ যোগ করো (হলো 6)</text>
+          <rect x="360" y="105" width="180" height="26" rx="4" fill="#fff5e6" stroke="#b8501f"/><text x="450" y="122">১. counter পড়ো (পেল 5!)</text>
+          <rect x="360" y="137" width="180" height="26" rx="4" fill="#fff5e6" stroke="#b8501f"/><text x="450" y="154">২. ১ যোগ করো (হলো 6)</text>
+          <rect x="60" y="170" width="180" height="26" rx="4" fill="#e7f1ee" stroke="#1a6b5a"/><text x="150" y="187">৩. লেখো (counter = 6)</text>
+          <rect x="360" y="200" width="180" height="26" rx="4" fill="#fff5e6" stroke="#b8501f"/><text x="450" y="217">৩. লেখো (counter = 6)</text>
+        </g>
+        <text x="300" y="250" text-anchor="middle" font-size="10" fill="#b8501f" font-weight="600">দুবার বাড়ানো হলো, কিন্তু counter মাত্র 5→6! একটা বৃদ্ধি হারিয়ে গেল</text>
+      </svg>
+    </div><figcaption>দুই thread একই সময়ে পড়লে একটার কাজ অন্যটা মুছে দেয়</figcaption></figure>
+    <p>Thread A পড়ল ৫, এর মাঝে (context switch) Thread B-ও পড়ল ৫। দুজনেই ৬ বানিয়ে লিখল। ফল — দুবার বাড়িয়েও counter ৫ থেকে মাত্র ৬ হলো, ৭ নয়। একটা বৃদ্ধি হারিয়ে গেল।</p>
+    <div class="box note"><span class="tag">💡 সংজ্ঞা — Race Condition</span>
+    যখন একাধিক thread একই শেয়ার্ড ডেটা একসাথে অ্যাক্সেস করে, আর ফলাফল নির্ভর করে <strong>কে আগে চলল তার উপর</strong> (timing) — সেটাই race condition। "Race" কারণ thread-রা যেন একটা দৌড়ে, আর কে জিতবে তা অনিশ্চিত। এই অনিশ্চয়তাই এটাকে এত কুখ্যাত করে — একই কোড কখনো ঠিক চলে, কখনো ভুল।</div>
+    <div class="box lab"><span class="tag">🛠 নিজে দেখুন</span>
+    উপরের কোড <code>race.c</code> নামে সেভ করে <code>gcc race.c -o race -pthread</code> দিয়ে compile করুন। তারপর কয়েকবার <code>./race</code> চালান — প্রতিবার ভিন্ন সংখ্যা, আর কখনোই ঠিক ২০ লক্ষ নয়। এই অনিশ্চিত আচরণ নিজ চোখে দেখাটাই এই মডিউল বোঝার প্রথম ধাপ।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary><code>counter++</code> কেন atomic নয়?</summary><p>এটা আসলে তিনটা CPU instruction — পড়া, যোগ, লেখা। এই তিনটার মাঝে context switch হতে পারে, তখন অন্য thread পুরনো মান দেখে ভুল হিসাব করে।</p></details>
+    <details><summary>Race condition-এর ফল প্রতিবার আলাদা কেন?</summary><p>কারণ ফলাফল নির্ভর করে thread-দের সঠিক timing-এর উপর — কে কখন context switch হলো। এটা scheduler ঠিক করে, যা অনির্দিষ্ট, তাই প্রতিবার ভিন্ন।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch2">
+    <div class="ch-head"><span class="ch-num">০২</span><div><h2>Critical Section</h2><div class="ch-sub">critical-section</div></div></div>
+    <p class="lead">সমস্যা বুঝলাম। সমাধানের আগে একটা জরুরি ধারণা — <strong>critical section</strong>। এটা কোডের সেই অংশ যেখানে শেয়ার্ড ডেটা ছোঁয়া হয়, আর যেখানে একসাথে একাধিক thread থাকলে বিপদ।</p>
+    <div class="box analogy"><span class="tag">🚻 উপমা — একটা টয়লেট, একটা চাবি</span>
+    একটা পাবলিক টয়লেট (critical section) — একসাথে একজনই ঢুকতে পারে। বাইরে একটা চাবি (lock)। যে ঢোকে সে চাবি নেয়, ভেতরে থাকে, বেরিয়ে চাবি ফেরত দেয়। বাকিরা বাইরে অপেক্ষা করে। এভাবে নিশ্চিত হয় একসময়ে একজনই ভেতরে। শেয়ার্ড ডেটাও তাই — একসময়ে একটা thread-ই ছুঁতে পারবে।</div>
+    <h3>একটা সঠিক সমাধানের তিনটা শর্ত</h3>
+    <table>
+      <tr><th>শর্ত</th><th>মানে</th></tr>
+      <tr><td><strong>Mutual Exclusion</strong></td><td>একসময়ে একটা thread-ই critical section-এ থাকবে</td></tr>
+      <tr><td><strong>Progress</strong></td><td>কেউ ভেতরে না থাকলে, ঢুকতে চাওয়া কেউ অনির্দিষ্টকাল আটকাবে না</td></tr>
+      <tr><td><strong>Bounded waiting</strong></td><td>কেউ চিরকাল অপেক্ষায় থাকবে না (starvation নেই)</td></tr>
+    </table>
+    <div class="box note"><span class="tag">💡 মূল লক্ষ্য — mutual exclusion</span>
+    Race condition দূর করার মূল কৌশল: critical section-কে এমনভাবে রক্ষা করা যাতে একসময়ে একটা thread-ই সেখানে ঢুকতে পারে। বাকিদের অপেক্ষা করতে হবে। কীভাবে এই "একজনই ঢুকবে" নিশ্চিত করা যায় — সেটাই পরের অধ্যায়ের lock।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Critical section কী?</summary><p>কোডের যে অংশে শেয়ার্ড ডেটা অ্যাক্সেস করা হয়, আর যেখানে একসাথে একাধিক thread থাকলে race condition হতে পারে। এই অংশটুকু রক্ষা করতে হয়।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch3">
+    <div class="ch-head"><span class="ch-num">০৩</span><div><h2>Lock ও Mutex</h2><div class="ch-sub">locks-and-mutexes</div></div></div>
+    <p class="lead">Lock (বা mutex — MUTual EXclusion) হলো সেই "চাবি"। একটা thread lock নেয়, critical section সারে, lock ছাড়ে। lock ধরা থাকলে অন্যরা অপেক্ষা করে।</p>
+    <h3>আগের সমস্যা mutex দিয়ে সমাধান</h3>
+    <pre><span class="f">#include</span> <span class="s">&lt;pthread.h&gt;</span>
+
+<span class="k">int</span> counter = 0;
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;   <span class="c">// একটা lock</span>
+
+<span class="k">void</span> *worker(<span class="k">void</span> *arg) {
+    <span class="k">for</span> (<span class="k">int</span> i = 0; i &lt; 1000000; i++) {
+        pthread_mutex_lock(&amp;lock);      <span class="c">// চাবি নাও (দরজা বন্ধ)</span>
+        counter++;                       <span class="c">// critical section — এখন নিরাপদ</span>
+        pthread_mutex_unlock(&amp;lock);    <span class="c">// চাবি ফেরত দাও</span>
+    }
+    <span class="k">return</span> NULL;
+}
+<span class="c">// এখন ফল সবসময় ঠিক 2000000!</span></pre>
+    <div class="box lab"><span class="tag">🛠 নিজে যাচাই করুন</span>
+    আগের <code>race.c</code>-তে এই তিনটা লাইন (<code>lock</code> ঘোষণা, <code>lock</code>/<code>unlock</code>) যোগ করে চালান। এখন যতবারই চালান, সবসময় ঠিক ২০ লক্ষ। lock নিশ্চিত করেছে একসময়ে একটা thread-ই <code>counter++</code> করছে — race condition শেষ।</div>
+    <h3>Lock কীভাবে কাজ করে — atomic instruction</h3>
+    <p>কিন্তু দাঁড়ান — lock নিজেই তো শেয়ার্ড ডেটা! "lock খালি আছে কিনা দেখা" আর "lock নেওয়া"-র মাঝেও তো race হতে পারে। এই মুরগি-ডিম সমস্যা সমাধান করে হার্ডওয়্যার।</p>
+    <div class="box deep"><span class="tag">🔬 গভীরে — test-and-set</span>
+    আধুনিক CPU-তে বিশেষ <strong>atomic instruction</strong> আছে (যেমন <code>test-and-set</code>, <code>compare-and-swap</code>) — যা একটা অবিভাজ্য ধাপে একই সাথে একটা মান পড়ে <em>এবং</em> নতুন মান লেখে, মাঝখানে কোনো interrupt ঢুকতে পারে না। lock এই instruction-এর উপর তৈরি: "যদি lock খালি থাকে তবে একই অবিভাজ্য ধাপে সেটা দখল করো"। হার্ডওয়্যারের এই atomic গ্যারান্টিই পুরো concurrency নিয়ন্ত্রণের ভিত্তি — সফটওয়্যার একা এটা নিশ্চিত করতে পারে না।</div>
+    <h3>Spinlock বনাম Blocking lock</h3>
+    <table>
+      <tr><th></th><th>Spinlock</th><th>Blocking (mutex)</th></tr>
+      <tr><td>অপেক্ষার সময়</td><td>বারবার চেক করতে থাকে (ব্যস্ত থাকে)</td><td>ঘুমিয়ে পড়ে, OS পরে জাগায়</td></tr>
+      <tr><td>ভালো যখন</td><td>অপেক্ষা খুব সংক্ষিপ্ত</td><td>অপেক্ষা দীর্ঘ হতে পারে</td></tr>
+      <tr><td>খরচ</td><td>CPU নষ্ট করে (spin)</td><td>context switch-এর খরচ</td></tr>
+    </table>
+    <div class="box warn"><span class="tag">⚠️ Lock-এর দাম আছে</span>
+    Lock নিরাপত্তা দেয়, কিন্তু বিনামূল্যে নয়। (১) <strong>Performance:</strong> lock-এর জন্য অপেক্ষা মানে thread বসে থাকা — সমান্তরালতা কমে। (২) যত বেশি অংশ lock করবেন, তত কম সমান্তরাল। তাই critical section <strong>যতটা সম্ভব ছোট</strong> রাখুন — শুধু যেটুকু আসলেই শেয়ার্ড ডেটা ছোঁয়, ততটুকু। (৩) ভুল lock ব্যবহার deadlock ডেকে আনে (অধ্যায় ৬)।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Lock নিজেই শেয়ার্ড ডেটা — তাহলে lock নেওয়ায় race হয় না কেন?</summary><p>কারণ lock নেওয়া atomic hardware instruction (test-and-set/compare-and-swap) দিয়ে হয় — যা এক অবিভাজ্য ধাপে চেক ও দখল করে, মাঝখানে interrupt ঢুকতে পারে না।</p></details>
+    <details><summary>Critical section ছোট রাখা কেন জরুরি?</summary><p>lock ধরা থাকলে বাকি thread অপেক্ষা করে, সমান্তরালতা কমে। যত ছোট critical section, তত কম সময় lock ধরা থাকে, তত বেশি thread একসাথে এগোতে পারে।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch4">
+    <div class="ch-head"><span class="ch-num">০৪</span><div><h2>Condition Variable</h2><div class="ch-sub">condition-variables</div></div></div>
+    <p class="lead">Lock একটা সমস্যা সমাধান করে (mutual exclusion), কিন্তু আরেকটা দরকার — <strong>সমন্বয়</strong>। কখনো একটা thread-কে অপেক্ষা করতে হয় "একটা শর্ত সত্য হওয়া পর্যন্ত"। যেমন — বাফার খালি হলে তবেই লিখব। এই অপেক্ষা করায় condition variable।</p>
+    <div class="box analogy"><span class="tag">🔔 উপমা — রেস্তোরাঁর অর্ডার বেল</span>
+    রাঁধুনি (consumer) খাবার তৈরির অপেক্ষায়। সে বারবার রান্নাঘরে উঁকি দিতে পারে (busy waiting — CPU নষ্ট), অথবা বিশ্রাম নিতে পারে আর ওয়েটার একটা বেল বাজিয়ে ডাকবে "অর্ডার এসেছে!" (condition variable)। দ্বিতীয়টা দক্ষ — thread ঘুমায়, শর্ত সত্য হলে অন্য thread তাকে "signal" দিয়ে জাগায়।</div>
+    <h3>তিনটা অপারেশন</h3>
+    <table>
+      <tr><th>অপারেশন</th><th>কাজ</th></tr>
+      <tr><td><code>wait()</code></td><td>lock ছেড়ে ঘুমিয়ে পড়ো, signal পেলে জাগো ও আবার lock নাও</td></tr>
+      <tr><td><code>signal()</code></td><td>একটা অপেক্ষমাণ thread-কে জাগাও</td></tr>
+      <tr><td><code>broadcast()</code></td><td>সব অপেক্ষমাণ thread-কে জাগাও</td></tr>
+    </table>
+    <pre><span class="c">// consumer: বাফারে জিনিস আসা পর্যন্ত অপেক্ষা</span>
+pthread_mutex_lock(&amp;lock);
+<span class="k">while</span> (count == 0) {                 <span class="c">// শর্ত: বাফার খালি?</span>
+    pthread_cond_wait(&amp;not_empty, &amp;lock);  <span class="c">// ঘুমাও (lock ছেড়ে দিয়ে)</span>
+}
+<span class="c">// এখানে এলে count &gt; 0 নিশ্চিত — জিনিস নাও</span>
+item = buffer[--count];
+pthread_mutex_unlock(&amp;lock);
+
+<span class="c">// producer: জিনিস রেখে consumer-কে জাগাও</span>
+pthread_mutex_lock(&amp;lock);
+buffer[count++] = item;
+pthread_cond_signal(&amp;not_empty);     <span class="c">// "বাফারে জিনিস আছে!"</span>
+pthread_mutex_unlock(&amp;lock);</pre>
+    <div class="box warn"><span class="tag">⚠️ সবসময় while, কখনো if নয়</span>
+    লক্ষ্য করুন — শর্ত চেক করা হয়েছে <code>while</code> দিয়ে, <code>if</code> দিয়ে নয়। কারণ <strong>spurious wakeup</strong> (কারণ ছাড়াই জেগে ওঠা) হতে পারে, বা signal পাওয়ার পরও অন্য thread আগে ঢুকে শর্ত আবার মিথ্যা করে দিতে পারে। তাই জাগার পর <strong>আবার</strong> শর্ত যাচাই করা জরুরি। <code>if</code> ব্যবহার করলে সূক্ষ্ম, কঠিন-ধরা বাগ তৈরি হয় — এটা concurrency-র একটা ক্লাসিক ভুল।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Condition variable আর lock-এর কাজ কীভাবে আলাদা?</summary><p>Lock দেয় mutual exclusion (একসাথে একজন)। Condition variable দেয় সমন্বয় — একটা thread শর্তের জন্য অপেক্ষা করে ঘুমায়, অন্যটা শর্ত সত্য হলে তাকে জাগায়। দুটো একসাথে ব্যবহার হয়।</p></details>
+    <details><summary>শর্ত চেক করতে <code>while</code> কেন, <code>if</code> নয়?</summary><p>Spurious wakeup বা signal-এর পর অন্য thread শর্ত আবার মিথ্যা করে দিতে পারে। তাই জাগার পর আবার যাচাই করা দরকার — <code>while</code> সেটা নিশ্চিত করে।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch5">
+    <div class="ch-head"><span class="ch-num">০৫</span><div><h2>Semaphore</h2><div class="ch-sub">semaphores</div></div></div>
+    <p class="lead">Semaphore হলো একটা আরও সাধারণ সমন্বয় টুল — মূলত একটা গণনাকারী (counter) যা নিরাপদে বাড়ানো-কমানো যায়। এটা দিয়ে lock ও condition variable দুটোরই কাজ করা যায়।</p>
+    <div class="box analogy"><span class="tag">🅿️ উপমা — পার্কিং লটের খালি জায়গার বোর্ড</span>
+    একটা পার্কিং লটের গেটে ডিজিটাল বোর্ড — "খালি: ১৫"। গাড়ি ঢুকলে সংখ্যা কমে (<code>wait</code>), বেরোলে বাড়ে (<code>signal</code>)। বোর্ড ০ দেখালে গেট বন্ধ — নতুন গাড়ি অপেক্ষা করে যতক্ষণ না কেউ বেরোয়। semaphore ঠিক এই গণনাকারী — কতগুলো "সম্পদ" খালি আছে তা রাখে।</div>
+    <h3>দুটো অপারেশন</h3>
+    <table>
+      <tr><th>অপারেশন</th><th>যাকে বলে</th><th>কাজ</th></tr>
+      <tr><td><code>wait()</code></td><td>P / down / acquire</td><td>মান ১ কমাও; ০ হলে অপেক্ষা করো</td></tr>
+      <tr><td><code>signal()</code></td><td>V / up / release</td><td>মান ১ বাড়াও; কেউ অপেক্ষায় থাকলে জাগাও</td></tr>
+    </table>
+    <h3>দুই ধরনের ব্যবহার</h3>
+    <p><strong>Binary semaphore (মান ০ বা ১):</strong> কার্যত একটা lock-এর মতো — mutual exclusion।</p>
+    <p><strong>Counting semaphore (যেকোনো মান):</strong> সীমিত সংখ্যক সম্পদ নিয়ন্ত্রণ — যেমন "একসাথে সর্বোচ্চ ৫টা thread এই কাজ করতে পারবে"।</p>
+    <pre><span class="f">#include</span> <span class="s">&lt;semaphore.h&gt;</span>
+
+sem_t sem;
+sem_init(&amp;sem, 0, 3);   <span class="c">// শুরুতে মান ৩ (একসাথে ৩ জন ঢুকতে পারবে)</span>
+
+<span class="k">void</span> *worker(<span class="k">void</span> *arg) {
+    sem_wait(&amp;sem);      <span class="c">// একটা "স্লট" নাও (মান কমল)</span>
+    <span class="c">// ... সীমিত সম্পদ ব্যবহার করো ...</span>
+    sem_post(&amp;sem);      <span class="c">// স্লট ফেরত দাও (মান বাড়ল)</span>
+    <span class="k">return</span> NULL;
+}</pre>
+    <div class="box note"><span class="tag">💡 কখন কোনটা?</span>
+    <strong>Lock/mutex:</strong> সরল mutual exclusion, একজন মালিক। <strong>Condition variable:</strong> একটা নির্দিষ্ট শর্তের জন্য অপেক্ষা। <strong>Semaphore:</strong> গণনা করা সম্পদ, বা producer-consumer-এর মতো সমস্যা যেখানে "কতগুলো আছে" গোনা দরকার। বাস্তবে তিনটাই দরকার হয়; কোন সমস্যায় কোনটা সবচেয়ে পরিষ্কার সমাধান দেয়, সেটাই বাছাইয়ের মাপকাঠি।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Binary আর counting semaphore-এর পার্থক্য?</summary><p>Binary-র মান শুধু ০/১ — কার্যত lock। Counting-এর মান যেকোনো — সীমিত সংখ্যক সম্পদ নিয়ন্ত্রণে (যেমন সর্বোচ্চ N thread একসাথে)।</p></details>
+    <details><summary>Semaphore-এর মান ৫ থেকে শুরু হলে মানে কী?</summary><p>৫টা "সম্পদ" বা স্লট খালি — একসাথে ৫টা thread <code>wait</code> করে ঢুকতে পারবে। ষষ্ঠটি অপেক্ষা করবে যতক্ষণ না কেউ <code>signal</code> দেয়।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch6">
+    <div class="ch-head"><span class="ch-num">০৬</span><div><h2>Deadlock</h2><div class="ch-sub">deadlock</div></div></div>
+    <p class="lead">Lock সমস্যা সমাধান করে, কিন্তু ভুলভাবে ব্যবহার করলে নতুন — আর ভয়ংকর — সমস্যা তৈরি করে: <strong>deadlock</strong>। দুটো thread একে অপরের জন্য চিরকাল অপেক্ষা করে, কেউ এগোয় না।</p>
+    <div class="box analogy"><span class="tag">🚗 উপমা — সরু গলিতে মুখোমুখি দুই গাড়ি</span>
+    একটা সরু গলিতে দুটো গাড়ি মুখোমুখি এসে থেমে গেছে। A এগোতে পারবে যদি B পিছিয়ে যায়; B এগোতে পারবে যদি A পিছিয়ে যায়। কেউ পিছবে না — দুজনেই চিরকাল আটকে। এটাই deadlock — প্রত্যেকে অন্যের ছেড়ে দেওয়া কিছুর জন্য অপেক্ষা করছে।</div>
+    <h3>একটা ক্লাসিক deadlock</h3>
+    <pre><span class="c">// Thread 1              |  Thread 2</span>
+lock(A);              <span class="c">// |</span>  lock(B);
+lock(B);  <span class="c">// ⟵ আটকে   |</span>  lock(A);  <span class="c">// ⟵ আটকে</span>
+<span class="c">// Thread 1-এর হাতে A, চায় B  |  Thread 2-এর হাতে B, চায় A</span>
+<span class="c">// দুজনেই চিরকাল অপেক্ষা করবে — DEADLOCK</span></pre>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="da" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#b8501f"/></marker></defs>
+        <circle cx="120" cy="70" r="38" fill="#efe9f2" stroke="#6a3d7a" stroke-width="1.5"/>
+        <text x="120" y="75" text-anchor="middle" font-size="12" font-weight="600" fill="#6a3d7a">Thread 1</text>
+        <circle cx="380" cy="70" r="38" fill="#fff5e6" stroke="#b8501f" stroke-width="1.5"/>
+        <text x="380" y="75" text-anchor="middle" font-size="12" font-weight="600" fill="#b8501f">Thread 2</text>
+        <rect x="90" y="165" width="60" height="34" rx="6" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="120" y="187" text-anchor="middle" font-size="12" font-weight="600">Lock A</text>
+        <rect x="350" y="165" width="60" height="34" rx="6" fill="#e6eef5" stroke="#25608f"/>
+        <text x="380" y="187" text-anchor="middle" font-size="12" font-weight="600">Lock B</text>
+        <line x1="120" y1="108" x2="120" y2="163" stroke="#3d6b2f" stroke-width="2"/>
+        <text x="128" y="140" font-size="9" fill="#3d6b2f">ধরে আছে</text>
+        <line x1="380" y1="108" x2="380" y2="163" stroke="#3d6b2f" stroke-width="2"/>
+        <text x="388" y="140" font-size="9" fill="#3d6b2f">ধরে আছে</text>
+        <line x1="150" y1="180" x2="348" y2="90" stroke="#b8501f" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#da)"/>
+        <line x1="350" y1="182" x2="152" y2="92" stroke="#b8501f" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#da)"/>
+        <text x="250" y="120" text-anchor="middle" font-size="9" fill="#b8501f">চায় (কিন্তু পাবে না)</text>
+      </svg>
+    </div><figcaption>বৃত্তাকার অপেক্ষা — প্রত্যেকে অন্যের ধরে রাখা lock চায়</figcaption></figure>
+    <h3>Deadlock-এর চারটা শর্ত (Coffman conditions)</h3>
+    <p>Deadlock হতে <strong>চারটাই</strong> একসাথে লাগে। যেকোনো একটা ভাঙলে deadlock অসম্ভব:</p>
+    <table>
+      <tr><th>শর্ত</th><th>মানে</th></tr>
+      <tr><td><strong>Mutual exclusion</strong></td><td>সম্পদ একসাথে একজনই ব্যবহার করতে পারে</td></tr>
+      <tr><td><strong>Hold and wait</strong></td><td>একটা ধরে রেখে আরেকটার জন্য অপেক্ষা</td></tr>
+      <tr><td><strong>No preemption</strong></td><td>জোর করে কারো lock কেড়ে নেওয়া যায় না</td></tr>
+      <tr><td><strong>Circular wait</strong></td><td>একটা বৃত্তাকার শৃঙ্খল — A চায় B, B চায় A</td></tr>
+    </table>
+    <div class="box note"><span class="tag">💡 সবচেয়ে সহজ প্রতিরোধ — lock ordering</span>
+    <strong>Circular wait</strong> ভাঙাই সবচেয়ে সহজ ব্যবহারিক উপায়। নিয়ম: সব thread সবসময় <strong>একই ক্রমে</strong> lock নেবে (যেমন সবসময় আগে A, তারপর B — কখনো উল্টো নয়)। তাহলে বৃত্ত তৈরি হতে পারে না, deadlock অসম্ভব। উপরের উদাহরণে Thread 2-ও যদি আগে A তারপর B নিত, deadlock হতো না। এই সরল নিয়মটাই বাস্তব কোডে সবচেয়ে বেশি ব্যবহৃত।</div>
+    <div class="box deep"><span class="tag">🔬 গভীরে — প্রতিরোধ, এড়ানো, সনাক্তকরণ</span>
+    <strong>Prevention:</strong> চার শর্তের একটা স্থায়ীভাবে ভাঙা (যেমন lock ordering)। <strong>Avoidance:</strong> চলার সময় হিসাব করে এমন অবস্থা এড়ানো যেখান থেকে deadlock সম্ভব (Banker's algorithm — কিন্তু ব্যবহারিক নয়, সব সম্পদের চাহিদা আগে জানতে হয়)। <strong>Detection &amp; recovery:</strong> deadlock হতে দাও, তারপর ধরো (সম্পদ-গ্রাফে চক্র খুঁজে) আর একটা thread মেরে/পিছিয়ে ভাঙো — database এই পদ্ধতি ব্যবহার করে (deadlock ধরে একটা transaction rollback করে)। বাস্তবে বেশিরভাগ সাধারণ প্রোগ্রাম prevention (lock ordering) ব্যবহার করে, কারণ সেটা সহজ ও নির্ভরযোগ্য।</div>
+    <div class="box warn"><span class="tag">⚠️ Deadlock বনাম Livelock বনাম Starvation</span>
+    <strong>Deadlock:</strong> সবাই আটকে, কেউ নড়ে না। <strong>Livelock:</strong> thread-রা নড়ছে (অবস্থা বদলাচ্ছে) কিন্তু কেউ এগোচ্ছে না — যেমন দুজন করিডোরে মুখোমুখি, দুজনেই একই দিকে সরে বারবার আবার মুখোমুখি। <strong>Starvation:</strong> কিছু thread এগোচ্ছে, কিন্তু একটা নির্দিষ্ট thread কখনো সুযোগ পাচ্ছে না (সবসময় অন্যরা আগে)। তিনটাই "এগোনো"-র সমস্যা, কিন্তু আলাদা।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Lock ordering কীভাবে deadlock ঠেকায়?</summary><p>সব thread একই ক্রমে lock নিলে circular wait অসম্ভব হয়ে যায় — বৃত্ত তৈরি হতে পারে না। চার শর্তের একটা ভাঙায় deadlock হয় না।</p></details>
+    <details><summary>Deadlock আর starvation কীভাবে আলাদা?</summary><p>Deadlock-এ কেউই এগোয় না (সবাই পরস্পরের জন্য আটকে)। Starvation-এ সিস্টেম এগোচ্ছে, কিন্তু একটা নির্দিষ্ট thread বারবার উপেক্ষিত হয়ে কখনো সুযোগ পায় না।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch7">
+    <div class="ch-head"><span class="ch-num">০৭</span><div><h2>ক্লাসিক Concurrency সমস্যা</h2><div class="ch-sub">classic-problems</div></div></div>
+    <p class="lead">কয়েকটা ক্লাসিক সমস্যা আছে যা concurrency-র মূল চ্যালেঞ্জগুলো ধরে রাখে। এগুলো শুধু একাডেমিক নয় — বাস্তব সিস্টেমের প্যাটার্ন, আর ইন্টারভিউতেও আসে।</p>
+    <h3>১. Producer-Consumer (Bounded Buffer)</h3>
+    <p>এক বা একাধিক producer ডেটা তৈরি করে একটা সীমিত বাফারে রাখে; consumer সেখান থেকে নিয়ে ব্যবহার করে। সমস্যা: বাফার ভরা থাকলে producer অপেক্ষা করবে, খালি থাকলে consumer অপেক্ষা করবে — আর দুজনের একসাথে বাফার ছোঁয়ায় race হবে না।</p>
+    <div class="box analogy"><span class="tag">🍞 উপমা — বেকারি ও তাক</span>
+    বেকার (producer) রুটি বানিয়ে তাকে (বাফার) রাখে। ক্রেতা (consumer) তাক থেকে নেয়। তাক ভরে গেলে বেকার থামে; তাক খালি হলে ক্রেতা অপেক্ষা করে। আর দুজন একসাথে একই জায়গায় হাত দিলে গোলমাল — তাই সমন্বয় দরকার।</div>
+    <div class="box note"><span class="tag">🔧 সমাধানের কাঠামো — তিনটা টুল একসাথে</span>
+    <strong>একটা mutex</strong> — বাফার ছোঁয়ার সময় mutual exclusion।<br>
+    <strong>দুটো semaphore</strong> — <code>empty</code> (কতগুলো খালি স্লট, শুরুতে = বাফার সাইজ) আর <code>full</code> (কতগুলো ভরা স্লট, শুরুতে = ০)।<br>
+    Producer: <code>wait(empty)</code> → lock → রাখো → unlock → <code>signal(full)</code>।<br>
+    Consumer: <code>wait(full)</code> → lock → নাও → unlock → <code>signal(empty)</code>।<br>
+    এই প্যাটার্নটা মুখস্থ রাখার মতো — বহু বাস্তব সমস্যার ভিত্তি (message queue, thread pool, pipeline)।</div>
+    <h3>২. Readers-Writers</h3>
+    <p>একটা শেয়ার্ড ডেটা — অনেকে একসাথে <strong>পড়তে</strong> পারে (কোনো সমস্যা নেই), কিন্তু কেউ <strong>লিখলে</strong> তাকে একা থাকতে হবে (পড়া ও লেখা একসাথে হলে বিপদ)। চ্যালেঞ্জ: যতটা সম্ভব বেশি reader-কে একসাথে চলতে দেওয়া, অথচ writer-কে একচেটিয়া অ্যাক্সেস দেওয়া — আর কেউ যেন starve না করে।</p>
+    <div class="box note"><span class="tag">💡 বাস্তব প্রয়োগ</span>
+    এটা সরাসরি database ও cache-এ ব্যবহৃত হয় — একটা <code>read-write lock</code> (rwlock)। বেশিরভাগ কাজ যখন পড়া (যেমন একটা কনফিগ যা কদাচিৎ বদলায়), তখন সব reader-কে একসাথে চলতে দিয়ে অনেক বেশি সমান্তরালতা পাওয়া যায়, শুধু বিরল লেখার সময় একচেটিয়া lock নেওয়া হয়।</div>
+    <h3>৩. Dining Philosophers</h3>
+    <p>পাঁচজন দার্শনিক একটা গোল টেবিলে। প্রতি দুজনের মাঝে একটা করে কাঁটা (মোট ৫টা)। খেতে হলে দুই পাশের দুটো কাঁটা লাগে। সবাই যদি একসাথে বাঁ দিকের কাঁটা তুলে ডানেরটার জন্য অপেক্ষা করে — <strong>deadlock!</strong> কেউ কখনো খেতে পারবে না।</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <circle cx="200" cy="130" r="60" fill="#f0e8d8" stroke="#a89478"/>
+        <text x="200" y="128" text-anchor="middle" font-size="10" fill="#6a6152">টেবিল</text>
+        <text x="200" y="144" text-anchor="middle" font-size="9" fill="#6a6152">(ভাত)</text>
+        <!-- 5 philosophers -->
+        <g font-size="10" text-anchor="middle">
+          <circle cx="200" cy="40" r="22" fill="#efe9f2" stroke="#6a3d7a"/><text x="200" y="44">P1</text>
+          <circle cx="325" cy="105" r="22" fill="#efe9f2" stroke="#6a3d7a"/><text x="325" y="109">P2</text>
+          <circle cx="278" cy="225" r="22" fill="#efe9f2" stroke="#6a3d7a"/><text x="278" y="229">P3</text>
+          <circle cx="122" cy="225" r="22" fill="#efe9f2" stroke="#6a3d7a"/><text x="122" y="229">P4</text>
+          <circle cx="75" cy="105" r="22" fill="#efe9f2" stroke="#6a3d7a"/><text x="75" y="109">P5</text>
+        </g>
+        <!-- forks between -->
+        <g stroke="#b8501f" stroke-width="2.5">
+          <line x1="248" y1="62" x2="268" y2="82"/>
+          <line x1="312" y1="158" x2="300" y2="182"/>
+          <line x1="200" y1="200" x2="200" y2="225"/>
+          <line x1="88" y1="182" x2="100" y2="158"/>
+          <line x1="132" y1="82" x2="152" y2="62"/>
+        </g>
+        <text x="200" y="255" text-anchor="middle" font-size="9" fill="#b8501f">কমলা রেখা = কাঁটা (৫টা, প্রতি জোড়ার মাঝে একটা)</text>
+      </svg>
+    </div><figcaption>Dining philosophers — সীমিত সম্পদ (কাঁটা) ভাগাভাগির ক্লাসিক deadlock সমস্যা</figcaption></figure>
+    <div class="box note"><span class="tag">💡 সমাধানের কয়েকটা কৌশল</span>
+    <strong>Lock ordering:</strong> কাঁটাগুলো নম্বর দাও, সবাই আগে ছোট নম্বরের কাঁটা তুলবে। তাহলে অন্তত একজন দুটো পাবে (circular wait ভাঙে)। <strong>Asymmetry:</strong> একজন দার্শনিক উল্টো ক্রমে তুলবে। <strong>Limiting:</strong> একসাথে সর্বোচ্চ ৪ জনকে বসতে দাও (একটা counting semaphore) — তাহলে অন্তত একজন দুটো কাঁটা পাবেই। এই সমস্যাটাই deadlock-এর চার শর্ত ও তাদের ভাঙার উপায় হাতে-কলমে শেখায়।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Producer-consumer-এ দুটো semaphore কেন লাগে?</summary><p>একটা (<code>empty</code>) গোনে কতগুলো খালি স্লট — producer-কে থামায় বাফার ভরা হলে। আরেকটা (<code>full</code>) গোনে কতগুলো ভরা — consumer-কে থামায় বাফার খালি হলে। সাথে mutex বাফার রক্ষা করে।</p></details>
+    <details><summary>Dining philosophers-এ deadlock কীভাবে ঠেকানো যায়?</summary><p>কয়েকভাবে — কাঁটায় ক্রম আরোপ (lock ordering), একজনকে উল্টো ক্রমে তোলানো, বা একসাথে সর্বোচ্চ ৪ জনকে বসতে দেওয়া। সবগুলোই circular wait ভাঙে।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch8">
+    <div class="ch-head"><span class="ch-num">০৮</span><div><h2>প্রজেক্ট — Concurrency হাতে-কলমে</h2><div class="ch-sub">projects</div></div></div>
+    <p class="lead">এই মডিউলের ধারণাগুলো শুধু পড়ে বোঝা যায় না — কোডে দেখতে হয়, ভাঙতে হয়, ঠিক করতে হয়। তিনটা প্রজেক্ট, সহজ থেকে কঠিন।</p>
+    <div class="box lab"><span class="tag">🛠 প্রজেক্ট ১ — Race দেখা ও সারানো</span>
+    অধ্যায় ১-এর <code>race.c</code> দিয়ে শুরু করুন।
+    <ol style="margin:6px 0 0">
+      <li>lock ছাড়া চালিয়ে কয়েকবার ভুল ফল দেখুন (প্রতিবার ভিন্ন)</li>
+      <li>mutex যোগ করে ঠিক করুন — এখন সবসময় ২০ লক্ষ</li>
+      <li>পরীক্ষা করুন: lock শুধু <code>counter++</code>-এর চারপাশে বনাম পুরো লুপের চারপাশে — গতির পার্থক্য মাপুন (<code>time ./race</code>)। শিখবেন কেন critical section ছোট রাখা জরুরি</li>
+    </ol></div>
+    <div class="box lab"><span class="tag">🛠 প্রজেক্ট ২ — Bounded Buffer (মূল প্রজেক্ট)</span>
+    একটা producer-consumer সিস্টেম বানান pthread দিয়ে:
+    <ol style="margin:6px 0 0">
+      <li>একটা নির্দিষ্ট আকারের বাফার (যেমন ১০টা স্লট, একটা array)</li>
+      <li>N producer thread — এলোমেলো সংখ্যা তৈরি করে বাফারে রাখে</li>
+      <li>M consumer thread — বাফার থেকে নিয়ে যোগফল হিসাব করে</li>
+      <li>একটা mutex + দুটো semaphore (<code>empty</code>, <code>full</code>) দিয়ে সমন্বয়</li>
+      <li>যাচাই: মোট উৎপাদিত = মোট ব্যবহৃত? (নাহলে কোথাও race)</li>
+    </ol>
+    এটাই এই মডিউলের কেন্দ্রীয় প্রজেক্ট — thread, mutex, semaphore, condition সব একসাথে।</div>
+    <div class="box lab"><span class="tag">🛠 প্রজেক্ট ৩ — Dining Philosophers (চ্যালেঞ্জ)</span>
+    পাঁচজন দার্শনিককে thread হিসেবে চালান, কাঁটাগুলোকে mutex হিসেবে।
+    <ol style="margin:6px 0 0">
+      <li>প্রথমে <strong>ইচ্ছাকৃতভাবে</strong> সবাইকে আগে বাঁ কাঁটা তোলান — deadlock দেখুন (প্রোগ্রাম আটকে যাবে)</li>
+      <li>তারপর lock ordering দিয়ে ঠিক করুন (কাঁটায় নম্বর, ছোট আগে)</li>
+      <li>যাচাই করুন সবাই খেতে পারছে, কেউ starve করছে না</li>
+    </ol>
+    Deadlock নিজে তৈরি করে তারপর সারানোটাই সবচেয়ে ভালো শিক্ষা।</div>
+    <div class="box deep"><span class="tag">🔬 debugging টুল</span>
+    Concurrency বাগ ধরা কঠিন, কিন্তু টুল আছে। <strong>Helgrind</strong> (valgrind-এর অংশ): <code>valgrind --tool=helgrind ./prog</code> — race condition ও lock সমস্যা ধরে। <strong>ThreadSanitizer:</strong> <code>gcc -fsanitize=thread</code> দিয়ে compile করলে চলার সময় race ধরিয়ে দেয়। এগুলো ছাড়া concurrency বাগ খোঁজা খড়ের গাদায় সুঁচ — টুল দুটো শিখে রাখুন, বাস্তব কাজে অমূল্য।</div>
+    <div class="box analogy" style="margin-top:40px;text-align:center;background:#efe9f2;border-color:#6a3d7a">
+      <span class="tag" style="color:#6a3d7a">🎓 মডিউল ৪ শেষ!</span>
+      আপনি এখন জানেন race condition কেন হয়, critical section কী, lock/mutex কীভাবে রক্ষা করে, condition variable ও semaphore দিয়ে thread সমন্বয়, deadlock-এর চার শর্ত ও তা ভাঙার উপায়, আর producer-consumer/dining philosophers-এর মতো ক্লাসিক সমস্যা। এটাই বাস্তব চাকরিতে সবচেয়ে বেশি কাজে লাগবে।<br><br>
+      Concurrency স্তম্ভ শেষ। পরের ধাপে <strong>মডিউল ৫ (Storage ও File System)</strong> — তৃতীয় ও শেষ স্তম্ভ Persistence। inode, journaling, disk scheduling, আর নিজে একটা ছোট file system বানানো।
+    </div>
+  </section>
+</main>
+</div>
+<script>
+  const links=[...document.querySelectorAll('#toc a')];
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+  const onScroll=()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<=120)idx=i;});links.forEach(l=>l.classList.remove('active'));links[idx]&&links[idx].classList.add('active');};
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+</script>
+</body>
+</html>
