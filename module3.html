@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>অপারেটিং সিস্টেম · মডিউল ৩ — Memory ও Virtual Memory</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#12100e;--paper:#f5f1e8;--paper2:#ece5d6;--line:#d6ccb6;--accent:#25608f;--accent2:#b8501f;--brown:#7a4a1e;--teal:#1a6b5a;--plum:#6a3d7a;--green:#3d6b2f;--muted:#6a6152;--code-bg:#14181c;--code-ink:#e5eaef}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:18px;line-height:1.82}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace}
+  .wrap{display:flex;min-height:100vh}
+  aside{width:296px;flex-shrink:0;background:var(--paper2);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 20px}
+  main{flex:1;max-width:880px;margin:0 auto;padding:50px 50px 130px}
+  aside .brand{font-weight:700;font-size:1.02rem;line-height:1.35;color:var(--accent)}
+  aside .brand small{display:block;font-weight:400;font-size:.66rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;margin-top:7px}
+  aside nav{margin-top:20px}
+  aside nav a{display:block;text-decoration:none;color:var(--ink);padding:6px 11px;border-radius:7px;font-size:.87rem;margin-bottom:1px}
+  aside nav a .n{color:var(--accent);font-weight:600;font-family:'JetBrains Mono';font-size:.73rem;margin-right:7px}
+  aside nav a:hover{background:var(--paper)}
+  aside nav a.active{background:var(--accent);color:#fff}
+  aside nav a.active .n{color:#bcd8ea}
+  aside .modtag{font-size:.67rem;background:var(--accent2);color:#fff;padding:2px 9px;border-radius:20px;letter-spacing:.07em;display:inline-block;margin-top:13px}
+  .hero{border-bottom:2px solid var(--ink);padding-bottom:30px;margin-bottom:44px}
+  .hero .eyebrow{font-family:'JetBrains Mono';font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:15px}
+  .hero h1{font-size:2.8rem;line-height:1.08;margin:0 0 15px;font-weight:700;letter-spacing:-.6px}
+  .hero p{font-size:1.1rem;color:var(--muted);max-width:60ch;margin:0}
+  section.chapter{margin-bottom:72px;scroll-margin-top:20px}
+  .ch-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:26px}
+  .ch-head .ch-num{font-family:'JetBrains Mono';font-size:2.1rem;font-weight:600;color:var(--accent);line-height:1}
+  .ch-head h2{font-size:1.72rem;margin:0;font-weight:700;letter-spacing:-.3px}
+  .ch-head .ch-sub{font-size:.79rem;color:var(--muted);font-family:'JetBrains Mono'}
+  h3{font-size:1.24rem;margin:34px 0 12px;font-weight:600}
+  h4{font-size:1.02rem;margin:22px 0 8px;font-weight:600;color:var(--accent)}
+  p{margin:12px 0}
+  .lead{font-size:1.04rem}
+  .box{border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.95rem;line-height:1.72}
+  .analogy{background:#fff5e6;border:1px solid #e6cb9c}
+  .analogy .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .note{background:#e6eef5;border:1px solid #adc9dc}
+  .note .tag{font-weight:700;color:var(--accent);font-size:.79rem;display:block;margin-bottom:5px}
+  .deep{background:#efe9f2;border:1px solid #cbb6d6}
+  .deep .tag{font-weight:700;color:var(--plum);font-size:.79rem;display:block;margin-bottom:5px}
+  .warn{background:#fceadf;border:1px solid #ecbb9d}
+  .warn .tag{font-weight:700;color:var(--accent2);font-size:.79rem;display:block;margin-bottom:5px}
+  .lab{background:#eaf1e4;border:1px solid #b6cfa2}
+  .lab .tag{font-weight:700;color:var(--green);font-size:.79rem;display:block;margin-bottom:5px}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:.81rem;line-height:1.62;margin:16px 0}
+  pre .c{color:#8a9b8f}
+  pre .k{color:#7fbdd6}
+  pre .s{color:#c8b88a}
+  pre .f{color:#8fb8e0}
+  p code,li code,td code{background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.83em;color:var(--accent2)}
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.88rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--paper2);font-weight:600;font-size:.82rem}
+  tr:hover td{background:#fff8ee}
+  figure{margin:26px 0}
+  .diagram{background:#fffdf7;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center}
+  figcaption{font-size:.82rem;color:var(--muted);text-align:center;margin-top:10px;font-style:italic}
+  svg{max-width:100%;height:auto}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  .quiz{background:var(--paper2);border:1px dashed var(--accent);border-radius:12px;padding:18px 22px;margin:24px 0}
+  .quiz .tag{font-weight:700;color:var(--accent);display:block;margin-bottom:8px;font-size:.86rem}
+  .quiz summary{cursor:pointer;font-weight:500;margin:8px 0}
+  .quiz details p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
+  .toc-hint{color:var(--muted);font-size:.76rem;margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+  @media(max-width:900px){aside{display:none}main{padding:28px 20px 90px}.hero h1{font-size:1.95rem}body{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+  <div class="brand">অপারেটিং সিস্টেম<small>মডিউল ৩ · Memory</small></div>
+  <span class="modtag">VIRTUALIZING MEMORY</span>
+  <nav id="toc">
+    <a href="#ch0"><span class="n">০০</span>শুরুর কথা</a>
+    <a href="#ch1"><span class="n">০১</span>কেন Virtual Memory</a>
+    <a href="#ch2"><span class="n">০২</span>Address Translation</a>
+    <a href="#ch3"><span class="n">০৩</span>Paging</a>
+    <a href="#ch4"><span class="n">০৪</span>TLB</a>
+    <a href="#ch5"><span class="n">০৫</span>Multi-level Page Table</a>
+    <a href="#ch6"><span class="n">০৬</span>Page Fault ও Swap</a>
+    <a href="#ch7"><span class="n">০৭</span>Page Replacement</a>
+    <a href="#ch8"><span class="n">০৮</span>প্রজেক্ট: malloc</a>
+  </nav>
+  <div class="toc-hint">সবুজ = হাতে-কলমে ল্যাব। বেগুনি = গভীর প্রযুক্তিগত অংশ। প্রতিটা কোড নিজে চালিয়ে দেখুন।</div>
+</aside>
+<main>
+  <div class="hero">
+    <div class="eyebrow">মডিউল ৩ · Virtualizing Memory</div>
+    <h1>Memory ও<br>Virtual Memory</h1>
+    <p>প্রতিটা প্রোগ্রাম মনে করে পুরো RAM শুধু তার — শূন্য থেকে শুরু, বিশাল, একান্ত নিজের। অথচ বাস্তবে ডজন ডজন প্রোগ্রাম একই সীমিত RAM ভাগ করছে। এই মায়াজাল কীভাবে তৈরি হয়, byte ধরে ধরে দেখবো।</p>
+  </div>
+
+  <section class="chapter" id="ch0">
+    <div class="ch-head"><span class="ch-num">০০</span><div><h2>শুরুর কথা</h2><div class="ch-sub">orientation</div></div></div>
+    <p class="lead">মডিউল ২-তে দেখলাম CPU কীভাবে virtualize হয় (একটা CPU, অনেক process)। এবার virtualization-এর দ্বিতীয় অর্ধেক — <strong>memory</strong>। একটা RAM, অথচ প্রতিটা process পায় নিজের সম্পূর্ণ একান্ত address space।</p>
+    <div class="box note"><span class="tag">🧭 এই মডিউল কোথায় ফিট করে</span>
+    মডিউল ২ (process) + মডিউল ৩ (memory) মিলে OSTEP-এর প্রথম স্তম্ভ Virtualization সম্পূর্ণ হয়। এখানকার মূল প্রশ্ন: দুটো প্রোগ্রাম যদি দুজনেই <code>0x1000</code> ঠিকানায় ডেটা রাখতে চায়, তারা কি একে অপরেরটা মুছে দেবে? উত্তর — না, আর সেই "না"-এর পেছনের কৌশলটাই এই মডিউল।</div>
+    <div class="box lab"><span class="tag">🛠 পরিবেশ</span>
+    আগের মতোই Linux/WSL2 + <code>gcc</code>। এই মডিউলে pointer আর memory নিয়ে অনেক কাজ, তাই <code>gdb</code> (debugger) ও <code>valgrind</code> (memory leak ধরার টুল) ইনস্টল রাখলে ভালো: <code>sudo apt install gdb valgrind</code></div>
+  </section>
+
+  <section class="chapter" id="ch1">
+    <div class="ch-head"><span class="ch-num">০১</span><div><h2>কেন Virtual Memory?</h2><div class="ch-sub">why-virtual-memory</div></div></div>
+    <p class="lead">সমস্যাটা আগে বুঝি। কল্পনা করুন virtual memory <strong>নেই</strong> — প্রতিটা প্রোগ্রাম সরাসরি physical RAM-এর ঠিকানা ব্যবহার করছে। কী কী ভুল হতে পারে?</p>
+    <div class="box warn"><span class="tag">⚠️ Virtual memory ছাড়া তিনটা বিপর্যয়</span>
+    <strong>১. নিরাপত্তা নেই:</strong> প্রোগ্রাম A সরাসরি ঠিকানা <code>0x2000</code>-এ লিখলে, সেটা যদি প্রোগ্রাম B-র ডেটা হয়, B ধ্বংস হয়ে যাবে। যেকোনো প্রোগ্রাম যেকোনো প্রোগ্রামের (এমনকি OS-এর) memory পড়তে-লিখতে পারবে।<br>
+    <strong>২. জটিলতা:</strong> প্রতিটা প্রোগ্রাম লেখার সময় জানতে হবে RAM-এর কোন অংশ খালি — কিন্তু সেটা তো নির্ভর করে আর কী কী চলছে তার উপর, যা আগে থেকে জানা অসম্ভব।<br>
+    <strong>৩. সীমাবদ্ধতা:</strong> RAM-এর চেয়ে বড় প্রোগ্রাম চালানো যাবে না।</div>
+    <h3>সমাধান — একটা বিভ্রম (abstraction)</h3>
+    <p>Virtual memory প্রতিটা process-কে একটা মিথ্যা কিন্তু সুবিধাজনক ছবি দেয়: <strong>"পুরো memory শুধু তোমার, ০ থেকে শুরু, বিশাল ও একটানা।"</strong> প্রোগ্রাম এই <strong>virtual ঠিকানা</strong> ব্যবহার করে, আর OS + হার্ডওয়্যার নীরবে সেটাকে আসল <strong>physical ঠিকানা</strong>-য় অনুবাদ করে দেয়।</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="va" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#25608f"/></marker></defs>
+        <text x="150" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#25608f">যা প্রতিটা process দেখে</text>
+        <text x="470" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#7a4a1e">আসল RAM</text>
+        <!-- virtual A -->
+        <rect x="40" y="35" width="100" height="100" rx="6" fill="#e6eef5" stroke="#25608f"/>
+        <text x="90" y="30" text-anchor="middle" font-size="9" fill="#6a6152">Process A-র "পুরো memory"</text>
+        <text x="90" y="90" text-anchor="middle" font-size="9.5" fill="#25608f">0 → বড়</text>
+        <!-- virtual B -->
+        <rect x="40" y="150" width="100" height="100" rx="6" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="90" y="205" text-anchor="middle" font-size="9.5" fill="#1a6b5a">0 → বড়</text>
+        <text x="90" y="265" text-anchor="middle" font-size="9" fill="#6a6152">Process B-ও একই ছবি দেখে</text>
+        <!-- OS translation -->
+        <rect x="220" y="90" width="140" height="100" rx="10" fill="#fbf0e2" stroke="#7a4a1e" stroke-width="1.5"/>
+        <text x="290" y="130" text-anchor="middle" font-size="11" font-weight="700" fill="#7a4a1e">OS + হার্ডওয়্যার</text>
+        <text x="290" y="150" text-anchor="middle" font-size="9" fill="#6a6152">অনুবাদ করে</text>
+        <text x="290" y="165" text-anchor="middle" font-size="9" fill="#6a6152">(virtual→physical)</text>
+        <!-- physical -->
+        <rect x="440" y="35" width="120" height="215" rx="6" fill="#fff5e6" stroke="#b8501f"/>
+        <g font-size="8.5" text-anchor="middle">
+          <rect x="452" y="48" width="96" height="26" fill="#e6eef5" stroke="#25608f"/><text x="500" y="65">A-র অংশ</text>
+          <rect x="452" y="80" width="96" height="26" fill="#e7f1ee" stroke="#1a6b5a"/><text x="500" y="97">B-র অংশ</text>
+          <rect x="452" y="112" width="96" height="26" fill="#e6eef5" stroke="#25608f"/><text x="500" y="129">A-র অংশ</text>
+          <rect x="452" y="144" width="96" height="26" fill="#f0e8d8" stroke="#a89478"/><text x="500" y="161">OS</text>
+          <rect x="452" y="176" width="96" height="26" fill="#e7f1ee" stroke="#1a6b5a"/><text x="500" y="193">B-র অংশ</text>
+          <rect x="452" y="208" width="96" height="26" fill="#eee" stroke="#aaa"/><text x="500" y="225">খালি</text>
+        </g>
+        <line x1="140" y1="85" x2="218" y2="120" stroke="#25608f" stroke-width="1.5" marker-end="url(#va)"/>
+        <line x1="140" y1="200" x2="218" y2="160" stroke="#1a6b5a" stroke-width="1.5" marker-end="url(#va)"/>
+        <line x1="362" y1="140" x2="438" y2="140" stroke="#7a4a1e" stroke-width="1.5" marker-end="url(#va)"/>
+        <text x="290" y="215" text-anchor="middle" font-size="8.5" fill="#6a6152">A ও B-র virtual 0 আসলে RAM-এর ভিন্ন জায়গায়</text>
+      </svg>
+    </div><figcaption>প্রতিটা process একই সরল ছবি দেখে; OS নীরবে আসল RAM-এ ছড়িয়ে রাখে</figcaption></figure>
+    <div class="box note"><span class="tag">💡 তিনটা সমস্যার সমাধান একসাথে</span>
+    <strong>নিরাপত্তা:</strong> A-র virtual ঠিকানা কখনো B-র physical memory-তে ম্যাপ করা হয় না, তাই A চাইলেও B-কে ছুঁতে পারে না। <strong>সরলতা:</strong> প্রতিটা প্রোগ্রাম ধরে নেয় সে ০ থেকে শুরু, বাকি কী চলছে জানার দরকার নেই। <strong>সীমা অতিক্রম:</strong> virtual space RAM-এর চেয়ে বড় হতে পারে — বাকিটা disk-এ (swap, পরে দেখবো)।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>দুটো প্রোগ্রাম দুজনেই <code>0x1000</code> ব্যবহার করলে সংঘর্ষ হয় না কেন?</summary><p>কারণ ওটা virtual ঠিকানা। OS দুটো process-এর একই virtual ঠিকানাকে RAM-এর <strong>ভিন্ন</strong> physical জায়গায় ম্যাপ করে। তাই কোনো সংঘর্ষ নেই।</p></details>
+    <details><summary>Virtual memory কীভাবে নিরাপত্তা দেয়?</summary><p>এক process-এর virtual ঠিকানা কখনো আরেক process-এর physical memory-তে ম্যাপ করা হয় না। তাই একটা process অন্যের (বা OS-এর) memory পড়তে বা নষ্ট করতে পারে না।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch2">
+    <div class="ch-head"><span class="ch-num">০২</span><div><h2>Address Translation</h2><div class="ch-sub">address-translation</div></div></div>
+    <p class="lead">মূল প্রশ্ন: একটা virtual ঠিকানা কীভাবে physical ঠিকানায় বদলায়? সবচেয়ে সরল ধারণা দিয়ে শুরু করি, তারপর দেখবো কেন সেটা যথেষ্ট নয়।</p>
+    <h3>সরলতম উপায় — Base + Bound</h3>
+    <p>প্রতিটা process-কে RAM-এর একটা একটানা টুকরো দেওয়া হয়। দুটো register রাখা হয়: <strong>base</strong> (টুকরোটা কোথায় শুরু) আর <strong>bound</strong> (কতটা বড়)। অনুবাদ সহজ:</p>
+    <pre><span class="c">physical ঠিকানা = virtual ঠিকানা + base</span>
+<span class="c">যদি virtual ঠিকানা &gt;= bound হয় → অবৈধ (protection fault)</span></pre>
+    <div class="box analogy"><span class="tag">🏢 উপমা — অ্যাপার্টমেন্ট নম্বর</span>
+    আপনি বললেন "ফ্ল্যাট ৫"। কিন্তু কোন বিল্ডিং? বিল্ডিংটা যদি ১০০ নম্বর থেকে শুরু হয় (base), তাহলে আপনার আসল ঠিকানা ১০৫। প্রতিটা process-এর নিজের "বিল্ডিং" (base), তাই সবার "ফ্ল্যাট ৫" আলাদা আসল জায়গায় পড়ে। আর bound নিশ্চিত করে আপনি নিজের বিল্ডিংয়ের বাইরের ফ্ল্যাট চাইতে পারবেন না।</div>
+    <div class="box warn"><span class="tag">⚠️ Base+bound-এর বড় সমস্যা — fragmentation</span>
+    প্রতিটা process-কে একটা <strong>একটানা</strong> বড় টুকরো দিতে হয়। কিন্তু process আসে-যায়, ফলে RAM-এ ছোট ছোট ফাঁকা টুকরো তৈরি হয় — মোট খালি জায়গা যথেষ্ট, কিন্তু কোনো একটানা টুকরো যথেষ্ট বড় নয়। একে বলে <strong>external fragmentation</strong>। আর process-এর পুরো address space (heap/stack-এর জন্য সংরক্ষিত জায়গা সহ) RAM-এ রাখতে হয়, যদিও বেশিরভাগ অব্যবহৃত — অপচয়। এই সমস্যার সমাধানই paging।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>base = 3000 হলে virtual ঠিকানা 50 কোথায় ম্যাপ হবে?</summary><p>Physical ঠিকানা 3050 (50 + 3000)। আর bound-এর বেশি চাইলে protection fault।</p></details>
+    <details><summary>External fragmentation কী?</summary><p>RAM-এ যথেষ্ট মোট খালি জায়গা আছে, কিন্তু ছড়ানো-ছিটানো ছোট টুকরোয়, তাই একটা বড় একটানা বরাদ্দ দেওয়া যায় না। base+bound-এর মূল দুর্বলতা।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch3">
+    <div class="ch-head"><span class="ch-num">০৩</span><div><h2>Paging — টুকরো টুকরো করে সমাধান</h2><div class="ch-sub">paging</div></div></div>
+    <p class="lead">Paging হলো আধুনিক memory ব্যবস্থাপনার হৃদয়। মূল ধারণা সহজ কিন্তু শক্তিশালী: memory-কে একটানা বড় টুকরোয় না ভেবে, <strong>সমান আকারের ছোট ব্লকে</strong> ভাগ করো।</p>
+    <div class="box note"><span class="tag">📦 দুটো মূল শব্দ</span>
+    <strong>Page:</strong> virtual memory-র একটা fixed-size ব্লক (সাধারণত ৪ KB)।<br>
+    <strong>Frame:</strong> physical RAM-এর একটা সমান আকারের ব্লক।<br>
+    কাজটা সহজ হয়ে যায় — যেকোনো page যেকোনো frame-এ বসতে পারে। আর সব সমান আকারের বলে external fragmentation নেই!</div>
+    <div class="box analogy"><span class="tag">📚 উপমা — বইয়ের পাতা তাকে রাখা</span>
+    একটা বই (process) টেবিলে একটানা রাখতে বড় জায়গা লাগে। কিন্তু বইটার প্রতিটা পাতা (page) যদি আলাদা করে ফেলেন, তাহলে তাকের যেকোনো খালি খোপে (frame) যেকোনো পাতা রাখতে পারেন — ছড়িয়ে-ছিটিয়ে থাকলেও চলে। শুধু একটা সূচি (page table) রাখতে হবে "কোন পাতা কোন খোপে"।</div>
+    <h3>Page Table — অনুবাদের মানচিত্র</h3>
+    <p>প্রতিটা process-এর একটা <strong>page table</strong> থাকে — যা বলে কোন virtual page কোন physical frame-এ আছে। একটা virtual ঠিকানা দুই ভাগে ভাঙা হয়:</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="pga" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#25608f"/></marker></defs>
+        <text x="300" y="20" text-anchor="middle" font-size="12" font-weight="600">Virtual ঠিকানা কীভাবে ভাঙে</text>
+        <!-- virtual address split -->
+        <rect x="120" y="35" width="180" height="36" fill="#e6eef5" stroke="#25608f"/>
+        <text x="210" y="58" text-anchor="middle" font-size="11" font-weight="600">Page Number (VPN)</text>
+        <rect x="300" y="35" width="180" height="36" fill="#fff5e6" stroke="#b8501f"/>
+        <text x="390" y="58" text-anchor="middle" font-size="11" font-weight="600">Offset</text>
+        <text x="210" y="88" text-anchor="middle" font-size="9" fill="#6a6152">কোন page</text>
+        <text x="390" y="88" text-anchor="middle" font-size="9" fill="#6a6152">page-এর ভেতরে কত দূরে</text>
+        <!-- page table -->
+        <rect x="120" y="115" width="160" height="150" rx="8" fill="#fffdf7" stroke="#7a4a1e"/>
+        <text x="200" y="135" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7a4a1e">Page Table</text>
+        <g font-size="9" text-anchor="middle">
+          <rect x="132" y="145" width="60" height="24" fill="#e6eef5" stroke="#25608f"/><text x="162" y="161">VPN 0</text>
+          <rect x="192" y="145" width="76" height="24" fill="#fff" stroke="#7a4a1e"/><text x="230" y="161">→ frame 5</text>
+          <rect x="132" y="171" width="60" height="24" fill="#e6eef5" stroke="#25608f"/><text x="162" y="187">VPN 1</text>
+          <rect x="192" y="171" width="76" height="24" fill="#fff" stroke="#7a4a1e"/><text x="230" y="187">→ frame 2</text>
+          <rect x="132" y="197" width="60" height="24" fill="#e6eef5" stroke="#25608f" stroke-width="2"/><text x="162" y="213">VPN 2</text>
+          <rect x="192" y="197" width="76" height="24" fill="#e7f1ee" stroke="#1a6b5a" stroke-width="2"/><text x="230" y="213">→ frame 8</text>
+          <rect x="132" y="223" width="60" height="24" fill="#e6eef5" stroke="#25608f"/><text x="162" y="239">VPN 3</text>
+          <rect x="192" y="223" width="76" height="24" fill="#fff" stroke="#7a4a1e"/><text x="230" y="239">→ frame 1</text>
+        </g>
+        <!-- physical address -->
+        <rect x="360" y="150" width="180" height="36" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="450" y="167" text-anchor="middle" font-size="10" font-weight="600">frame 8</text>
+        <rect x="360" y="186" width="180" height="30" fill="#fff5e6" stroke="#b8501f"/>
+        <text x="450" y="205" text-anchor="middle" font-size="9.5">একই offset</text>
+        <text x="450" y="135" text-anchor="middle" font-size="10" font-weight="700" fill="#1a6b5a">Physical ঠিকানা</text>
+        <line x1="210" y1="71" x2="200" y2="113" stroke="#25608f" stroke-width="1.5" marker-end="url(#pga)"/>
+        <line x1="280" y1="209" x2="358" y2="168" stroke="#1a6b5a" stroke-width="1.5" marker-end="url(#pga)"/>
+        <line x1="390" y1="71" x2="440" y2="184" stroke="#b8501f" stroke-width="1.3" stroke-dasharray="3 3" marker-end="url(#pga)"/>
+        <text x="300" y="285" text-anchor="middle" font-size="9.5" fill="#6a6152">VPN দিয়ে frame খোঁজা হয়, offset অপরিবর্তিত থাকে</text>
+      </svg>
+    </div><figcaption>Paging — VPN page table-এ frame খুঁজে দেয়, offset একই থাকে</figcaption></figure>
+    <div class="box deep"><span class="tag">🔬 গভীরে — offset কেন অপরিবর্তিত?</span>
+    ধরুন page size ৪ KB (৪০৯৬ byte = ২¹²)। তাহলে ঠিকানার নিচের ১২ বিট হলো offset (page-এর ভেতরে অবস্থান), আর বাকি উপরের বিটগুলো VPN। যেহেতু page আর frame একই আকারের, page-এর ভেতরে যতটা দূরে, frame-এর ভেতরেও ঠিক ততটাই দূরে — তাই offset বদলানোর দরকার নেই। শুধু "কোন page → কোন frame" অংশটুকু অনুবাদ হয়। এই কারণেই page size সবসময় ২-এর ঘাত — যাতে বিট ভাগ করা সহজ হয়।</div>
+    <p>page table-এর প্রতিটা এন্ট্রিতে (PTE) frame নম্বর ছাড়াও কিছু গুরুত্বপূর্ণ বিট থাকে:</p>
+    <table>
+      <tr><th>বিট</th><th>মানে</th></tr>
+      <tr><td><strong>Valid</strong></td><td>এই page কি ব্যবহৃত? (নাহলে অ্যাক্সেসে fault)</td></tr>
+      <tr><td><strong>Protection</strong> (R/W/X)</td><td>পড়া / লেখা / চালানো যাবে?</td></tr>
+      <tr><td><strong>Present</strong></td><td>page কি এখন RAM-এ, নাকি disk-এ (swap)?</td></tr>
+      <tr><td><strong>Dirty</strong></td><td>page কি বদলানো হয়েছে? (swap করার সময় লাগে)</td></tr>
+      <tr><td><strong>Accessed</strong></td><td>সম্প্রতি ব্যবহৃত? (replacement সিদ্ধান্তে লাগে)</td></tr>
+    </table>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Paging কেন external fragmentation দূর করে?</summary><p>কারণ সব page ও frame একই আকারের। যেকোনো page যেকোনো খালি frame-এ বসে, তাই "যথেষ্ট বড় একটানা টুকরো" খোঁজার সমস্যাই নেই।</p></details>
+    <details><summary>Page size ৪ KB হলে offset কত বিট?</summary><p>১২ বিট (২¹² = ৪০৯৬)। বাকি উপরের বিটগুলো VPN।</p></details>
+    <details><summary>PTE-র valid বিট ০ থাকলে অ্যাক্সেস করলে?</summary><p>একটা fault হয় (invalid access) — সাধারণত segmentation fault, কারণ ওই virtual page ব্যবহারই হচ্ছে না।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch4">
+    <div class="ch-head"><span class="ch-num">০৪</span><div><h2>TLB — অনুবাদ দ্রুত করা</h2><div class="ch-sub">translation-lookaside-buffer</div></div></div>
+    <p class="lead">Paging-এর একটা লুকানো খরচ আছে। প্রতিটা memory অ্যাক্সেসে আগে page table দেখতে হয় (RAM-এ), তারপর আসল ডেটা আনতে হয় (আবার RAM-এ)। অর্থাৎ <strong>প্রতিটা অ্যাক্সেস দ্বিগুণ ধীর</strong>! এই সমস্যার সমাধান TLB।</p>
+    <div class="box analogy"><span class="tag">📇 উপমা — বারবার ব্যবহৃত নম্বর মুখস্থ</span>
+    ফোনবুকে (page table) নম্বর খোঁজা ধীর। কিন্তু যে কয়েকটা নম্বর আপনি বারবার ডায়াল করেন, সেগুলো মুখস্থ হয়ে যায় (TLB)। পরেরবার ফোনবুক না খুলেই ডায়াল করেন। TLB হলো CPU-র ভেতরের একটা ছোট, অতি-দ্রুত cache যা সাম্প্রতিক অনুবাদগুলো মনে রাখে।</div>
+    <h3>TLB সহ অনুবাদের প্রবাহ</h3>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="ta" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#25608f"/></marker></defs>
+        <rect x="30" y="105" width="110" height="40" rx="8" fill="#e6eef5" stroke="#25608f"/>
+        <text x="85" y="123" text-anchor="middle" font-size="10" font-weight="600">virtual ঠিকানা</text>
+        <text x="85" y="138" text-anchor="middle" font-size="8.5" fill="#6a6152">CPU চায়</text>
+        <!-- TLB check -->
+        <path d="M200 90 l60 -30 l60 30 l-60 30 z" fill="#fbf0e2" stroke="#7a4a1e" stroke-width="1.5"/>
+        <text x="260" y="86" text-anchor="middle" font-size="10" font-weight="600" fill="#7a4a1e">TLB-তে আছে?</text>
+        <line x1="140" y1="120" x2="198" y2="95" stroke="#25608f" stroke-width="1.5" marker-end="url(#ta)"/>
+        <!-- hit -->
+        <rect x="380" y="35" width="180" height="44" rx="8" fill="#eaf1e4" stroke="#3d6b2f"/>
+        <text x="470" y="53" text-anchor="middle" font-size="10" font-weight="600" fill="#3d6b2f">HIT — সরাসরি frame</text>
+        <text x="470" y="69" text-anchor="middle" font-size="8.5" fill="#6a6152">দ্রুত! (~১ cycle)</text>
+        <line x1="320" y1="70" x2="378" y2="57" stroke="#3d6b2f" stroke-width="1.5" marker-end="url(#ta)"/>
+        <text x="345" y="50" font-size="9" fill="#3d6b2f">হ্যাঁ</text>
+        <!-- miss -->
+        <rect x="380" y="140" width="180" height="70" rx="8" fill="#fceadf" stroke="#b8501f"/>
+        <text x="470" y="160" text-anchor="middle" font-size="10" font-weight="600" fill="#b8501f">MISS</text>
+        <text x="470" y="178" text-anchor="middle" font-size="8.5" fill="#6a6152">page table দেখো (RAM)</text>
+        <text x="470" y="193" text-anchor="middle" font-size="8.5" fill="#6a6152">TLB-তে যোগ করো, তারপর</text>
+        <line x1="290" y1="115" x2="378" y2="160" stroke="#b8501f" stroke-width="1.5" marker-end="url(#ta)"/>
+        <text x="330" y="150" font-size="9" fill="#b8501f">না</text>
+        <text x="300" y="235" text-anchor="middle" font-size="9.5" fill="#6a6152">বেশিরভাগ সময় HIT হয় (locality), তাই গড়ে খুব দ্রুত</text>
+      </svg>
+    </div><figcaption>TLB hit হলে অনুবাদ প্রায় বিনামূল্যে; miss হলে page table দেখতে হয়</figcaption></figure>
+    <div class="box note"><span class="tag">💡 কেন TLB এত ভালো কাজ করে — Locality</span>
+    প্রোগ্রাম সাধারণত পরপর কাছাকাছি ঠিকানা ব্যবহার করে (একটা array-র উপর লুপ, বা একই function বারবার)। একে বলে <strong>locality of reference</strong>। তাই একটা page-এর অনুবাদ একবার TLB-তে এলে, পরের অনেক অ্যাক্সেস সেই একই page-এ পড়ে — সব HIT। এজন্যই ছোট TLB (হয়তো ৬৪-১৫৩৬ এন্ট্রি) থাকা সত্ত্বেও hit rate সাধারণত ৯৯%+।</div>
+    <div class="box warn"><span class="tag">⚠️ TLB ও performance — বাস্তব প্রভাব</span>
+    TLB miss ব্যয়বহুল। যে প্রোগ্রাম memory-তে এলোমেলোভাবে (কম locality) অ্যাক্সেস করে — যেমন বিশাল hash table বা linked list এলোমেলো ঘোরা — তার TLB miss বেশি হয়, তাই ধীর চলে। এজন্যই cache-friendly ডেটা স্ট্রাকচার (array, পাশাপাশি memory) প্রায়ই linked structure-এর চেয়ে দ্রুত, যদিও big-O একই। পারফরম্যান্স টিউনিং-এ এটা বড় বিবেচনা।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>TLB না থাকলে প্রতিটা memory অ্যাক্সেসে কী সমস্যা?</summary><p>প্রতিবার আগে page table (RAM-এ) দেখতে হতো, তারপর আসল ডেটা (RAM-এ) — অর্থাৎ প্রতিটা অ্যাক্সেস দ্বিগুণ ধীর হতো।</p></details>
+    <details><summary>Array কেন প্রায়ই linked list-এর চেয়ে দ্রুত, একই big-O সত্ত্বেও?</summary><p>Array-র উপাদান পাশাপাশি memory-তে, তাই ভালো locality — কম TLB miss ও কম cache miss। Linked list এলোমেলো ছড়ানো, তাই বেশি miss, ধীর।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch5">
+    <div class="ch-head"><span class="ch-num">০৫</span><div><h2>Multi-level Page Table</h2><div class="ch-sub">multi-level-page-tables</div></div></div>
+    <p class="lead">একটা সমস্যা রয়ে গেছে। page table নিজেই তো memory খায়! আর সেটা আশ্চর্যজনকভাবে বড় হতে পারে। এই অধ্যায় সেই সমস্যা ও তার মার্জিত সমাধান।</p>
+    <div class="box warn"><span class="tag">⚠️ সমস্যা — page table বিশাল</span>
+    ৩২-বিট সিস্টেমে (৪ GB virtual space), page size ৪ KB হলে, মোট page সংখ্যা = ২²⁰ = প্রায় ১০ লক্ষ। প্রতিটা PTE যদি ৪ byte, তাহলে একটা process-এর page table = ৪ MB। <strong>প্রতিটা process-এর জন্য!</strong> ১০০টা process চললে শুধু page table-এই ৪০০ MB। আর বেশিরভাগ process তো পুরো ৪ GB ব্যবহারই করে না — বিশাল অংশ ফাঁকা, তবু তার জন্য এন্ট্রি রাখতে হচ্ছে।</div>
+    <h3>সমাধান — গাছের মতো স্তরে স্তরে</h3>
+    <p>একটা বিশাল সমতল টেবিলের বদলে, page table-কে <strong>স্তরে স্তরে</strong> ভাঙা হয় — একটা page directory যা ছোট ছোট page table-এর দিকে নির্দেশ করে। মূল চালাকি: <strong>যে অংশ ব্যবহৃত হয় না, তার জন্য কোনো নিচের স্তরের টেবিল বানানোই হয় না।</strong></p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="ma" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#25608f"/></marker></defs>
+        <text x="300" y="20" text-anchor="middle" font-size="11" font-weight="600">দুই-স্তরের page table</text>
+        <!-- directory -->
+        <rect x="40" y="70" width="130" height="120" rx="8" fill="#fffdf7" stroke="#7a4a1e"/>
+        <text x="105" y="90" text-anchor="middle" font-size="10" font-weight="700" fill="#7a4a1e">Page Directory</text>
+        <g font-size="8.5" text-anchor="middle">
+          <rect x="52" y="98" width="106" height="20" fill="#e7f1ee" stroke="#1a6b5a"/><text x="105" y="112">[0] → টেবিল A</text>
+          <rect x="52" y="120" width="106" height="20" fill="#eee" stroke="#aaa"/><text x="105" y="134">[1] → খালি ✗</text>
+          <rect x="52" y="142" width="106" height="20" fill="#eee" stroke="#aaa"/><text x="105" y="156">[2] → খালি ✗</text>
+          <rect x="52" y="164" width="106" height="20" fill="#e6eef5" stroke="#25608f"/><text x="105" y="178">[3] → টেবিল B</text>
+        </g>
+        <!-- second level tables -->
+        <rect x="250" y="55" width="130" height="70" rx="8" fill="#fffdf7" stroke="#1a6b5a"/>
+        <text x="315" y="73" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a6b5a">টেবিল A</text>
+        <text x="315" y="90" text-anchor="middle" font-size="8" fill="#6a6152">→ frame 5, 2, ...</text>
+        <text x="315" y="105" text-anchor="middle" font-size="8" fill="#6a6152">(শুধু এই অংশ ব্যবহৃত)</text>
+        <rect x="250" y="150" width="130" height="70" rx="8" fill="#fffdf7" stroke="#25608f"/>
+        <text x="315" y="168" text-anchor="middle" font-size="9.5" font-weight="600" fill="#25608f">টেবিল B</text>
+        <text x="315" y="185" text-anchor="middle" font-size="8" fill="#6a6152">→ frame 8, 1, ...</text>
+        <line x1="170" y1="108" x2="248" y2="85" stroke="#1a6b5a" stroke-width="1.4" marker-end="url(#ma)"/>
+        <line x1="170" y1="174" x2="248" y2="180" stroke="#25608f" stroke-width="1.4" marker-end="url(#ma)"/>
+        <rect x="440" y="95" width="140" height="80" rx="8" fill="#fff5e6" stroke="#b8501f"/>
+        <text x="510" y="130" text-anchor="middle" font-size="10" fill="#b8501f">লক্ষ্য করুন:</text>
+        <text x="510" y="148" text-anchor="middle" font-size="8.5" fill="#6a6152">খালি অংশের জন্য কোনো</text>
+        <text x="510" y="162" text-anchor="middle" font-size="8.5" fill="#6a6152">নিচের টেবিল নেই — memory বাঁচে</text>
+        <text x="300" y="240" text-anchor="middle" font-size="9.5" fill="#6a6152">অব্যবহৃত অংশের জন্য কিছুই বরাদ্দ হয় না</text>
+      </svg>
+    </div><figcaption>Multi-level — অব্যবহৃত অংশের নিচের টেবিল বানানোই হয় না, তাই memory বাঁচে</figcaption></figure>
+    <div class="box deep"><span class="tag">🔬 গভীরে — বাস্তবে কত স্তর?</span>
+    আধুনিক ৬৪-বিট x86 (x86-64) সাধারণত <strong>৪ স্তর</strong> ব্যবহার করে (কিছু নতুন সিস্টেমে ৫)। virtual ঠিকানা ভাগ হয় কয়েকটা index + একটা offset-এ, প্রতিটা index এক স্তরের টেবিলে নামায়। খরচ: TLB miss হলে অনুবাদের জন্য এখন ৪ বার memory দেখতে হয় (প্রতি স্তরে একবার)! এজন্যই TLB আরও গুরুত্বপূর্ণ হয়ে ওঠে — multi-level page table memory বাঁচায় কিন্তু miss-এর খরচ বাড়ায়, আর TLB সেই খরচ আড়াল করে। সুন্দর ভারসাম্য।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Multi-level page table কীভাবে memory বাঁচায়?</summary><p>Virtual space-এর যে অংশ ব্যবহৃত হয় না, তার জন্য নিচের স্তরের টেবিল বানানোই হয় না। বিশাল ফাঁকা address space-এর জন্য শুধু কয়েকটা directory এন্ট্রি লাগে, পুরো টেবিল নয়।</p></details>
+    <details><summary>Multi-level-এ TLB miss কেন বেশি ব্যয়বহুল?</summary><p>প্রতিটা স্তরের টেবিল আলাদাভাবে দেখতে হয়। ৪-স্তরে একটা অনুবাদে ৪ বার memory অ্যাক্সেস লাগে — তাই TLB hit আরও বেশি জরুরি হয়ে ওঠে।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch6">
+    <div class="ch-head"><span class="ch-num">০৬</span><div><h2>Page Fault ও Swap</h2><div class="ch-sub">page-fault-and-swap</div></div></div>
+    <p class="lead">এবার virtual memory-র সবচেয়ে শক্তিশালী কৌশল: RAM-এর চেয়ে বেশি memory ব্যবহার করা। কীভাবে? যে page গুলো এই মুহূর্তে লাগছে না, সেগুলো <strong>disk-এ</strong> সরিয়ে রাখা।</p>
+    <div class="box analogy"><span class="tag">🗄️ উপমা — ডেস্ক আর ফাইল ক্যাবিনেট</span>
+    আপনার ডেস্ক (RAM) ছোট, সব ফাইল রাখা যায় না। যেগুলো এখন কাজে লাগছে সেগুলো ডেস্কে, বাকিগুলো ফাইল ক্যাবিনেটে (disk/swap)। হঠাৎ ক্যাবিনেটের একটা ফাইল দরকার হলে, ডেস্কের কোনো একটা সরিয়ে সেটা এনে রাখেন। এই "ক্যাবিনেট থেকে আনা"-র মুহূর্তটাই <strong>page fault</strong>।</p></div>
+    <h3>Page Fault-এ কী ঘটে</h3>
+    <p>CPU একটা virtual ঠিকানা চাইল, কিন্তু page table বলছে page টা এখন RAM-এ নেই (present বিট = ০, disk-এ আছে)। তখন:</p>
+    <ol>
+      <li>হার্ডওয়্যার একটা <strong>page fault</strong> (একধরনের trap) তোলে, OS-এ নিয়ন্ত্রণ যায়</li>
+      <li>OS disk-এ খুঁজে page টা বের করে</li>
+      <li>RAM-এ একটা খালি frame বাছে (না থাকলে একটা page সরায় — পরের অধ্যায়)</li>
+      <li>disk থেকে page টা সেই frame-এ আনে</li>
+      <li>page table আপডেট করে (present = ১)</li>
+      <li>যে instruction fault করেছিল, সেটা আবার চালায় — এবার সফল হয়</li>
+    </ol>
+    <div class="box note"><span class="tag">💡 fault মানে সবসময় ভুল নয়</span>
+    "Fault" শুনলে ভুল মনে হয়, কিন্তু page fault একটা <strong>স্বাভাবিক ও প্রত্যাশিত</strong> ঘটনা। এটা OS-কে সুযোগ দেয় নীরবে disk থেকে ডেটা আনার। প্রোগ্রাম টেরও পায় না — শুধু সেই একটা অ্যাক্সেস একটু ধীর হয়। এই কৌশলে একটা প্রোগ্রাম RAM-এর চেয়ে অনেক বড় হতে পারে; শুধু সক্রিয় অংশটুকু RAM-এ থাকে।</div>
+    <div class="box warn"><span class="tag">⚠️ Thrashing — যখন সব ভেঙে পড়ে</span>
+    Disk RAM-এর চেয়ে হাজার গুণ ধীর। যদি একসাথে চলা প্রোগ্রামগুলোর মোট সক্রিয় memory (working set) RAM-এর চেয়ে বেশি হয়, তাহলে OS ক্রমাগত page swap করতে থাকে — একটা আনতে গিয়ে আরেকটা সরায়, যেটা সরাল সেটাই আবার লাগে। এই অবস্থায় CPU-র বেশিরভাগ সময় শুধু disk I/O-তে যায়, আসল কাজ প্রায় থেমে যায়। একে বলে <strong>thrashing</strong> — কম্পিউটার হঠাৎ ভয়ংকর ধীর হয়ে গেলে প্রায়ই এটাই কারণ (RAM কম, বেশি প্রোগ্রাম)।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Page fault কি সবসময় একটা error?</summary><p>না — এটা প্রায়ই স্বাভাবিক। OS এই সুযোগে disk থেকে দরকারি page RAM-এ আনে। প্রোগ্রাম চলতে থাকে, শুধু ওই অ্যাক্সেসটা ধীর হয়।</p></details>
+    <details><summary>Thrashing কেন হয়?</summary><p>সক্রিয় প্রোগ্রামগুলোর মোট working set RAM-এর চেয়ে বড় হলে। তখন OS অবিরাম page swap করে, CPU-র সময় প্রায় সব disk I/O-তে যায়, আসল কাজ থেমে যায়।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch7">
+    <div class="ch-head"><span class="ch-num">০৭</span><div><h2>Page Replacement</h2><div class="ch-sub">page-replacement</div></div></div>
+    <p class="lead">RAM ভরে গেছে, নতুন একটা page আনতে হবে — কিন্তু কোন পুরনো page সরাবেন? এই সিদ্ধান্ত গুরুত্বপূর্ণ, কারণ ভুল page সরালে সেটা আবার সাথে সাথে লাগবে (আরেকটা fault)।</p>
+    <h3>মূল অ্যালগরিদমগুলো</h3>
+    <table>
+      <tr><th>নীতি</th><th>ধারণা</th><th>সমস্যা</th></tr>
+      <tr><td><strong>Optimal (OPT)</strong></td><td>যে page সবচেয়ে দূর ভবিষ্যতে লাগবে, সেটা সরাও</td><td>ভবিষ্যৎ জানা অসম্ভব — শুধু তুলনার মাপকাঠি</td></tr>
+      <tr><td><strong>FIFO</strong></td><td>যে page সবচেয়ে আগে এসেছে, সেটা সরাও</td><td>বহু ব্যবহৃত page-ও সরে যেতে পারে</td></tr>
+      <tr><td><strong>LRU</strong></td><td>যে page সবচেয়ে বেশিক্ষণ ব্যবহৃত হয়নি, সেটা সরাও</td><td>নিখুঁত করা ব্যয়বহুল</td></tr>
+      <tr><td><strong>Clock</strong></td><td>LRU-র সস্তা আনুমানিক রূপ</td><td>নিখুঁত নয়, কিন্তু যথেষ্ট ভালো</td></tr>
+    </table>
+    <div class="box note"><span class="tag">💡 LRU কেন যুক্তিসঙ্গত — আবারও Locality</span>
+    LRU-র ধারণা: যা সম্প্রতি ব্যবহৃত হয়েছে, তা আবার শিগগির লাগবে (locality)। তাই যেটা অনেকক্ষণ ব্যবহার হয়নি, সেটা সরানোই নিরাপদ। বাস্তবে বেশিরভাগ প্রোগ্রামে এটা ভালো কাজ করে। কিন্তু নিখুঁত LRU-তে প্রতিটা অ্যাক্সেসে টাইমস্ট্যাম্প আপডেট করতে হয় — ব্যয়বহুল। তাই বাস্তব OS "Clock" (বা তার উন্নত রূপ) ব্যবহার করে।</div>
+    <div class="box deep"><span class="tag">🔬 গভীরে — Clock অ্যালগরিদম</span>
+    সব page একটা বৃত্তাকার তালিকায় (ঘড়ির মতো)। প্রতিটা page-এর একটা <strong>use বিট</strong> (accessed বিট) আছে — ব্যবহৃত হলে হার্ডওয়্যার ১ করে দেয়। একটা "কাঁটা" ঘুরতে থাকে: যে page-এ use বিট = ১, সেটাকে ০ করে এগিয়ে যায় (দ্বিতীয় সুযোগ দেয়); যে page-এ use বিট = ০ পায়, সেটাই সরায়। এভাবে সাম্প্রতিক ব্যবহৃত page বেঁচে যায়, আর পুরোটা টাইমস্ট্যাম্প রাখার খরচ ছাড়াই LRU-র কাছাকাছি ফল পাওয়া যায়। মার্জিত!</div>
+    <div class="box warn"><span class="tag">⚠️ Belady's Anomaly — একটা অদ্ভুত ব্যাপার</span>
+    সাধারণত বেশি RAM = কম page fault, তাই না? FIFO-তে সবসময় নয়! কিছু ক্ষেত্রে <strong>বেশি frame দিলে FIFO-তে page fault বেড়ে যায়</strong> — একে বলে Belady's Anomaly। এটা FIFO-র একটা দুর্বলতা প্রকাশ করে। LRU-তে এই সমস্যা নেই (এগুলোকে "stack algorithm" বলে)। পরীক্ষায় ও ইন্টারভিউতে এটা একটা প্রিয় প্রশ্ন।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Optimal অ্যালগরিদম বাস্তবে ব্যবহার করা যায় না কেন?</summary><p>এর জন্য ভবিষ্যৎ জানা লাগে (কোন page কখন লাগবে), যা অসম্ভব। এটা শুধু অন্য অ্যালগরিদম কতটা ভালো তা মাপার তাত্ত্বিক মাপকাঠি।</p></details>
+    <details><summary>Clock অ্যালগরিদম কীভাবে সস্তায় LRU-র কাছাকাছি যায়?</summary><p>প্রতিটা page-এর একটা use বিট রাখে। কাঁটা ঘুরে use বিট ১ পেলে ০ করে দ্বিতীয় সুযোগ দেয়, ০ পেলে সরায়। টাইমস্ট্যাম্প রাখার ব্যয় ছাড়াই সাম্প্রতিক page বাঁচে।</p></details>
+    <details><summary>Belady's Anomaly কী?</summary><p>FIFO-তে কখনো কখনো বেশি frame দিলে page fault বেড়ে যায় — স্বজ্ঞার বিপরীত। LRU-জাতীয় অ্যালগরিদমে হয় না।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch8">
+    <div class="ch-head"><span class="ch-num">০৮</span><div><h2>প্রজেক্ট — নিজের malloc লিখুন</h2><div class="ch-sub">build-malloc</div></div></div>
+    <p class="lead">এই মডিউলের সব ধারণা কাজে লাগানোর সময়। <code>malloc</code>/<code>free</code> আপনি হাজারবার ব্যবহার করেছেন — এবার নিজে লিখে দেখবেন heap কীভাবে কাজ করে, fragmentation কী, আর memory ব্যবস্থাপনা কেন কঠিন।</p>
+    <div class="box note"><span class="tag">🎯 malloc আসলে কী করে</span>
+    OS প্রোগ্রামকে একটা বড় heap দেয় (<code>brk</code>/<code>sbrk</code> বা <code>mmap</code> দিয়ে)। <code>malloc</code>-এর কাজ সেই বড় ব্লকটাকে ছোট ছোট টুকরোয় ভাগ করে চাহিদামতো দেওয়া, আর <code>free</code>-তে ফেরত নেওয়া টুকরো আবার ব্যবহারযোগ্য করা। অর্থাৎ malloc হলো <strong>heap-এর ভেতরের একজন ছোট ব্যবস্থাপক</strong>।</div>
+    <h3>মূল ধারণা — free list</h3>
+    <p>সবচেয়ে সাধারণ পদ্ধতি: খালি টুকরোগুলোর একটা linked list রাখা। প্রতিটা টুকরোর শুরুতে একটা ছোট <strong>header</strong> — কত বড়, আর free কিনা।</p>
+    <pre><span class="c">// প্রতিটা memory ব্লকের header</span>
+<span class="k">typedef struct</span> block {
+    <span class="k">size_t</span> size;           <span class="c">// এই ব্লক কত বড়</span>
+    <span class="k">int</span> free;              <span class="c">// খালি না ব্যবহৃত (1 = free)</span>
+    <span class="k">struct</span> block *next;    <span class="c">// পরের ব্লক</span>
+} block_t;</pre>
+    <h3>ধাপ ১ — একটা সরল allocator</h3>
+    <pre><span class="f">#include</span> <span class="s">&lt;unistd.h&gt;</span>   <span class="c">// sbrk</span>
+<span class="f">#include</span> <span class="s">&lt;stddef.h&gt;</span>
+
+<span class="k">static</span> block_t *head = NULL;   <span class="c">// free list-এর শুরু</span>
+
+<span class="k">void</span> *my_malloc(<span class="k">size_t</span> size) {
+    <span class="c">// ১. free list-এ যথেষ্ট বড় একটা খালি ব্লক খোঁজো (first-fit)</span>
+    block_t *cur = head;
+    <span class="k">while</span> (cur) {
+        <span class="k">if</span> (cur-&gt;free &amp;&amp; cur-&gt;size &gt;= size) {
+            cur-&gt;free = 0;
+            <span class="k">return</span> (cur + 1);   <span class="c">// header-এর পরের অংশ ফেরত দাও</span>
+        }
+        cur = cur-&gt;next;
+    }
+    <span class="c">// ২. না পেলে OS থেকে নতুন জায়গা নাও (sbrk heap বাড়ায়)</span>
+    block_t *blk = sbrk(<span class="k">sizeof</span>(block_t) + size);
+    blk-&gt;size = size;
+    blk-&gt;free = 0;
+    blk-&gt;next = head;
+    head = blk;
+    <span class="k">return</span> (blk + 1);
+}
+
+<span class="k">void</span> my_free(<span class="k">void</span> *ptr) {
+    <span class="k">if</span> (!ptr) <span class="k">return</span>;
+    block_t *blk = (block_t *)ptr - 1;  <span class="c">// header-এ ফিরে যাও</span>
+    blk-&gt;free = 1;                       <span class="c">// শুধু "খালি" চিহ্নিত করো</span>
+}</pre>
+    <div class="box lab"><span class="tag">🛠 চালান ও যাচাই করুন</span>
+    উপরের কোড একটা ফাইলে রেখে <code>main()</code>-এ কয়েকবার <code>my_malloc</code>/<code>my_free</code> ডাকুন, ফেরত পাওয়া pointer প্রিন্ট করুন। লক্ষ্য করুন — একটা free করার পর আবার সমান আকার চাইলে <strong>একই ঠিকানা</strong> ফিরে আসে (free list পুনঃব্যবহার করছে)।</div>
+    <h3>ধাপ ২ — যে সমস্যাগুলো সমাধান করতে হবে</h3>
+    <div class="box warn"><span class="tag">⚠️ Internal ও External Fragmentation</span>
+    <strong>Internal:</strong> ১০ byte চাইলেন, কিন্তু একটা ১০০ byte ব্লক দিলাম — ৯০ byte নষ্ট (ব্লকের <em>ভেতরে</em>)। সমাধান: বড় ব্লক পেলে <strong>ভাগ করা</strong> (splitting) — ১০ byte দিয়ে বাকি ৯০ byte নতুন free ব্লক বানানো।<br>
+    <strong>External:</strong> অনেকগুলো ছোট free ব্লক পাশাপাশি, কিন্তু একটাও যথেষ্ট বড় নয়। সমাধান: পাশাপাশি free ব্লকগুলো <strong>জোড়া লাগানো</strong> (coalescing) — <code>free</code>-র সময় পরের ব্লকও free হলে দুটো মিলিয়ে একটা বড় করা।</div>
+    <h3>চ্যালেঞ্জ — নিজে যোগ করুন</h3>
+    <div class="box lab"><span class="tag">🛠 ধাপে ধাপে উন্নত করুন</span>
+    <ol style="margin:6px 0 0">
+      <li><strong>Splitting:</strong> চাহিদার চেয়ে অনেক বড় ব্লক পেলে ভাগ করুন, বাকিটা free রাখুন</li>
+      <li><strong>Coalescing:</strong> <code>free</code>-তে পাশের free ব্লকের সাথে জোড়া লাগান</li>
+      <li><strong>Alignment:</strong> ফেরত ঠিকানা ৮ বা ১৬ byte-এ align করুন (অনেক CPU-তে দরকার)</li>
+      <li><strong>নীতি তুলনা:</strong> first-fit, best-fit, worst-fit — কোনটা কম fragmentation দেয় পরীক্ষা করুন</li>
+      <li><strong>calloc ও realloc:</strong> এই দুটোও implement করুন</li>
+    </ol></div>
+    <div class="box deep"><span class="tag">🔬 গভীরে — এই প্রজেক্ট কেন এত শিক্ষণীয়</span>
+    নিজে malloc লিখলে হঠাৎ অনেক কিছু পরিষ্কার হয়ে যায়: কেন <code>free</code> করা pointer আবার ব্যবহার করা বিপজ্জনক (use-after-free — ব্লকটা এখন অন্য কাউকে দেওয়া হয়ে থাকতে পারে), কেন <code>free</code>-র পর pointer <code>NULL</code> করা ভালো, কেন buffer overflow ভয়ংকর (পরের ব্লকের header নষ্ট হয়ে পুরো free list ভেঙে যেতে পারে), আর কেন memory leak হয় (free না করলে ব্লক চিরকাল "ব্যবহৃত" থেকে যায়)। এগুলো তত্ত্বে পড়া আর নিজে হাতে দেখা — আকাশ-পাতাল পার্থক্য।</div>
+    <div class="box lab"><span class="tag">🛠 তুলনা করুন আসলটার সাথে</span>
+    <code>valgrind ./your_program</code> চালিয়ে দেখুন আপনার allocator-এ leak আছে কিনা। আর আসল <code>malloc</code> কীভাবে আচরণ করে দেখতে একটা প্রোগ্রামে অনেকবার malloc/free করে <code>strace</code> দিয়ে দেখুন কখন <code>brk</code> বা <code>mmap</code> system call হয় — বুঝবেন glibc-এর malloc কখন OS থেকে নতুন memory নেয়, আর কখন নিজের কাছে থাকা free ব্লক পুনঃব্যবহার করে।</div>
+    <div class="box analogy" style="margin-top:40px;text-align:center;background:#e6eef5;border-color:#25608f">
+      <span class="tag" style="color:#25608f">🎓 মডিউল ৩ শেষ!</span>
+      আপনি এখন জানেন কেন virtual memory দরকার, address translation কীভাবে হয়, paging ও page table কীভাবে কাজ করে, TLB কেন performance-এর জন্য গুরুত্বপূর্ণ, multi-level table কীভাবে memory বাঁচায়, page fault ও swap কীভাবে RAM-এর সীমা ছাড়ায়, page replacement-এর নীতি — আর নিজে একটা malloc লিখে heap-এর ভেতরটা দেখেছেন।<br><br>
+      এখানেই Virtualization স্তম্ভ সম্পূর্ণ। পরের ধাপে <strong>মডিউল ৪ (Concurrency)</strong> — একসাথে অনেক thread চললে জিনিস কীভাবে ভাঙে, race condition, lock, deadlock, আর producer-consumer ও dining philosophers সমাধান।
+    </div>
+  </section>
+</main>
+</div>
+<script>
+  const links=[...document.querySelectorAll('#toc a')];
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+  const onScroll=()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<=120)idx=i;});links.forEach(l=>l.classList.remove('active'));links[idx]&&links[idx].classList.add('active');};
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+</script>
+</body>
+</html>
