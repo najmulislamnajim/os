@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>অপারেটিং সিস্টেম · মডিউল ৬ — নিজের OS বানানো</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#12100e;--paper:#f5f1e8;--paper2:#ece5d6;--line:#d6ccb6;--accent:#b8501f;--accent2:#7a4a1e;--brown:#7a4a1e;--teal:#1a6b5a;--blue:#25608f;--plum:#6a3d7a;--green:#3d6b2f;--muted:#6a6152;--code-bg:#1c1613;--code-ink:#ece2d8}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:18px;line-height:1.82}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace}
+  .wrap{display:flex;min-height:100vh}
+  aside{width:296px;flex-shrink:0;background:var(--paper2);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 20px}
+  main{flex:1;max-width:880px;margin:0 auto;padding:50px 50px 130px}
+  aside .brand{font-weight:700;font-size:1.02rem;line-height:1.35;color:var(--accent)}
+  aside .brand small{display:block;font-weight:400;font-size:.66rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;margin-top:7px}
+  aside nav{margin-top:20px}
+  aside nav a{display:block;text-decoration:none;color:var(--ink);padding:6px 11px;border-radius:7px;font-size:.87rem;margin-bottom:1px}
+  aside nav a .n{color:var(--accent);font-weight:600;font-family:'JetBrains Mono';font-size:.73rem;margin-right:7px}
+  aside nav a:hover{background:var(--paper)}
+  aside nav a.active{background:var(--accent);color:#fff}
+  aside nav a.active .n{color:#f2cdb5}
+  aside .modtag{font-size:.67rem;background:var(--accent2);color:#fff;padding:2px 9px;border-radius:20px;letter-spacing:.07em;display:inline-block;margin-top:13px}
+  .hero{border-bottom:2px solid var(--ink);padding-bottom:30px;margin-bottom:44px}
+  .hero .eyebrow{font-family:'JetBrains Mono';font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:15px}
+  .hero h1{font-size:2.8rem;line-height:1.08;margin:0 0 15px;font-weight:700;letter-spacing:-.6px}
+  .hero p{font-size:1.1rem;color:var(--muted);max-width:60ch;margin:0}
+  section.chapter{margin-bottom:72px;scroll-margin-top:20px}
+  .ch-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:26px}
+  .ch-head .ch-num{font-family:'JetBrains Mono';font-size:2.1rem;font-weight:600;color:var(--accent);line-height:1}
+  .ch-head h2{font-size:1.72rem;margin:0;font-weight:700;letter-spacing:-.3px}
+  .ch-head .ch-sub{font-size:.79rem;color:var(--muted);font-family:'JetBrains Mono'}
+  h3{font-size:1.24rem;margin:34px 0 12px;font-weight:600}
+  h4{font-size:1.02rem;margin:22px 0 8px;font-weight:600;color:var(--accent)}
+  p{margin:12px 0}
+  .lead{font-size:1.04rem}
+  .box{border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.95rem;line-height:1.72}
+  .analogy{background:#fff5e6;border:1px solid #e6cb9c}
+  .analogy .tag{font-weight:700;color:var(--accent);font-size:.79rem;display:block;margin-bottom:5px}
+  .note{background:#e7f1ee;border:1px solid #b2d4ca}
+  .note .tag{font-weight:700;color:var(--teal);font-size:.79rem;display:block;margin-bottom:5px}
+  .deep{background:#e6eef5;border:1px solid #adc9dc}
+  .deep .tag{font-weight:700;color:var(--blue);font-size:.79rem;display:block;margin-bottom:5px}
+  .warn{background:#fceadf;border:1px solid #ecbb9d}
+  .warn .tag{font-weight:700;color:var(--accent);font-size:.79rem;display:block;margin-bottom:5px}
+  .lab{background:#eaf1e4;border:1px solid #b6cfa2}
+  .lab .tag{font-weight:700;color:var(--green);font-size:.79rem;display:block;margin-bottom:5px}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:.81rem;line-height:1.62;margin:16px 0}
+  pre .c{color:#9b8f85}
+  pre .k{color:#e0a878}
+  pre .s{color:#c8b88a}
+  pre .f{color:#8fb8e0}
+  p code,li code,td code{background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.83em;color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.88rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--paper2);font-weight:600;font-size:.82rem}
+  tr:hover td{background:#fff8ee}
+  figure{margin:26px 0}
+  .diagram{background:#fffdf7;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center}
+  figcaption{font-size:.82rem;color:var(--muted);text-align:center;margin-top:10px;font-style:italic}
+  svg{max-width:100%;height:auto}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  .quiz{background:var(--paper2);border:1px dashed var(--accent);border-radius:12px;padding:18px 22px;margin:24px 0}
+  .quiz .tag{font-weight:700;color:var(--accent);display:block;margin-bottom:8px;font-size:.86rem}
+  .quiz summary{cursor:pointer;font-weight:500;margin:8px 0}
+  .quiz details p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
+  .toc-hint{color:var(--muted);font-size:.76rem;margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+  @media(max-width:900px){aside{display:none}main{padding:28px 20px 90px}.hero h1{font-size:1.95rem}body{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+  <div class="brand">অপারেটিং সিস্টেম<small>মডিউল ৬ · নিজের OS</small></div>
+  <span class="modtag">BUILD YOUR OWN</span>
+  <nav id="toc">
+    <a href="#ch0"><span class="n">০০</span>শুরুর কথা</a>
+    <a href="#ch1"><span class="n">০১</span>কেন xv6</a>
+    <a href="#ch2"><span class="n">০২</span>xv6 চালানো</a>
+    <a href="#ch3"><span class="n">০৩</span>xv6-এর গঠন</a>
+    <a href="#ch4"><span class="n">০৪</span>নতুন syscall যোগ</a>
+    <a href="#ch5"><span class="n">০৫</span>Scheduler বদলানো</a>
+    <a href="#ch6"><span class="n">০৬</span>GDB দিয়ে debug</a>
+    <a href="#ch7"><span class="n">০৭</span>MIT 6.1810 পথ</a>
+    <a href="#ch8"><span class="n">০৮</span>এরপর কোথায়</a>
+  </nav>
+  <div class="toc-hint">সবুজ = হাতে-কলমে ল্যাব। নীল = গভীর প্রযুক্তিগত অংশ। এটাই চূড়ান্ত মডিউল — সব একসাথে।</div>
+</aside>
+<main>
+  <div class="hero">
+    <div class="eyebrow">মডিউল ৬ · চূড়ান্ত ধাপ</div>
+    <h1>নিজের OS<br>বানানো</h1>
+    <p>এতদিন যা যা শিখেছেন — process, memory, concurrency, file system — এবার সেসব একটা আসল, চলমান kernel-এ দেখবেন। xv6 পড়ে, পরিবর্তন করে, আর নতুন feature যোগ করে আপনি "বুঝেছি" থেকে "পারি"-তে পৌঁছাবেন।</p>
+  </div>
+
+  <section class="chapter" id="ch0">
+    <div class="ch-head"><span class="ch-num">০০</span><div><h2>শুরুর কথা</h2><div class="ch-sub">orientation</div></div></div>
+    <p class="lead">এটাই যাত্রার শেষ ধাপ, আর সবচেয়ে ফলদায়ক। এতদিন প্রতিটা ধারণা আলাদা করে শিখেছেন আর ছোট প্রজেক্টে দেখেছেন। এবার একটা <strong>সম্পূর্ণ OS</strong>-এ সব একসাথে কীভাবে জোড়া লাগে দেখবেন — আর নিজে সেই kernel পরিবর্তন করবেন।</p>
+    <div class="box note"><span class="tag">🧭 এই মডিউল আগেরগুলো থেকে আলাদা</span>
+    আগের মডিউলগুলো ছিল ধারণা + ছোট প্রজেক্ট। এটা মূলত একটা <strong>পথনির্দেশ</strong> — কারণ আসল kernel hacking-এর সেরা উপায় হলো MIT-র তৈরি করা lab অনুসরণ করা। আমি এখানে xv6-এর মূল ধারণা, কীভাবে শুরু করবেন, প্রথম কয়েকটা পরিবর্তন কীভাবে করবেন — সব দেখাবো, যাতে MIT 6.1810-এ ঢুকতে সহজ হয়। এটা মানচিত্র; আসল অভিযান আপনার।</div>
+    <div class="box warn"><span class="tag">⚠️ আগের মডিউলগুলো আগে শেষ করুন</span>
+    এই মডিউল ধরে নেয় আপনি process (মডিউল ২), memory/paging (মডিউল ৩), আর file system (মডিউল ৫) বুঝেছেন — কারণ xv6-এ এই সবকিছুর আসল বাস্তবায়ন একসাথে দেখবেন। যদি কোনোটা ঝাপসা থাকে, ফিরে গিয়ে ঝালিয়ে নিন। এখানে সব একসাথে আসবে।</div>
+  </section>
+
+  <section class="chapter" id="ch1">
+    <div class="ch-head"><span class="ch-num">০১</span><div><h2>কেন xv6?</h2><div class="ch-sub">why-xv6</div></div></div>
+    <p class="lead">Linux kernel-এর কোড লক্ষ লক্ষ লাইন — একজন শিক্ষার্থীর পক্ষে বোঝা অসম্ভব। তাই MIT একটা ছোট, শিক্ষামূলক OS বানিয়েছে: <strong>xv6</strong>। এটাই kernel শেখার আদর্শ প্রবেশপথ।</p>
+    <div class="box note"><span class="tag">📦 xv6 কী</span>
+    xv6 হলো MIT-র তৈরি একটা ছোট UNIX-সদৃশ operating system, শিক্ষার জন্য। এটা ১৯৭০-এর Unix V6-এর একটা আধুনিক পুনর্লিখন, চলে RISC-V প্রসেসরে (QEMU emulator-এ)। পুরো কোড <strong>মাত্র ~৯০০০ লাইন</strong> — একজন মানুষ কয়েক সপ্তাহে পুরোটা পড়ে বুঝতে পারে। অথচ এতে একটা আসল OS-এর সব মূল অংশ আছে: process, scheduling, virtual memory, system call, interrupt, file system।</div>
+    <div class="box analogy"><span class="tag">🚗 উপমা — শেখার গাড়ি</span>
+    আপনি ফর্মুলা-১ গাড়ি দিয়ে ড্রাইভিং শেখেন না — একটা সরল গাড়ি দিয়ে শেখেন, যার প্রতিটা অংশ বোঝা যায়। Linux হলো ফর্মুলা-১ (শক্তিশালী কিন্তু বিশাল ও জটিল); xv6 হলো সেই শেখার গাড়ি — ছোট, সরল, প্রতিটা অংশ দেখা যায়। শেখার পর ফর্মুলা-১ (Linux) বোঝা সহজ হয়।</div>
+    <h3>xv6-এ আগের মডিউলগুলো যেভাবে ফিরে আসে</h3>
+    <table>
+      <tr><th>আপনি শিখেছেন</th><th>xv6-এ যেখানে দেখবেন</th></tr>
+      <tr><td>Process, fork/exec (মডিউল ২)</td><td><code>proc.c</code>, <code>exec.c</code></td></tr>
+      <tr><td>Scheduling (মডিউল ২)</td><td><code>proc.c</code>-এর <code>scheduler()</code></td></tr>
+      <tr><td>Virtual memory, paging (মডিউল ৩)</td><td><code>vm.c</code>, <code>kalloc.c</code></td></tr>
+      <tr><td>Lock, concurrency (মডিউল ৪)</td><td><code>spinlock.c</code>, <code>sleeplock.c</code></td></tr>
+      <tr><td>File system, inode (মডিউল ৫)</td><td><code>fs.c</code>, <code>file.c</code></td></tr>
+      <tr><td>System call, trap (মডিউল ১)</td><td><code>syscall.c</code>, <code>trap.c</code></td></tr>
+    </table>
+    <div class="box note"><span class="tag">💡 এটাই সবচেয়ে বড় প্রাপ্তি</span>
+    এতদিন ধারণাগুলো আলাদা আলাদা শিখেছেন। xv6-এ দেখবেন সেগুলো একটা বাস্তব সিস্টেমে কীভাবে <strong>একসাথে</strong> কাজ করে — কীভাবে fork একটা নতুন page table বানায়, কীভাবে system call trap-এ পরিণত হয়, কীভাবে file system lock ব্যবহার করে। বিচ্ছিন্ন টুকরোগুলো হঠাৎ একটা সম্পূর্ণ ছবিতে জোড়া লাগবে।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>Linux-এর বদলে xv6 দিয়ে শেখা কেন ভালো?</summary><p>Linux লক্ষ লক্ষ লাইন — একজনের পক্ষে বোঝা অসম্ভব। xv6 মাত্র ~৯০০০ লাইন, কিন্তু একটা আসল OS-এর সব মূল অংশ আছে। তাই পুরোটা পড়ে বোঝা সম্ভব।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch2">
+    <div class="ch-head"><span class="ch-num">০২</span><div><h2>xv6 চালানো</h2><div class="ch-sub">running-xv6</div></div></div>
+    <p class="lead">তত্ত্ব যথেষ্ট — এবার xv6 নিজের মেশিনে চালিয়ে দেখি। ভালো খবর: কোনো আসল হার্ডওয়্যার বা আলাদা মেশিন লাগবে না, সবকিছু QEMU emulator-এ চলে।</p>
+    <div class="box lab"><span class="tag">🛠 ধাপ ১ — টুল ইনস্টল</span>
+    RISC-V compiler ও QEMU দরকার। Ubuntu/WSL2-তে:
+    <pre><span class="k">sudo</span> apt update
+<span class="k">sudo</span> apt install git build-essential gdb-multiarch qemu-system-misc \
+     gcc-riscv64-linux-gnu binutils-riscv64-linux-gnu</pre>
+    (Mac-এ Homebrew দিয়ে riscv toolchain ও qemu; MIT-র সাইটে বিস্তারিত নির্দেশ আছে।)</div>
+    <div class="box lab"><span class="tag">🛠 ধাপ ২ — কোড নামিয়ে চালান</span>
+    <pre><span class="c"># MIT-র xv6 (RISC-V সংস্করণ) নামান</span>
+<span class="k">git</span> clone https://github.com/mit-pdos/xv6-riscv.git
+<span class="k">cd</span> xv6-riscv
+
+<span class="c"># compile করে QEMU-তে চালান</span>
+<span class="k">make</span> qemu</pre>
+    কিছুক্ষণ পর দেখবেন xv6 boot হচ্ছে, আর একটা shell prompt আসছে:
+    <pre>xv6 kernel is booting
+
+init: starting sh
+$ </pre>
+    এটা আপনার নিজের মেশিনে চলা একটা সম্পূর্ণ OS! <code>ls</code>, <code>cat</code>, <code>echo</code> চালিয়ে দেখুন।</div>
+    <div class="box note"><span class="tag">🚪 QEMU থেকে বেরোনো</span>
+    QEMU বন্ধ করতে: <code>Ctrl+A</code> চাপুন, ছেড়ে দিন, তারপর <code>x</code>। (প্রথমবার অনেকে আটকে যায় — এটা মনে রাখুন!)</div>
+    <div class="box deep"><span class="tag">🔬 কী ঘটল — মডিউল ১-এর boot মনে আছে?</span>
+    <code>make qemu</code> দিলে: QEMU একটা virtual RISC-V কম্পিউটার তৈরি করে, xv6 kernel সেখানে boot করে (মডিউল ১-এর boot process — এখানে QEMU firmware → kernel), kernel প্রথম process <code>init</code> চালায় (PID 1, মডিউল ২-র মতো), <code>init</code> একটা shell চালায় (<code>sh</code>, ঠিক আপনার মডিউল ২ প্রজেক্টের মতো!)। আপনি যে shell বানিয়েছিলেন, xv6-এর <code>sh.c</code> তার-ই একটা পূর্ণ সংস্করণ — পড়ে দেখুন, চেনা লাগবে।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>xv6 চালাতে আসল হার্ডওয়্যার লাগে?</summary><p>না — QEMU একটা virtual RISC-V কম্পিউটার emulate করে, তার উপর xv6 চলে। সব আপনার সাধারণ মেশিনেই।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch3">
+    <div class="ch-head"><span class="ch-num">০৩</span><div><h2>xv6-এর গঠন</h2><div class="ch-sub">xv6-structure</div></div></div>
+    <p class="lead">কোড পরিবর্তন করার আগে জানা দরকার কোথায় কী আছে। xv6-এর কোড পরিষ্কারভাবে সাজানো — প্রতিটা ফাইলের একটা নির্দিষ্ট দায়িত্ব।</p>
+    <h3>মূল ফাইলগুলো (kernel/ ফোল্ডারে)</h3>
+    <table>
+      <tr><th>ফাইল</th><th>দায়িত্ব</th><th>মডিউল</th></tr>
+      <tr><td><code>proc.c</code></td><td>process, fork, scheduler, context switch</td><td>২</td></tr>
+      <tr><td><code>exec.c</code></td><td>নতুন প্রোগ্রাম লোড করা (exec)</td><td>২</td></tr>
+      <tr><td><code>vm.c</code></td><td>virtual memory, page table</td><td>৩</td></tr>
+      <tr><td><code>kalloc.c</code></td><td>physical memory বরাদ্দ (page allocator)</td><td>৩</td></tr>
+      <tr><td><code>trap.c</code></td><td>interrupt, trap, system call এন্ট্রি</td><td>১</td></tr>
+      <tr><td><code>syscall.c</code></td><td>system call টেবিল ও dispatch</td><td>১</td></tr>
+      <tr><td><code>sysproc.c</code></td><td>process-সম্পর্কিত syscall বাস্তবায়ন</td><td>২</td></tr>
+      <tr><td><code>fs.c</code></td><td>file system (inode, block)</td><td>৫</td></tr>
+      <tr><td><code>file.c</code></td><td>file descriptor স্তর</td><td>৫</td></tr>
+      <tr><td><code>spinlock.c</code></td><td>lock (concurrency)</td><td>৪</td></tr>
+    </table>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <text x="280" y="20" text-anchor="middle" font-size="12" font-weight="600">xv6-এর স্তর (উপর থেকে নিচে)</text>
+        <rect x="130" y="35" width="300" height="34" rx="6" fill="#fff5e6" stroke="#b8501f"/>
+        <text x="280" y="56" text-anchor="middle" font-size="10.5" font-weight="600">User প্রোগ্রাম (sh, ls, cat)</text>
+        <rect x="130" y="76" width="300" height="34" rx="6" fill="#e7f1ee" stroke="#1a6b5a"/>
+        <text x="280" y="97" text-anchor="middle" font-size="10.5" font-weight="600">System call ইন্টারফেস (syscall.c)</text>
+        <rect x="60" y="117" width="200" height="60" rx="6" fill="#e6eef5" stroke="#25608f"/>
+        <text x="160" y="137" text-anchor="middle" font-size="10" font-weight="600">Process ব্যবস্থা</text>
+        <text x="160" y="153" text-anchor="middle" font-size="8.5" fill="#6a6152">proc.c, exec.c</text>
+        <text x="160" y="167" text-anchor="middle" font-size="8.5" fill="#6a6152">scheduler, trap.c</text>
+        <rect x="300" y="117" width="200" height="60" rx="6" fill="#efe9f2" stroke="#6a3d7a"/>
+        <text x="400" y="137" text-anchor="middle" font-size="10" font-weight="600">Memory ও FS</text>
+        <text x="400" y="153" text-anchor="middle" font-size="8.5" fill="#6a6152">vm.c, kalloc.c</text>
+        <text x="400" y="167" text-anchor="middle" font-size="8.5" fill="#6a6152">fs.c, file.c</text>
+        <rect x="130" y="184" width="300" height="34" rx="6" fill="#eaf1e4" stroke="#3d6b2f"/>
+        <text x="280" y="205" text-anchor="middle" font-size="10.5" font-weight="600">হার্ডওয়্যার (QEMU RISC-V)</text>
+        <text x="280" y="238" text-anchor="middle" font-size="9" fill="#6a6152">প্রতিটা স্তর আপনার আগের মডিউলগুলোর সাথে মেলে</text>
+      </svg>
+    </div><figcaption>xv6-এর স্তরবিন্যাস — user থেকে হার্ডওয়্যার পর্যন্ত</figcaption></figure>
+    <div class="box lab"><span class="tag">🛠 প্রথমে যা পড়বেন</span>
+    পুরো kernel একবারে পড়তে যাবেন না। এই ক্রমে শুরু করুন: (১) <code>user/sh.c</code> — চেনা shell, আপনার প্রজেক্টের মতো। (২) <code>user/ls.c</code> — একটা সরল user প্রোগ্রাম। (৩) <code>kernel/proc.h</code> — process struct (আপনার PCB!)। (৪) <code>kernel/syscall.c</code> — কীভাবে syscall dispatch হয়। ছোট, চেনা জিনিস দিয়ে শুরু করলে আত্মবিশ্বাস আসে।</div>
+    <div class="box note"><span class="tag">📖 সঙ্গী বই</span>
+    MIT একটা বিনামূল্যে বই দেয় — <strong>"xv6: a simple, Unix-like teaching operating system"</strong> (PDF)। এটা xv6-এর কোড লাইন ধরে ধরে ব্যাখ্যা করে। কোড পড়ার পাশে এই বই রাখুন — কোন অংশ কী করছে বুঝতে অমূল্য। এটাই xv6 শেখার সরকারি গাইড।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>process struct (PCB) xv6-এর কোথায়?</summary><p><code>kernel/proc.h</code>-এ <code>struct proc</code>। এটাই মডিউল ২-তে শেখা PCB-র আসল বাস্তবায়ন — state, page table, trapframe, খোলা ফাইল সব এখানে।</p></details>
+    <details><summary>xv6 পড়া শুরু করার ভালো জায়গা কোথায়?</summary><p>চেনা user প্রোগ্রাম দিয়ে — <code>sh.c</code> (shell), <code>ls.c</code>। তারপর ধীরে ধীরে kernel-এ (proc.h, syscall.c)। ছোট চেনা জিনিস থেকে বড় দিকে।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch4">
+    <div class="ch-head"><span class="ch-num">০৪</span><div><h2>নতুন System Call যোগ করা</h2><div class="ch-sub">adding-a-syscall</div></div></div>
+    <p class="lead">এটাই প্রথম আসল kernel hacking — আর সবচেয়ে শিক্ষণীয়। একটা নতুন system call যোগ করে আপনি দেখবেন user প্রোগ্রাম থেকে kernel পর্যন্ত পুরো পথটা কীভাবে জোড়া। মডিউল ১-এর system call তত্ত্ব এখানে হাতে-কলমে।</p>
+    <div class="box note"><span class="tag">🎯 লক্ষ্য — একটা সরল syscall</span>
+    ধরা যাক আমরা একটা <code>getreadcount()</code> syscall বানাবো, যা বলবে বুট হওয়ার পর কতবার <code>read</code> syscall ডাকা হয়েছে। সরল, কিন্তু এটা করতে গিয়ে syscall-এর <strong>পুরো শৃঙ্খল</strong> ছুঁতে হবে — সেটাই আসল শিক্ষা।</div>
+    <h3>একটা syscall যোগ করতে যে ফাইলগুলো ছুঁতে হয়</h3>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg" font-family="Hind Siliguri, sans-serif">
+        <defs><marker id="s6" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#b8501f"/></marker></defs>
+        <g font-size="9">
+          <rect x="30" y="40" width="150" height="40" rx="6" fill="#fff5e6" stroke="#b8501f"/>
+          <text x="105" y="58" text-anchor="middle" font-weight="600">user/user.h</text>
+          <text x="105" y="72" text-anchor="middle" font-size="8" fill="#6a6152">syscall-এর ঘোষণা</text>
+          <rect x="30" y="100" width="150" height="40" rx="6" fill="#fff5e6" stroke="#b8501f"/>
+          <text x="105" y="118" text-anchor="middle" font-weight="600">user/usys.pl</text>
+          <text x="105" y="132" text-anchor="middle" font-size="8" fill="#6a6152">user-side stub</text>
+          <rect x="200" y="70" width="150" height="40" rx="6" fill="#e7f1ee" stroke="#1a6b5a"/>
+          <text x="275" y="88" text-anchor="middle" font-weight="600">kernel/syscall.h</text>
+          <text x="275" y="102" text-anchor="middle" font-size="8" fill="#6a6152">syscall নম্বর</text>
+          <rect x="200" y="130" width="150" height="40" rx="6" fill="#e7f1ee" stroke="#1a6b5a"/>
+          <text x="275" y="148" text-anchor="middle" font-weight="600">kernel/syscall.c</text>
+          <text x="275" y="162" text-anchor="middle" font-size="8" fill="#6a6152">dispatch টেবিলে যোগ</text>
+          <rect x="380" y="100" width="150" height="40" rx="6" fill="#e6eef5" stroke="#25608f"/>
+          <text x="455" y="118" text-anchor="middle" font-weight="600">kernel/sysproc.c</text>
+          <text x="455" y="132" text-anchor="middle" font-size="8" fill="#6a6152">আসল বাস্তবায়ন</text>
+        </g>
+        <line x1="180" y1="60" x2="198" y2="82" stroke="#b8501f" stroke-width="1.3" marker-end="url(#s6)"/>
+        <line x1="180" y1="120" x2="198" y2="150" stroke="#b8501f" stroke-width="1.3" marker-end="url(#s6)"/>
+        <line x1="350" y1="150" x2="378" y2="128" stroke="#25608f" stroke-width="1.3" marker-end="url(#s6)"/>
+        <text x="280" y="210" text-anchor="middle" font-size="9.5" fill="#6a6152">user ঘোষণা → নম্বর → dispatch → বাস্তবায়ন</text>
+        <text x="280" y="228" text-anchor="middle" font-size="9" fill="#b8501f">একটা syscall পুরো স্তরটা ছোঁয় — এজন্যই শেখায় বেশি</text>
+      </svg>
+    </div><figcaption>একটা নতুন syscall যোগ করতে user থেকে kernel — পুরো শৃঙ্খল ছুঁতে হয়</figcaption></figure>
+    <h3>ধাপে ধাপে</h3>
+    <div class="box lab"><span class="tag">🛠 পাঁচটা ধাপ</span>
+    <strong>১. <code>user/user.h</code>:</strong> syscall-এর ঘোষণা যোগ করুন যাতে user প্রোগ্রাম ডাকতে পারে:
+    <pre><span class="k">int</span> getreadcount(<span class="k">void</span>);</pre>
+    <strong>২. <code>user/usys.pl</code>:</strong> একটা এন্ট্রি যোগ করুন (এই perl script user-side stub তৈরি করে, যা আসলে trap ঘটায়):
+    <pre>entry(<span class="s">"getreadcount"</span>);</pre>
+    <strong>৩. <code>kernel/syscall.h</code>:</strong> একটা নতুন syscall নম্বর দিন:
+    <pre><span class="f">#define</span> SYS_getreadcount 22</pre>
+    <strong>৪. <code>kernel/syscall.c</code>:</strong> dispatch টেবিলে যোগ করুন (আর extern ঘোষণা):
+    <pre><span class="k">extern</span> uint64 sys_getreadcount(<span class="k">void</span>);
+<span class="c">// syscalls[] টেবিলে:</span>
+[SYS_getreadcount] sys_getreadcount,</pre>
+    <strong>৫. <code>kernel/sysproc.c</code>:</strong> আসল কাজটা লিখুন:
+    <pre>uint64
+sys_getreadcount(<span class="k">void</span>) {
+    <span class="k">return</span> readcount;   <span class="c">// একটা global counter</span>
+}</pre>
+    (আর <code>read</code>-এর বাস্তবায়নে <code>readcount++</code> যোগ করতে হবে।)</div>
+    <div class="box lab"><span class="tag">🛠 পরীক্ষা করুন</span>
+    একটা ছোট user প্রোগ্রাম লিখুন (<code>user/rctest.c</code>) যা <code>getreadcount()</code> ডাকে ও প্রিন্ট করে, <code>Makefile</code>-এ যোগ করুন (<code>UPROGS</code> তালিকায়), <code>make qemu</code> দিয়ে চালান। xv6 prompt-এ <code>rctest</code> চালালে read count দেখবেন — আপনার নিজের বানানো syscall কাজ করছে!</div>
+    <div class="box deep"><span class="tag">🔬 গভীরে — আপনি ঠিক কী করলেন</span>
+    এই ছোট কাজটায় মডিউল ১-এর পুরো তত্ত্ব জীবন্ত হলো: user প্রোগ্রাম <code>getreadcount()</code> ডাকল → usys.pl-এর তৈরি stub একটা <code>ecall</code> instruction চালাল (RISC-V-এর trap, মডিউল ১) → CPU kernel mode-এ গেল, <code>trap.c</code>-এ পৌঁছাল → <code>syscall.c</code> নম্বর দেখে সঠিক function খুঁজল → <code>sys_getreadcount()</code> চলল → ফল register-এ রেখে user mode-এ ফিরল। মডিউল ১-এ যে "system call = নিয়ন্ত্রিত দরজা" শিখেছিলেন, তার প্রতিটা ইট এখানে ছুঁয়েছেন।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>একটা syscall যোগ করতে কেন এতগুলো ফাইল ছুঁতে হয়?</summary><p>কারণ syscall user ও kernel-এর সীমানা পার করে — user-side stub (ঘোষণা, trap ঘটানো), একটা নম্বর (kernel চেনার জন্য), dispatch টেবিল (নম্বর→function), আর আসল বাস্তবায়ন। পুরো পথটাই সংযুক্ত করতে হয়।</p></details>
+    <details><summary>user প্রোগ্রামের syscall কীভাবে kernel-এ পৌঁছায়?</summary><p>usys.pl-এর তৈরি stub একটা trap instruction (<code>ecall</code>) চালায়, যা CPU-কে kernel mode-এ নিয়ে trap handler-এ পাঠায়। সেখান থেকে syscall.c নম্বর দেখে সঠিক function ডাকে।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch5">
+    <div class="ch-head"><span class="ch-num">০৫</span><div><h2>Scheduler বদলানো</h2><div class="ch-sub">changing-the-scheduler</div></div></div>
+    <p class="lead">দ্বিতীয় ক্লাসিক kernel hack — scheduler পরিবর্তন। xv6 ডিফল্টে একটা সরল round-robin ব্যবহার করে। এটা বদলে আপনি মডিউল ২-এর scheduling তত্ত্ব বাস্তবে প্রয়োগ করবেন।</p>
+    <div class="box note"><span class="tag">🔍 xv6-এর বর্তমান scheduler</span>
+    <code>kernel/proc.c</code>-এর <code>scheduler()</code> function দেখুন — এটা আশ্চর্যজনকভাবে সরল। এটা শুধু process টেবিল ধরে ধরে ঘোরে, একটা RUNNABLE process পেলে তাকে চালায়, timer interrupt এলে পরেরটায় যায়। এটাই বিশুদ্ধ round-robin (মডিউল ২)। মাত্র কয়েক লাইন কোড!</div>
+    <div class="box lab"><span class="tag">🛠 প্রজেক্ট — priority scheduling যোগ করুন</span>
+    <ol style="margin:6px 0 0">
+      <li><code>struct proc</code>-এ (proc.h) একটা <code>priority</code> ফিল্ড যোগ করুন</li>
+      <li>একটা নতuন syscall <code>setpriority(int)</code> বানান (অধ্যায় ৪-এর পদ্ধতিতে) — process নিজের priority সেট করতে পারবে</li>
+      <li><code>scheduler()</code> বদলান — শুধু পরেরটা না নিয়ে, সবচেয়ে উঁচু priority-র RUNNABLE process বাছুন</li>
+      <li>পরীক্ষা করুন: ভিন্ন priority-র কয়েকটা process চালিয়ে দেখুন উঁচুটা বেশি CPU পাচ্ছে</li>
+    </ol></div>
+    <div class="box deep"><span class="tag">🔬 আরও উচ্চাভিলাষী — MLFQ বা Lottery</span>
+    আত্মবিশ্বাস এলে মডিউল ২-এর উন্নত scheduler বাস্তবায়ন করুন। <strong>Lottery scheduling:</strong> প্রতিটা process কিছু "টিকিট" পায়, scheduler এলোমেলোভাবে একটা টিকিট তোলে — বেশি টিকিট = বেশি সুযোগ, কিন্তু কেউ পুরোপুরি বঞ্চিত হয় না। বাস্তবায়ন সহজ ও মার্জিত। <strong>MLFQ:</strong> কয়েকটা priority queue, আচরণ দেখে priority সমন্বয় (মডিউল ২)। এগুলো MIT 6.1810-র বাইরের চ্যালেঞ্জ, কিন্তু অসাধারণ শেখায় — কারণ আপনাকে scheduler, timer interrupt, আর process state একসাথে সামলাতে হবে।</div>
+    <div class="box warn"><span class="tag">⚠️ এখানে lock-এর কথা মনে রাখুন</span>
+    Scheduler ছোঁয়া মানে concurrency-র গভীরে ঢোকা (মডিউল ৪)। process টেবিল একটা শেয়ার্ড রিসোর্স — একাধিক CPU একসাথে scheduler চালায়। তাই xv6-এ প্রতিটা process-এর একটা lock আছে, আর scheduler সেগুলো সাবধানে নেয়-ছাড়ে। কোড বদলানোর সময় lock-এর নিয়ম না মানলে race condition বা deadlock হবে। মডিউল ৪ এখানে সরাসরি কাজে লাগবে — এটাই সব একসাথে আসার জায়গা।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>xv6-এর ডিফল্ট scheduler কোন অ্যালগরিদম?</summary><p>সরল round-robin — process টেবিল ধরে ঘোরে, প্রতিটা RUNNABLE process-কে পালা করে সুযোগ দেয়, timer interrupt-এ পরেরটায় যায়।</p></details>
+    <details><summary>Scheduler বদলাতে গেলে কেন concurrency সাবধানতা লাগে?</summary><p>process টেবিল একাধিক CPU-র শেয়ার্ড রিসোর্স। lock ঠিকমতো ব্যবহার না করলে race condition বা deadlock হবে (মডিউল ৪)। xv6-এর lock নিয়ম মেনে চলতে হয়।</p></details>
+    </div>
+  </section>
+  <section class="chapter" id="ch6">
+    <div class="ch-head"><span class="ch-num">০৬</span><div><h2>GDB দিয়ে Kernel Debug করা</h2><div class="ch-sub">debugging-with-gdb</div></div></div>
+    <p class="lead">Kernel-এ বাগ ধরা কঠিন — <code>printf</code> সবসময় যথেষ্ট নয়। ভালো খবর: QEMU + GDB দিয়ে আপনি চলন্ত kernel-কে থামিয়ে, লাইন ধরে ধরে দেখতে পারেন কী ঘটছে। এটা kernel hacking-এর অপরিহার্য দক্ষতা।</p>
+    <div class="box lab"><span class="tag">🛠 GDB চালু করা</span>
+    দুটো টার্মিনাল লাগবে। প্রথমটায়:
+    <pre><span class="k">make</span> qemu-gdb</pre>
+    এটা xv6 চালু করে কিন্তু GDB-র সংযোগের জন্য অপেক্ষা করে। দ্বিতীয় টার্মিনালে (xv6-riscv ফোল্ডারে):
+    <pre>gdb-multiarch kernel/kernel</pre>
+    এখন GDB kernel-এর সাথে যুক্ত — breakpoint বসাতে, variable দেখতে, লাইন ধরে চলতে পারবেন।</div>
+    <div class="box lab"><span class="tag">🛠 কাজের GDB কমান্ড</span>
+    <pre>break syscall          <span class="c"># syscall function-এ থামো</span>
+continue               <span class="c"># চলতে দাও (breakpoint পর্যন্ত)</span>
+next / step            <span class="c"># এক লাইন এগোও</span>
+print p-&gt;pid           <span class="c"># একটা variable দেখো</span>
+backtrace              <span class="c"># কোন পথে এখানে এলাম</span>
+info registers         <span class="c"># সব register</span></pre>
+    যেমন — অধ্যায় ৪-এর নিজের syscall-এ breakpoint বসিয়ে দেখুন সত্যিই সেখানে পৌঁছাচ্ছে কিনা, argument কী আসছে।</div>
+    <div class="box deep"><span class="tag">🔬 কেন এটা এত শক্তিশালী</span>
+    এতদিন যা তত্ত্বে পড়েছেন — context switch, page table, trap — GDB দিয়ে সেগুলো <strong>ঘটতে দেখতে</strong> পারবেন। <code>swtch</code> (context switch) function-এ breakpoint বসিয়ে register-এর মান দেখুন প্রক্রিয়ার আগে-পরে; trap handler-এ থেমে দেখুন trapframe-এ কী সংরক্ষিত হলো। তত্ত্বকে চোখের সামনে ঘটতে দেখা — এর চেয়ে ভালো শেখার উপায় নেই। বাস্তব চাকরিতেও kernel/systems debugging-এ এই দক্ষতা অমূল্য।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>kernel debug করতে দুটো টার্মিনাল কেন লাগে?</summary><p>একটায় QEMU kernel চালায় (এবং GDB-র সংযোগের অপেক্ষা করে), আরেকটায় GDB সেই চলন্ত kernel-এর সাথে যুক্ত হয়ে নিয়ন্ত্রণ করে (breakpoint, লাইন-বাই-লাইন)।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch7">
+    <div class="ch-head"><span class="ch-num">০৭</span><div><h2>MIT 6.1810-র পথ</h2><div class="ch-sub">the-mit-path</div></div></div>
+    <p class="lead">এতক্ষণ যা শিখলেন তা আপনাকে xv6-এ ঢোকার প্রস্তুতি দিয়েছে। এবার আসল, কাঠামোবদ্ধ পথ — MIT-র 6.1810 কোর্স, যা পুরোপুরি বিনামূল্যে ও অনলাইনে উন্মুক্ত।</p>
+    <div class="box note"><span class="tag">🎓 MIT 6.1810 কী</span>
+    এটা MIT-র স্নাতক operating systems কোর্স (আগে 6.828 নামে পরিচিত)। এর সব উপকরণ উন্মুক্ত: লেকচার নোট, xv6 বই, আর — সবচেয়ে গুরুত্বপূর্ণ — একগুচ্ছ <strong>lab</strong>, যেখানে আপনি xv6-এ ধাপে ধাপে feature যোগ করেন। এগুলোই বিশ্বের হাজার হাজার শিক্ষার্থীর kernel শেখার পথ।</div>
+    <h3>Lab-গুলোর ধারা (আপনার মডিউলের সাথে মিলিয়ে)</h3>
+    <table>
+      <tr><th>Lab</th><th>কী করবেন</th><th>যে মডিউল কাজে লাগবে</th></tr>
+      <tr><td>Util</td><td>ছোট user প্রোগ্রাম (গা-গরম)</td><td>২</td></tr>
+      <tr><td>System calls</td><td>নতুন syscall যোগ (যেমন অধ্যায় ৪)</td><td>১, ২</td></tr>
+      <tr><td>Page tables</td><td>page table নিয়ে কাজ</td><td>৩</td></tr>
+      <tr><td>Traps</td><td>trap ও interrupt গভীরে</td><td>১</td></tr>
+      <tr><td>Copy-on-write</td><td>fork-কে দক্ষ করা (COW)</td><td>৩</td></tr>
+      <tr><td>Multithreading</td><td>user-level thread, lock</td><td>৪</td></tr>
+      <tr><td>Locks</td><td>lock নিয়ে concurrency</td><td>৪</td></tr>
+      <tr><td>File system</td><td>xv6 FS-এ feature যোগ</td><td>৫</td></tr>
+      <tr><td>mmap</td><td>memory-mapped file</td><td>৩, ৫</td></tr>
+    </table>
+    <div class="box note"><span class="tag">💡 লক্ষ্য করুন — এই কোর্সই সেই প্রস্তুতি</span>
+    টেবিলটা দেখুন — প্রতিটা lab আপনার কোনো না কোনো মডিউলের সাথে মেলে। এই ৬টা মডিউলে যা শিখেছেন, তা আপনাকে ঠিক এই lab-গুলোর জন্য তৈরি করেছে। এখন যখন "page table lab" করবেন, মডিউল ৩-এর ধারণা হাতে থাকায় আটকাবেন না — শুধু xv6-এর নির্দিষ্ট কোডে সেগুলো প্রয়োগ করবেন।</div>
+    <div class="box lab"><span class="tag">🛠 কীভাবে শুরু করবেন</span>
+    <ol style="margin:6px 0 0">
+      <li>"MIT 6.1810" খুঁজুন (সাম্প্রতিকতম সংস্করণের সাইট) — সব উন্মুক্ত</li>
+      <li>Lab পেজে যান, <code>util</code> lab দিয়ে শুরু করুন (git branch দেওয়া থাকে)</li>
+      <li>প্রতিটা lab-এর সাথে সংশ্লিষ্ট লেকচার ও xv6 বইয়ের অধ্যায় পড়ুন</li>
+      <li>ধৈর্য ধরুন — একটা lab কয়েক দিন লাগতে পারে, এটাই স্বাভাবিক</li>
+    </ol></div>
+    <div class="box warn"><span class="tag">⚠️ একটা পরামর্শ — আটকানো স্বাভাবিক</span>
+    Kernel lab কঠিন। ঘণ্টার পর ঘণ্টা একটা বাগে আটকে থাকা এই যাত্রার অংশ — লজ্জার কিছু নয়, বরং এখানেই সবচেয়ে গভীর শেখা হয়। GDB ব্যবহার করুন (অধ্যায় ৬), xv6 বই আবার পড়ুন, কোড আরেকবার মন দিয়ে দেখুন। প্রতিটা কঠিন বাগ পার হওয়ার পর আপনি আগের চেয়ে অনেক শক্তিশালী প্রোগ্রামার। "যা বানাতে পারবেন না, তা বুঝেছেন বলে ধরবেন না" — রোডম্যাপের এই কথাটাই এখানে সবচেয়ে সত্য।</div>
+    <div class="quiz"><span class="tag">🧠 যাচাই করুন</span>
+    <details><summary>MIT 6.1810-র lab-গুলো কীসের উপর ভিত্তি করে?</summary><p>xv6-এর উপর। প্রতিটা lab-এ xv6-এ ধাপে ধাপে feature যোগ করতে হয় — syscall, page table, lock, file system ইত্যাদি — যা আপনার এই ৬ মডিউলের ধারণার সরাসরি প্রয়োগ।</p></details>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch8">
+    <div class="ch-head"><span class="ch-num">০৮</span><div><h2>এরপর কোথায়</h2><div class="ch-sub">where-to-go-next</div></div></div>
+    <p class="lead">আপনি যদি এই ছয় মডিউল আর MIT 6.1810 শেষ করেন, তাহলে operating systems-এ আপনার একটা শক্ত ভিত্তি — অনেক পেশাদার প্রোগ্রামারের চেয়ে গভীর। এবার কোথায় যাবেন, তার কয়েকটা দিক।</p>
+    <h3>আরও গভীরে যাওয়ার পথ</h3>
+    <table>
+      <tr><th>আগ্রহ</th><th>পরবর্তী পদক্ষেপ</th></tr>
+      <tr><td>একদম শূন্য থেকে OS</td><td>OSDev wiki — bootloader থেকে নিজের OS</td></tr>
+      <tr><td>আধুনিক ভাষায় OS</td><td>"Writing an OS in Rust" (Philipp Oppermann)</td></tr>
+      <tr><td>আসল Linux kernel</td><td>Linux kernel-এ ছোট contribution, LKML পড়া</td></tr>
+      <tr><td>গভীর তত্ত্ব</td><td>উন্নত বই, গবেষণাপত্র (distributed OS, microkernel)</td></tr>
+      <tr><td>hardware-কাছাকাছি</td><td>embedded systems, RTOS (real-time OS)</td></tr>
+    </table>
+    <div class="box note"><span class="tag">💡 কিন্তু আসল লাভ অন্যখানে</span>
+    এই জ্ঞানের সবচেয়ে বড় মূল্য হয়তো নিজে OS বানানো নয় — বরং <strong>বাকি সব কিছু ভালো বোঝা</strong>। এখন আপনি জানেন কেন একটা প্রোগ্রাম ধীর (cache miss, page fault, context switch), কেন multithreaded কোডে অদ্ভুত বাগ (race condition), কেন database এভাবে ডিজাইন (journaling, fsync), কীভাবে কন্টেইনার কাজ করে (namespace, cgroup)। এই "নিচের স্তর দেখতে পারা"-ই আপনাকে অন্যদের থেকে আলাদা করবে — সিস্টেম ডিজাইন, ডিবাগিং, পারফরম্যান্স, সবখানে।</div>
+    <div class="box deep"><span class="tag">🔬 বাস্তব জগতে এই জ্ঞান</span>
+    যেসব জায়গায় এই OS জ্ঞান সরাসরি কাজে লাগে: <strong>ব্যাকএন্ড ইঞ্জিনিয়ারিং</strong> (concurrency, memory, I/O টিউনিং), <strong>DevOps/SRE</strong> (কন্টেইনার, cgroup, সিস্টেম ডিবাগিং), <strong>ডেটাবেস</strong> (storage engine, journaling, buffer cache), <strong>embedded/IoT</strong> (RTOS, সীমিত সম্পদ), <strong>নিরাপত্তা</strong> (privilege, memory protection), <strong>ক্লাউড অবকাঠামো</strong> (virtualization, hypervisor)। OS বোঝা মানে computing-এর মেরুদণ্ড বোঝা।</div>
+    <div class="box analogy" style="margin-top:44px;text-align:center;background:#fff5e6;border-color:#b8501f;padding:24px">
+      <span class="tag" style="color:#b8501f;font-size:.95rem">🎓 পুরো OS কোর্স সম্পূর্ণ!</span>
+      <p style="margin:10px 0 0;font-size:.97rem">আপনি একটা দীর্ঘ পথ পাড়ি দিয়েছেন — <strong>প্ল্যান থেকে ছয়টা মডিউল</strong>:</p>
+      <p style="margin:12px 0;font-size:.92rem;line-height:2">
+      <strong>১ · ভিত্তি</strong> — kernel, syscall, interrupt, boot<br>
+      <strong>২ · Process</strong> — fork/exec, scheduling, নিজের shell<br>
+      <strong>৩ · Memory</strong> — paging, TLB, নিজের malloc<br>
+      <strong>৪ · Concurrency</strong> — race, lock, deadlock<br>
+      <strong>৫ · Storage</strong> — inode, journaling, নিজের file system<br>
+      <strong>৬ · নিজের OS</strong> — xv6, kernel hacking
+      </p>
+      <p style="margin:12px 0 0;font-size:.92rem">OSTEP-এর <strong>তিন স্তম্ভই</strong> (Virtualization · Concurrency · Persistence) শেষ। এখন শুধু পড়া নয় — আপনি shell, malloc, file system বানিয়েছেন, আর একটা আসল kernel পরিবর্তন করার পথ জানেন।</p>
+      <p style="margin:14px 0 0;font-size:.95rem;font-weight:600;color:#7a4a1e">যা বানাতে পারবেন, তা-ই সত্যিকারের বোঝা। এবার গিয়ে বানান। 🚀</p>
+    </div>
+  </section>
+</main>
+</div>
+<script>
+  const links=[...document.querySelectorAll('#toc a')];
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+  const onScroll=()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<=120)idx=i;});links.forEach(l=>l.classList.remove('active'));links[idx]&&links[idx].classList.add('active');};
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+</script>
+</body>
+</html>
