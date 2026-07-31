@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>অপারেটিং সিস্টেম · মডিউল ৩ — Memory ও Virtual Memory</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none'><style>.s{stroke:%237a4a1e}@media(prefers-color-scheme:dark){.s{stroke:%23f0d5be}}</style><g class='s' stroke-width='3' stroke-linecap='round'><rect x='4' y='4' width='32' height='32' rx='6'/><path d='M20 4v8M20 28v8M4 20h8M28 20h8'/></g><rect x='12' y='12' width='16' height='16' rx='2' fill='%23b8501f'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{--ink:#12100e;--paper:#f5f1e8;--paper2:#ece5d6;--line:#d6ccb6;--accent:#25608f;--accent2:#b8501f;--brown:#7a4a1e;--teal:#1a6b5a;--plum:#6a3d7a;--green:#3d6b2f;--muted:#6a6152;--code-bg:#14181c;--code-ink:#e5eaef}
@@ -68,12 +69,32 @@
   .quiz summary{cursor:pointer;font-weight:500;margin:8px 0}
   .quiz details p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
   .toc-hint{color:var(--muted);font-size:.76rem;margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+  aside .home{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--muted);font-size:.78rem;font-weight:500;margin-bottom:15px}
+  aside .home:hover{color:var(--accent)}
+  aside .modnav{margin-top:22px;border-top:1px solid var(--line);padding-top:15px}
+  aside .modnav .lbl{font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+  aside .modnav a{display:block;text-decoration:none;color:var(--muted);font-size:.81rem;padding:4px 11px;border-radius:6px}
+  aside .modnav a:hover{background:var(--paper);color:var(--ink)}
+  aside .modnav a.cur{color:var(--accent);font-weight:600;background:var(--paper)}
+  aside .modnav a .n{font-family:'JetBrains Mono';font-size:.7rem;margin-right:7px;opacity:.75}
+  .crumbs{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-bottom:24px}
+  .crumbs a{color:var(--muted);text-decoration:none}
+  .crumbs a:hover{color:var(--accent);text-decoration:underline}
+  .crumbs .sep{opacity:.45}
+  .crumbs .here{color:var(--ink);font-weight:600}
+  .pager{display:flex;gap:14px;margin-top:60px;border-top:1px solid var(--line);padding-top:28px;flex-wrap:wrap}
+  .pager a{flex:1 1 220px;text-decoration:none;color:inherit;background:#fffdf7;border:1px solid var(--line);border-radius:12px;padding:14px 18px;transition:border-color .15s,transform .15s}
+  .pager a:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .pager .dir{font-family:'JetBrains Mono';font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .pager .ttl{font-weight:600;margin-top:3px;font-size:.95rem}
+  .pager .nx{text-align:right}
   @media(max-width:900px){aside{display:none}main{padding:28px 20px 90px}.hero h1{font-size:1.95rem}body{font-size:17px}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <aside>
+  <a href="index.html" class="home">← কোর্স হোম</a>
   <div class="brand">অপারেটিং সিস্টেম<small>মডিউল ৩ · Memory</small></div>
   <span class="modtag">VIRTUALIZING MEMORY</span>
   <nav id="toc">
@@ -88,8 +109,23 @@
     <a href="#ch8"><span class="n">০৮</span>প্রজেক্ট: malloc</a>
   </nav>
   <div class="toc-hint">সবুজ = হাতে-কলমে ল্যাব। বেগুনি = গভীর প্রযুক্তিগত অংশ। প্রতিটা কোড নিজে চালিয়ে দেখুন।</div>
+  <div class="modnav">
+    <div class="lbl">কোর্সের সব অংশ</div>
+    <a href="plan.html">📍 রোডম্যাপ</a>
+    <a href="module1.html"><span class="n">০১</span>ভিত্তি</a>
+    <a href="module2.html"><span class="n">০২</span>Process</a>
+    <a href="module3.html" class="cur"><span class="n">০৩</span>Memory</a>
+    <a href="module4.html"><span class="n">০৪</span>Concurrency</a>
+    <a href="module5.html"><span class="n">০৫</span>Storage</a>
+    <a href="module6.html"><span class="n">০৬</span>নিজের OS</a>
+  </div>
 </aside>
 <main>
+  <div class="crumbs">
+    <a href="index.html">কোর্স হোম</a><span class="sep">/</span>
+    <a href="plan.html">রোডম্যাপ</a><span class="sep">/</span>
+    <span class="here">মডিউল ৩ · Memory ও Virtual Memory</span>
+  </div>
   <div class="hero">
     <div class="eyebrow">মডিউল ৩ · Virtualizing Memory</div>
     <h1>Memory ও<br>Virtual Memory</h1>
@@ -439,6 +475,10 @@
       এখানেই Virtualization স্তম্ভ সম্পূর্ণ। পরের ধাপে <strong>মডিউল ৪ (Concurrency)</strong> — একসাথে অনেক thread চললে জিনিস কীভাবে ভাঙে, race condition, lock, deadlock, আর producer-consumer ও dining philosophers সমাধান।
     </div>
   </section>
+  <nav class="pager">
+    <a href="module2.html"><div class="dir">← আগের অংশ</div><div class="ttl">মডিউল ২ · Process ও Scheduling</div></a>
+    <a class="nx" href="module4.html"><div class="dir">পরের অংশ →</div><div class="ttl">মডিউল ৪ · Concurrency</div></a>
+  </nav>
 </main>
 </div>
 <script>
